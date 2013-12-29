@@ -1,0 +1,140 @@
+#
+# Copyright (C) 2013-2014 Frederic Wang
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+"\\!" return "NEGSPACE";
+"\\," return "THINSPACE";
+"\\:" return "MEDSPACE";
+"\\;" return "THICKSPACE";
+"\\Big" return "BBIG";
+"\\Bigg" return "BBIGG";
+"\\Biggl" return "BBIGGL";
+"\\Biggr" return "BBIGG";
+"\\Bigl"  return "BBIGL";
+"\\Bigr" return "BBIG";
+"\\arccos"|"\\arcsin"|"\\arctan"|"\\arg"|"\\cos"|"\\cosh"|"\\cot"|"\\coth"|"\\csc"|"\\deg"|"\\dim"|"\\exp"|"\\hom"|"\\ker"|"\\lg"|"\\ln"|"\\log"|"\\sec"|"\\sin"|"\\sinh"|"\\tan"|"\\tanh"|"\\det"|"\\gcd"|"\\inf"|"\\lim"|"\\liminf"|"\\limsup"|"\\max"|"\\min"|"\\Pr"|"\\sup" { yytext = yytext.slice(1); return "F"; }
+"\\atop" return "TEXATOP";
+"\\bar" { yytext = "\u00AF"; return "ACCENTNS"; }
+"\\begin{Bmatrix}" return "BBMATRIX";
+"\\begin{Vmatrix}" return "VVMATRIX";
+"\\begin{aligned}" return "BALIGNED";
+"\\begin{array}" return "BARRAY";
+"\\begin{bmatrix}" return "BMATRIX";
+"\\begin{cases}" return "BCASES";
+"\\begin{gathered}" return "BGATHERED";
+"\\begin{matrix}" return "BMATRIX";
+"\\begin{pmatrix}" return "BPMATRIX";
+"\\begin{smallmatrix}" return "BSMALLMATRIX";
+"\\begin{split}" return "BALIGNED";
+"\\begin{vmatrix}" return "BVMATRIX";
+"\\bgcolor" { this.pushState("TEXTARG"); return "BGCOLOR"; }
+"\\big" return "BIG";
+"\\bigg" return "BIGG";
+"\\biggl" return "BIGGL";
+"\\biggr" return "BIGG";
+"\\bigl" return "BIGL";
+"\\bigr" return "BIG";
+"\\binom" return "BINOM";
+"\\boldsymbol" return "MATHBF";
+"\\boxed" return "BOXED";
+"\\check" { yytext = "\u02C7"; return "ACCENTNS"; }
+"\\choose" return "TEXCHOOSE";
+"\\closure" { yytext = "\u02C7"; return "ACCENT"; }
+"\\color" { this.pushState("TEXTARG"); return "COLOR"; }
+"\\ddddot" { yytext = "\u20DC"; return "ACCENT"; }
+"\\dddot" { yytext = "\u30DB"; return "ACCENT"; }
+"\\ddot" { yytext = "\u0308"; return "ACCENT"; }
+"\\displaystyle" return "DISPLAYSTYLE";
+"\\dot" { yytext = "\u02D9"; return "ACCENT"; }
+"\\end{Bmatrix}" return "EBBMATRIX";
+"\\end{Vmatrix}" return "EVVMATRIX";
+"\\end{aligned}" return "EALIGNED";
+"\\end{array}" return "EARRAY";
+"\\end{bmatrix}" return "EBMATRIX";
+"\\end{cases}" return "ECASES";
+"\\end{gathered}" return "EGATHERED";
+"\\end{matrix}" return "EMATRIX";
+"\\end{pmatrix}" return "EPMATRIX";
+"\\end{smallmatrix}" return "ESMALLMATRIX";
+"\\end{split}" return "EALIGNED";
+"\\end{vmatrix}" return "EVMATRIX";
+"\\frac" return "FRAC";
+"\\hat" { yytext = "\u005E"; return "ACCENTNS"; }
+"\\href" { this.pushState("TEXTARG"); return "HREF"; }
+"\\left" return "LEFT";
+"\\mathbb" return "MATHBB";
+"\\mathbcal" return "MATHBSRC";
+"\\mathbf" return "MATHBF";
+"\\mathbin" { this.begin("TEXTARG"); return "MATHBIN"; }
+"\\mathbit" return "MATHBIT";
+"\\mathbsrc" return "MATHBSRC";
+"\\mathcal" return "MATHSRC";
+"\\mathclap" return "MATHCLAP";
+"\\mathfr" return "MATHFRAK";
+"\\mathfrak" return "MATHFRAK";
+"\\mathit" return "MATHIT";
+"\\mathllap" return "MATHLLAP";
+"\\mathmit" return "MATHIT";
+"\\mathop" { this.begin("TEXTARG"); return "MATHOP"; }
+"\\mathrel" { this.begin("TEXTARG"); return "MATHREL"; }
+"\\mathrlap" return "MATHRLAP";
+"\\mathrm" return "MATHRM";
+"\\mathsf" return "MATHSF";
+"\\mathsrc" return "MATHSRC";
+"\\mathtt" return "MATHTT";
+"\\medspace" return "MEDSPACE";
+"\\mi" { this.pushState("TEXTARG"); return "MI"; }
+"\\mn" { this.pushState("TEXTARG"); return "MN"; }
+"\\mo" { this.pushState("TEXTARG"); return "MO"; }
+"\\ms" { this.pushState("TEXTARG"); this.pushState("TEXTOPTARG"); this.pushState("TRYOPTARG"); this.pushState("TEXTOPTARG"); this.pushState("TRYOPTARG"); return "MS"; }
+"\\mtext" { this.begin("TEXTARG"); return "MTEXT"; }
+"\\multiscripts" return "MULTI";
+"\\negspace" return "NEGSPACE";
+"\\operatorname" { this.begin("TEXTARG"); return "OPERATORNAME"; }
+"\\over" return "TEXOVER";
+"\\overbrace" return "OVERBRACE";
+"\\overline" { yytext = "\u02C7"; return "ACCENT"; }
+"\\overset" return "OVERSET";
+"\\phantom" return "PHANTOM";
+"\\qquad" return "QQUAD";
+"\\quad" return "QUAD";
+"\\right" return "RIGHT";
+"\\root" return "ROOT";
+"\\scriptscriptsize" return "SCRIPTSCRIPTSIZE";
+"\\scriptsize" return "SCRIPTSIZE";
+"\\slash" return "SLASH";
+"\\sqrt" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); return "SQRT"; }
+"\\stackrel" return "OVERSET";
+"\\substack" return "SUBSTACK";
+"\\tensor" return "TENSOR";
+"\\text" { this.begin("TEXTARG"); return "MTEXT"; }
+"\\textsize" return "TEXTSIZE";
+"\\textstyle" return "TEXTSTYLE";
+"\\tfrac" return "TFRAC";
+"\\thickspace" return "THICKSPACE";
+"\\thinspace" return "THINSPACE";
+"\\tilde" { yytext = "\u02DC"; return "ACCENTNS"; }
+"\\underbrace" return "UNDERBRACE";
+"\\underline" return "UNDERLINE";
+"\\underoverset"  return UNDEROVERSET;
+"\\underset" return "UNDERSET";
+"\\vec" { yytext = "\u21C0"; return "ACCENTNS"; }
+"\\widebar" { yytext = "\u00AF"; return "ACCENT"; }
+"\\widecheck" { yytext = "\u02C7"; return "ACCENT"; }
+"\\widehat" { yytext = "\u005E"; return "ACCENT"; }
+"\\widetilde" { yytext = "\u02DC"; return "ACCENT"; }
+"\\widevec" { yytext = "\u21C0"; return "ACCENT"; }
