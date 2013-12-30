@@ -76,47 +76,6 @@ function newMrow(aList, tagName)
   return "<" + tagName + ">" + aList.join("") + "</" + tagName + ">";
 }
 
-function appendList(aList1, aList2)
-{
-   /* Append the content of aList2 to aList1. */
-   if (aList2.priority > aList1.priority) {
-     /* Wrap the content of aList2 into an <mrow> before appending it. */
-     aList1.list.push(newMrow(aList2.list));
-   } else {
-     /* Just concatenate the two lists. */
-     aList1.list = aList1.list.concat(aList2.list);
-   }
-}
-
-function newIsolated(aPriority, aElement)
-{
-  return { list: [aElement], priority: aPriority };
-}
-
-function newUnary(aPriority, aOperator, aOperand)
-{
-  var l = { list: [aOperator], priority: aPriority };
-  appendList(l, aOperand);
-  return l;
-}
-
-function newPostfixUnary(aPriority, aOperand, aOperator)
-{
-  var l = { list: [], priority: aPriority };
-  appendList(l, aOperand);
-  l.list.push(aOperator);
-  return l;
-}
-
-function newBinary(aPriority, aLeft, aOperator, aRight)
-{
-  var l = { list: [], priority: aPriority };
-  appendList(l, aLeft);
-  l.list.push(aOperator);
-  appendList(l, aRight);
-  return l;
-}
-
 var MathMLNameSpace = "http://www.w3.org/1998/Math/MathML";
 var TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
                     "application/x-tex", "application/x-latex"];
@@ -157,7 +116,7 @@ parser.getTeXSource = function(aMathMLElement)
   return getTeXSourceInternal(aMathMLElement);
 }
 
-parser.toMathMLString = function(aTeX, aDisplay)
+parser.toMathMLString = function(aTeX, aDisplay, aRTL)
 {
   /* Parse the TeX source and get the main MathML node. */
   var output;
@@ -173,6 +132,10 @@ parser.toMathMLString = function(aTeX, aDisplay)
     /* Set the display mode if it has been detected or specified. */
     mathml += " display=\"block\""
   }
+  if (aRTL) {
+    /* Set the RTL mode if specified. */
+    mathml += " dir=\"rtl\""
+  }
   mathml += "><semantics>" + output.source
   mathml += "<annotation encoding=\"TeX\">";
   mathml += escapeText(aTeX);
@@ -181,16 +144,15 @@ parser.toMathMLString = function(aTeX, aDisplay)
   return mathml;
 }
 
-parser.toMathML = function(aTeX, aDisplay)
+parser.toMathML = function(aTeX, aDisplay, aRTL)
 {
-  return parseMathMLDocument(this.toMathMLString(aTeX, aDisplay));
+  return parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL));
 }
 %}
 
 /* Operator associations and precedence. */
 %left textstyle
 %left TEXOVER TEXATOP TEXCHOOSE
-
 %left "^" "_"
 
 %start math
@@ -198,8 +160,8 @@ parser.toMathML = function(aTeX, aDisplay)
 %% /* language grammar */
 
 math
-  : expressionList EOF {
-    $$ = { source: newMrow($1.list), display: false };
+  : styledExpression EOF {
+    $$ = { source: $1, display: false };
     return $$;
   }
   | EOF {
@@ -235,7 +197,7 @@ tokenContent
 
 closedTerm
   : "{" "}" { $$ = "<mrow/>"; }
-  | "{" expressionList "}" { $$ = newMrow($2.list); }
+  | "{" styledExpression "}" { $$ = $2; }
   | BIG OPFS {
     $$ = newTag("mo", $2, "maxsize=\"1.2em\" minsize=\"1.2em\"");
   }
@@ -260,32 +222,30 @@ closedTerm
   | BBIGGL OPFS {
     $$ = newTag("mo", $2, "maxsize=\"3em\" minsize=\"3em\"");
   }
-  | left expressionList right {
-    $$ = newTag("mrow", $1 + newMrow($2.list) + $3);
+  | left styledExpression right {
+    $$ = newTag("mrow", $1 + $2 + $3);
   }
-  | "{" expressionList TEXATOP expressionList "}" {
-    $$ = newTag("mfrac", newMrow($2.list) + newMrow($4.list),
-                "linethickness=\"0\"");
+  | "{" styledExpression TEXATOP styledExpression "}" {
+    $$ = newTag("mfrac", $2 + $4, "linethickness=\"0\"");
   }
-  | left expressionList TEXATOP expressionList right {
-    $$ = newTag("mfrac", newMrow($2.list) + newMrow($4.list),
-                "linethickness=\"0\"");
+  | left styledExpression TEXATOP styledExpression right {
+    $$ = newTag("mfrac", $2 + $4, "linethickness=\"0\"");
     $$ = newTag("mrow", $1 + $$ + $3);
   }
-  | "{" expressionList TEXOVER expressionList "}" {
-    $$ = newTag("mfrac", newMrow($2.list) + newMrow($4.list));
+  | "{" styledExpression TEXOVER styledExpression "}" {
+    $$ = newTag("mfrac", $2 + $4);
   }
-  | left expressionList TEXOVER expressionList right {
-    $$ = newTag("mfrac", newMrow($2.list) + newMrow($4.list));
+  | left styledExpression TEXOVER styledExpression right {
+    $$ = newTag("mfrac", $2 + $4);
     $$ = newTag("mrow", $1 + $$ + $3);
   }
-  | "{" expressionList TEXCHOOSE expressionList "}" {
-    $$ = newTag("mfrac", newMrow($2.list) + newMrow($4.list),
+  | "{" styledExpression TEXCHOOSE styledExpression "}" {
+    $$ = newTag("mfrac", $2 + $4,
                 "linethickness=\"0\"");
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
-  | left expressionList TEXCHOOSE expressionList right {
-    $$ = newTag("mfrac", newMrow($2.list) + newMrow($4.list),
+  | left styledExpression TEXCHOOSE styledExpression right {
+    $$ = newTag("mfrac", $2 + $4,
                 "linethickness=\"0\"");
     $$ = newTag("mrow", $1 + $$ + $3);
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
@@ -331,8 +291,8 @@ closedTerm
   | FRAC closedTerm closedTerm { $$ = newTag("mfrac", $2 + $3); }
   | ROOT closedTerm closedTerm { $$ = newTag("mroot", $3 + $2); }
   | SQRT closedTerm { $$ = newTag("msqrt", $2); }
-  | SQRT "[" expressionList "]" closedTerm {
-    $$ = newTag("mroot", $5 + newMrow($3.list));
+  | SQRT "[" styledExpression "]" closedTerm {
+    $$ = newTag("mroot", $5 + $3);
   }
   | UNDERSET closedTerm closedTerm { $$ = newTag("munder", $3 + $2); }
   | OVERSET closedTerm closedTerm { $$ = newTag("mover", $3 + $2); }
@@ -463,7 +423,7 @@ right
   }
   ;
 
-scriptedTerm
+compoundTerm
   : closedTerm "_" closedTerm "^" closedTerm {
     $$ = newScript(false, $1, $3, $5);
   }
@@ -492,17 +452,14 @@ scriptedTerm
   | OPM { $$ = newMo($1); }
   ;
 
-scriptedTermList
-  : scriptedTerm { $$ = [$1]; }
-  | scriptedTermList scriptedTerm { $1.push($2); $$ = $1; }
+compoundTermList
+  : compoundTerm { $$ = [$1]; }
+  | compoundTermList compoundTerm { $1.push($2); $$ = $1; }
   ;
 
-expressionList
-  : textstyle expressionList {
-    $$ = newIsolated(0, newTag("mstyle", newMrow($2.list), $1));
-  }
-
-  | scriptedTermList { $$ = newIsolated(1000, newMrow($1)); }
+styledExpression
+  : textstyle styledExpression { $$ = newTag("mstyle", $2, $1); }
+  | compoundTermList { $$ = newMrow($1); }
   ;
 
 textstyle
@@ -531,7 +488,7 @@ simpleTableRow
 
 tableCell
   : { $$ = newTag("mtd", ""); }
-  | expressionList { $$ = newMrow($1.list, "mtd"); }
+  | styledExpression { $$ = newTag("mtd", $1); }
   ;
 
 subsupList

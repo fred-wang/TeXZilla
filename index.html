@@ -13,7 +13,9 @@
           output.removeChild(output.firstElementChild);
         if (aValue) input.value = aValue;
         var math = TeXZilla.
-          toMathML(input.value, document.getElementById("display").checked);
+          toMathML(input.value,
+                   document.getElementById("mode").value === "display",
+                   document.getElementById("dir").value === "RTL");
         output.appendChild(math);
       }
     </script>
@@ -28,9 +30,16 @@
       Web rendering engine.</p>
 
     <p>
-      Display Equation: <input id="display" onchange="update()"
-                               type="checkbox" checked="checked"/> ;
-      Examples:
+      <select id="mode" onchange="update();">
+        <option value="display">Display Mode</option>
+        <option value="inline">Inline Mode</option>
+      </select> ;
+
+      <select id="dir" onchange="update();">
+        <option value="LTR">LTR</option>
+        <option value="RTL">RTL</option>
+      </select> ;
+
       <select id="examples" onchange="update(this.value);">
         <option value=""  selected="selected">-- select an example --</option>
         <option value="\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1">Ellipse Equation</option>

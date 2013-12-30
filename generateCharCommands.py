@@ -19,29 +19,29 @@
 from __future__ import print_function
 import argparse
 import re
-import string
 import sys
 
 def isValidLaTeXCommand(aCommand):
 
-    if (string.find(command, "\\") == -1 or
+    if (command.find("\\") == -1 or
+        command == "\\hat" or
         command == "{_\\ast}" or
         command == "{{/}\\!\\!{/}}" or
         # Should these commands be filtered out?
-        # string.find(command, "\\mathbb") != -1 or
-        # string.find(command, "\\mathscr") != -1 or
-        # string.find(command, "\\mathbcal") != -1 or
-        # string.find(command, "\\mathbf") != -1 or
-        # string.find(command, "\\mathbit") != -1 or
-        # string.find(command, "\\mathfrak") != -1 or
-        # string.find(command, "\\mathmit") != -1 or
-        # string.find(command, "\\mathrm") != -1 or
-        # string.find(command, "\\mathsf") != -1 or
-        # string.find(command, "\\mathtt") != -1 or
-        string.find(command, "\\fontencoding") != -1 or
-        string.find(command, "\\ElsevierGlyph") != -1 or
-        string.find(command, "\\Pisymbol") != -1 or
-        string.find(command, "\\mbox") != -1):
+        # command.find("\\mathbb") != -1 or
+        # command.find("\\mathscr") != -1 or
+        # command.find("\\mathbcal") != -1 or
+        # command.find("\\mathbf") != -1 or
+        # command.find("\\mathbit") != -1 or
+        # command.find("\\mathfrak") != -1 or
+        # command.find("\\mathmit") != -1 or
+        # command.find("\\mathrm") != -1 or
+        # command.find("\\mathsf") != -1 or
+        # command.find("\\mathtt") != -1 or
+        command.find("\\fontencoding") != -1 or
+        command.find("\\ElsevierGlyph") != -1 or
+        command.find("\\Pisymbol") != -1 or
+        command.find("\\mbox") != -1):
         return False
 
     return True
@@ -60,7 +60,7 @@ def getSurrogatePair(aCodePoint):
 
     if (0x10000 <= aCodePoint and aCodePoint <= 0x10FFFF):
         # Surrogate pairs
-        highSurrogate = (aCodePoint - 0x10000) / 0x400 + 0xD800;
+        highSurrogate = (aCodePoint - 0x10000) // 0x400 + 0xD800;
         lowSurrogate = (aCodePoint - 0x10000) % 0x400 + 0xDC00;
         return surrogatePair(highSurrogate, lowSurrogate)
 
