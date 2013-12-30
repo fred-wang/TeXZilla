@@ -164,11 +164,8 @@ if __name__ == "__main__":
 
         isSingleChar = (len(codePoint) == 1)
 
-        # Extract the mathclass, form and operator priority (if any).
-        match = re.match("([A-Z]+)\??_([A-Z]*)_([0-9]*)", info[1])
-        mathclass = match.group(1)
-        forms = match.group(2)
-        priority = match.group(3)
+        # Extract the mathclass.
+        mathclass = info[1]
 
         # Extract the TeX commands for this character.
         LaTeXCommands = []
@@ -198,17 +195,9 @@ if __name__ == "__main__":
                 # $
                 mathclass = "TEXT"
 
-        if (mathclass == "A" or mathclass[:3] == "MOF" or
-            mathclass[:3] == "MOA" or
-            mathclass == "NUM" or mathclass == "TEXT"):
-            # Alphabetic characters ; Fences and accents.
+        if (mathclass == "A" or mathclass[:2] == "OP" or mathclass == "NUM" or
+            mathclass == "TEXT"):
             token = mathclass
-        elif mathclass[:3] == "MOL":
-            # Large Operators.
-            token = mathclass + priority
-        elif mathclass[:2] == "MO":
-            # Other operators with priority and forms.
-            token = mathclass + forms + priority
         else:
             token = None
 
@@ -242,9 +231,3 @@ if __name__ == "__main__":
 
     args.input.close()
     args.output.close()
-
-    # FIXME: automate generation of the BNF grammar using this output?
-    # for token in tokenRegExp:
-    #     if token == "A" or token[:3] in ["MOA", "MOL", "MOF"]:
-    #         continue
-    #     print(token, file = sys.stderr)
