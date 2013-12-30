@@ -189,66 +189,6 @@ parser.toMathML = function(aTeX, aDisplay)
 
 /* Operator associations and precedence. */
 %left textstyle
-%left MOINF30 /* ; */
-%left MOINF40 /* , */
-%left MOINF70
-%right MOPOS100 /* .. ... */
-%left MOINF100
-%left MOINF110
-%left MOINF150
-%left MOINF160
-%left MOINF170
-%left MOINF190
-%left MOINF200
-%left MOPRE230
-%left MOINF240
-%left MOINF241
-%left MOINF242
-%left MOINF243
-%left MOINF244
-%left MOINF245
-%left MOINF246
-%left MOINF247
-%left MOINF250
-%left MOINF252
-%left MOINF255
-%left MOINF260 /* = */
-%left MOINF265
-%left MOSINF265
-%left MOINF270
-%left MOINF275
-%left MOSINF270
-%left MOINFPRE275 /* +, - */
-%left MOINFPRE275_PRE /* +, - prefix */
-%left mo290
-%left MOINF300
-%left mo300
-%left mo310
-%left mo320
-%left mo330
-%left MOINF340
-%left MOINF350
-%left mo350
-%left MOINF390 /* × */
-%left MOINF400
-%left MOINF410
-%left MOINF640
-%left MOINF650
-%left MOINF660
-%left MOPRE670
-%left MOPRE680
-%left MOINF710
-%left MOPRE740
-%right MOPOS800
-%right MOPOS810
-%left MOINF825
-%left MOINF835
-%left MOPRE845
-%left MOSPRE845
-%left MOINF850
-%left MOINF880
-%right MOPOS880
-
 %left TEXOVER TEXATOP TEXCHOOSE
 
 %left "^" "_"
@@ -296,28 +236,28 @@ tokenContent
 closedTerm
   : "{" "}" { $$ = "<mrow/>"; }
   | "{" expressionList "}" { $$ = newMrow($2.list); }
-  | BIG MOFS {
+  | BIG OPFS {
     $$ = newTag("mo", $2, "maxsize=\"1.2em\" minsize=\"1.2em\"");
   }
-  | BBIG MOFS {
+  | BBIG OPFS {
     $$ = newTag("mo", $2, "maxsize=\"1.8em\" minsize=\"1.8em\"");
   } 
-  | BIGG MOFS {
+  | BIGG OPFS {
     $$ = newTag("mo", $2, "maxsize=\"2.4em\" minsize=\"2.4em\"");
   }
-  | BBIGG MOFS {
+  | BBIGG OPFS {
     $$ = newTag("mo", $2, "maxsize=\"3em\" minsize=\"3em\"");
   }
-  | BIGL MOFS {
+  | BIGL OPFS {
     $$ = newTag("mo", $2, "maxsize=\"1.2em\" minsize=\"1.2em\"");
   }
-  | BBIGL MOFS {
+  | BBIGL OPFS {
     $$ = newTag("mo", $2, "maxsize=\"1.8em\" minsize=\"1.8em\"");
   }
-  | BIGGL MOFS {
+  | BIGGL OPFS {
     $$ = newTag("mo", $2, "maxsize=\"2.4em\" minsize=\"2.4em\"");
   }
-  | BBIGGL MOFS {
+  | BBIGGL OPFS {
     $$ = newTag("mo", $2, "maxsize=\"3em\" minsize=\"3em\"");
   }
   | left expressionList right {
@@ -358,10 +298,10 @@ closedTerm
   | MN tokenContent { $$ = newTag("mn", $2); }
   | MO tokenContent { $$ = newMo($2); }
   | "." { $$ = newMo($1); }
-  | MOA { $$ = newMo($1); }
-  | MOAS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
-  | MOFS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
-  | MOS tokenContent { $$ = newTag("mo", $2, "stretchy=\"false\""); }
+  | OP { $$ = newMo($1); }
+  | OPAS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
+  | OPFS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
+  | OPS tokenContent { $$ = newTag("mo", $2, "stretchy=\"false\""); }
   | MS tokenContent { $$ = newTag("ms", $2); }
   | MS textOptArg textOptArg tokenContent {
      $$ = newTag("ms", $4, "lquote=\"" + escapeQuote($2) +
@@ -506,7 +446,7 @@ closedTerm
   ;
 
 left
-  : LEFT MOFS {
+  : LEFT OPFS {
     $$ = newMo($2);
   }
   | LEFT "." {
@@ -515,7 +455,7 @@ left
   ;
 
 right
-  : RIGHT MOFS {
+  : RIGHT OPFS {
     $$ = newMo($2);
   }
   | RIGHT "." {
@@ -537,6 +477,19 @@ scriptedTerm
     $$ = newScript(false, $1, null, $3);
   }
   | closedTerm { $$ = $1; }
+  | OPM "_" closedTerm "^" closedTerm {
+    $$ = newScript(true, newMo($1), $3, $5);
+  }
+  | OPM "^" closedTerm "_" closedTerm {
+    $$ = newScript(true, newMo($1), $5, $3);
+  }
+  | OPM "_" closedTerm {
+    $$ = newScript(true, newMo($1), $3, null);
+  }
+  | OPM "^" closedTerm {
+    $$ = newScript(true, newMo($1), null, $3);
+  }
+  | OPM { $$ = newMo($1); }
   ;
 
 scriptedTermList
@@ -550,301 +503,6 @@ expressionList
   }
 
   | scriptedTermList { $$ = newIsolated(1000, newMrow($1)); }
-
-  | expressionList MOINF30 expressionList {
-    $$ = newBinary(30, $1, newMo($2), $3);
-  }
-  | expressionList MOINF30 {
-    $$ = newPostfixUnary(30, $1, newMo($2));
-  } 
-  | MOINF30 { $$ = newIsolated(30, newMo($1)); }
-
-  | expressionList MOINF40 expressionList {
-    $$ = newBinary(40, $1, newMo($2), $3);
-  }
-  | expressionList MOINF40 {
-    $$ = newPostfixUnary(40, $1, newMo($2));
-  } 
-  | MOINF40 { $$ = newIsolated(40, newMo($1)); }
-
-  | expressionList MOINF70 expressionList {
-    $$ = newBinary(70, $1, newMo($2), $3);
-  }
-  | MOINF70 { $$ = newIsolated(70, newMo($1)); }
-
-  | expressionList MOINF100 expressionList {
-    $$ = newBinary(100, $1, newMo($2), $3);
-  }
-  | MOINF100 { $$ = newIsolated(100, newMo($1)); }
-
-  | expressionList MOPOS100 {
-    $$ = newPostfixUnary(100, $1, newMo($2));
-  }
-  | MOPOS100 {
-    $$ = newIsolated(100, newMo($1));
-  }
-
-  | expressionList MOINF110 expressionList {
-    $$ = newBinary(110, $1, newMo($2), $3);
-  }
-  | MOINF110 { $$ = newIsolated(110, newMo($1)); }
-
-  | expressionList MOINF150 expressionList {
-    $$ = newBinary(150, $1, newMo($2), $3);
-  }
-  | MOINF150 { $$ = newIsolated(150, newMo($1)); }
-
-  | expressionList MOINF160 expressionList {
-    $$ = newBinary(160, $1, newMo($2), $3);
-  }
-  | MOINF160 { $$ = newIsolated(160, newMo($1)); }
-
-  | expressionList MOINF170 expressionList {
-    $$ = newBinary(170, $1, newMo($2), $3);
-  }
-  | MOINF170 { $$ = newIsolated(170, newMo($1)); }
-
-  | expressionList MOINF190 expressionList {
-    $$ = newBinary(190, $1, newMo($2), $3);
-  }
-  | MOINF190 { $$ = newIsolated(190, newMo($1)); }
-
-  | expressionList MOINF200 expressionList {
-    $$ = newBinary(200, $1, newMo($2), $3);
-  }
-  | MOINF200 { $$ = newIsolated(200, newMo($1)); }
-
-  | MOPRE230 expressionList { $$ = newUnary(230, newMo($1), $2); }
-  | MOPRE230 { $$ = newIsolated(230, newMo($1)); }
-
-  | expressionList MOINF240 expressionList {
-    $$ = newBinary(240, $1, newMo($2), $3);
-  }
-  | MOINF240 { $$ = newIsolated(240, newMo($1)); }
-
-  | expressionList MOINF241 expressionList {
-    $$ = newBinary(241, $1, newMo($2), $3);
-  }
-  | MOINF241 { $$ = newIsolated(241, newMo($1)); }
-
-  | expressionList MOINF242 expressionList {
-    $$ = newBinary(242, $1, newMo($2), $3);
-  }
-  | MOINF242 { $$ = newIsolated(242, newMo($1)); }
-
-  | expressionList MOINF243 expressionList {
-    $$ = newBinary(243, $1, newMo($2), $3);
-  }
-  | MOINF243 { $$ = newIsolated(243, newMo($1)); }
-
-  | expressionList MOINF244 expressionList {
-    $$ = newBinary(244, $1, newMo($2), $3);
-  }
-  | MOINF244 { $$ = newIsolated(244, newMo($1)); }
-
-  | expressionList MOINF245 expressionList {
-    $$ = newBinary(245, $1, newMo($2), $3);
-  }
-  | MOINF245 { $$ = newIsolated(245, newMo($1)); }
-
-  | expressionList MOINF246 expressionList {
-    $$ = newBinary(246, $1, newMo($2), $3);
-  }
-  | MOINF246 { $$ = newIsolated(246, newMo($1)); }
-
-  | expressionList MOINF247 expressionList {
-    $$ = newBinary(247, $1, newMo($2), $3);
-  }
-  | MOINF247 { $$ = newIsolated(247, newMo($1)); }
-
-  | expressionList MOINF250 expressionList {
-    $$ = newBinary(250, $1, newMo($2), $3);
-  }
-  | MOINF250 { $$ = newIsolated(250, newMo($1)); }
-
-  | expressionList MOINF252 expressionList {
-    $$ = newBinary(252, $1, newMo($2), $3);
-  }
-  | MOINF252 { $$ = newIsolated(252, newMo($1)); }
-
-  | expressionList MOINF255 expressionList {
-    $$ = newBinary(255, $1, newMo($2), $3);
-  }
-  | MOINF255 { $$ = newIsolated(255, newMo($1)); }
-
-  | expressionList MOINF260 expressionList {
-    $$ = newBinary(260, $1, newMo($2), $3);
-  }
-  | MOINF260 expressionList {
-    $$ = newUnary(260, newMo($1), $2);
-  }
-  | MOINF260 { $$ = newIsolated(260, newMo($1)); }
-
-  | expressionList MOINF265 expressionList {
-    $$ = newBinary(265, $1, newMo($2), $3);
-  }
-  | MOINF265 { $$ = newIsolated(265, newMo($1)); }
-
-  | expressionList MOSINF265 expressionList {
-    $$ = newBinary(265, $1, newTag("mo", $2, "stretchy=\"false\""), $3);
-  }
-  | MOSINF265 {
-    $$ = newIsolated(265, newTag("mo", $2, "stretchy=\"false\""));
-  }
-
-  | expressionList MOINF270 expressionList {
-    $$ = newBinary(270, $1, newMo($2), $3);
-  }
-  | MOINF270 { $$ = newIsolated(270, newMo($1)); }
-
-  | expressionList MOSINF270 expressionList {
-    $$ = newBinary(270, $1, newTag("mo", $2, "stretchy=\"false\""), $3);
-  }
-  | MOSINF270 {
-    $$ = newIsolated(270, newTag("mo", $2, "stretchy=\"false\""));
-  }
-
-  | expressionList MOINF275 expressionList {
-    $$ = newBinary(275, $1, newMo($2), $3);
-  }
-  | MOINF275 { $$ = newIsolated(275, newMo($1)); }
-
-  | MOINFPRE275 expressionList %prec MOINFPRE275_PRE {
-    /* increase priority, so that -1+-1 will produce {{-1}+{-1}} */
-    $$ = newUnary(276, newMo($1), $2);
-  }
-  | expressionList MOINFPRE275 expressionList {
-    $$ = newBinary(275, $1, newMo($2), $3);
-  }
-  | MOINFPRE275 { $$ = newIsolated(275, newMo($1)); }
-
-  | mo290 expressionList { $$ = newUnary(290, $1, $2); }
-  | mo290 { $$ = newIsolated(290, $1); }
-
-  | expressionList MOINF300 expressionList {
-    $$ = newBinary(300, $1, newMo($2), $3);
-  }
-  | MOINF300 { $$ = newIsolated(300, newMo($1)); }
-
-  | mo300 expressionList { $$ = newUnary(300, $1, $2); }
-  | mo300 { $$ = newIsolated(300, $1); }
-
-  | mo310 expressionList { $$ = newUnary(310, $1, $2); }
-  | mo310 { $$ = newIsolated(310, $1); }
-
-  | mo320 expressionList { $$ = newUnary(320, $1, $2); }
-  | mo320 { $$ = newIsolated(320, $1); }
-
-  | mo330 expressionList { $$ = newUnary(330, $1, $2); }
-  | mo330 { $$ = newIsolated(330, $1); }
-
-  | expressionList MOINF340 expressionList {
-    $$ = newBinary(340, $1, newMo($2), $3);
-  }
-  | MOINF340 { $$ = newIsolated(340, newMo($1)); }
-
-  | expressionList MOINF350 expressionList {
-    $$ = newBinary(350, $1, newMo($2), $3);
-  }
-  | MOINF350 { $$ = newIsolated(350, newMo($1)); }
-
-  | mo350 expressionList { $$ = newUnary(350, $1, $2); }
-  | mo350 { $$ = newIsolated(350, $1); }
-
-  | expressionList MOINF390 expressionList {
-    $$ = newBinary(390, $1, newMo($2), $3);
-  }
-  | MOINF390 { $$ = newIsolated(390, newMo($1)); }
-
-  | expressionList MOINF400 expressionList {
-    $$ = newBinary(400, $1, newMo($2), $3);
-  }
-  | MOINF400 { $$ = newIsolated(400, newMo($1)); }
-
-  | expressionList MOINF410 expressionList {
-    $$ = newBinary(410, $1, newMo($2), $3);
-  }
-  | MOINF410 { $$ = newIsolated(410, newMo($1)); }
-
-  | expressionList MOINF640 expressionList {
-    $$ = newBinary(640, $1, newMo($2), $3);
-  }
-  | MOINF640 { $$ = newIsolated(640, newMo($1)); }
-
-  | expressionList MOINF650 expressionList {
-    $$ = newBinary(650, $1, newMo($2), $3);
-  }
-  | MOINF650 { $$ = newIsolated(650, newMo($1)); }
-
-  | expressionList MOINF660 expressionList {
-    $$ = newBinary(660, $1, newMo($2), $3);
-  }
-  | MOINF660 { $$ = newIsolated(660, newMo($1)); }
-
-  | MOPRE670 expressionList { $$ = newUnary(670, newMo($1), $2); }
-  | MOPRE670 { $$ = newIsolated(670, newMo($1)); }
-
-  | MOPRE680 expressionList { $$ = newUnary(680, newMo($1), $2); }
-  | MOPRE680 { $$ = newIsolated(680, newMo($1)); }
-
-  | expressionList MOINF710 expressionList {
-    $$ = newBinary(710, $1, newMo($2), $3);
-  }
-  | MOINF710 { $$ = newIsolated(710, newMo($1)); }
-
-  | MOPRE740 expressionList { $$ = newUnary(740, newMo($1), $2); }
-  | MOPRE740 { $$ = newIsolated(740, newMo($1)); }
-
-  | expressionList MOPOS800 {
-    $$ = newPostfixUnary(800, $1, newMo($2));
-  }
-  | MOPOS800 {
-    $$ = newIsolated(800, newMo($1));
-  }
-
-  | expressionList MOPOS810 {
-    $$ = newPostfixUnary(810, $1, newMo($2));
-  }
-  | MOPOS810 {
-    $$ = newIsolated(810, newMo($1));
-  }
-
-  | expressionList MOINF825 expressionList {
-    $$ = newBinary(825, $1, newMo($2), $3);
-  }
-  | MOINF825 { $$ = newIsolated(825, newMo($1)); }
-
-  | expressionList MOINF835 expressionList {
-    $$ = newBinary(835, $1, newMo($2), $3);
-  }
-  | MOINF835 { $$ = newIsolated(835, newMo($1)); }
-
-  | MOPRE845 expressionList { $$ = newUnary(845, newMo($1), $2); }
-  | MOPRE845 { $$ = newIsolated(845, newMo($1)); }
-
-  | MOSPRE845 expressionList {
-    $$ = newUnary(M845, newTag("mo", $1, "stretchy=\"false\""), $2);
-  }
-  | MOSPRE845 {
-    $$ = newIsolated(M845, newTag("mo", $1, "stretchy=\"false\""));
-  }
-
-  | expressionList MOINF850 expressionList {
-    $$ = newBinary(850, $1, newMo($2), $3);
-  }
-  | MOINF850 { $$ = newIsolated(850, newMo($1)); }
-
-  | expressionList MOINF880 expressionList {
-    $$ = newBinary(880, $1, newMo($2), $3);
-  }
-  | MOINF880 { $$ = newIsolated(880, newMo($1)); }
-
-  | expressionList MOPOS880 {
-    $$ = newPostfixUnary(880, $1, newMo($2));
-  }
-  | MOPOS880 {
-    $$ = newIsolated(880, newMo($1));
-  }
   ;
 
 textstyle
@@ -855,141 +513,6 @@ textstyle
   | SCRIPTSCRIPTSIZE { $$ = "scriptlevel=\"2\""; }
   | COLOR textArg { $$ = "mathcolor=\"" + escapeQuote($2) + "\""; }
   | BGCOLOR textArg { $$ = "mathbackground=\"" + escapeQuote($2) + "\""; }
-  ;
-
-mo290
-  : MOLM290 "_" closedTerm "^" closedTerm {
-    $$ = newScript(true, newMo($1), $3, $5);
-  }
-  | MOLM290 "^" closedTerm "_" closedTerm {
-    $$ = newScript(true, newMo($1), $5, $3);
-  }
-  | MOLM290 "_" closedTerm {
-    $$ = newScript(true, newMo($1), $3, null);
-  }
-  | MOLM290 "^" closedTerm {
-    $$ = newScript(true, newMo($1), null, $3);
-  }
-  | MOLM290 { $$ = newMo($1); }
-  | MOL290 "_" closedTerm "^" closedTerm {
-    $$ = newScript(false, newMo($1), $3, $5);
-  }
-  | MOL290 "^" closedTerm "_" closedTerm {
-    $$ = newScript(false, newMo($1), $5, $3);
-  }
-  | MOL290 "_" closedTerm {
-    $$ = newScript(false, newMo($1), $3, null);
-  }
-  | MOL290 "^" closedTerm {
-    $$ = newScript(false, newMo($1), null, $3);
-  }
-  | MOL290 { $$ = newMo($1); }
-  ;
-
-mo300
-  : MOLM300 "_" closedTerm "^" closedTerm {
-    $$ = newScript(true, newMo($1), $3, $5);
-  }
-  | MOLM300 "^" closedTerm "_" closedTerm {
-    $$ = newScript(true, newMo($1), $5, $3);
-  }
-  | MOLM300 "_" closedTerm {
-    $$ = newScript(true, newMo($1), $3, null);
-  }
-  | MOLM300 "^" closedTerm {
-    $$ = newScript(true, newMo($1), null, $3);
-  }
-  | MOLM300 { $$ = newMo($1); }
-  | MOL300 "_" closedTerm "^" closedTerm {
-    $$ = newScript(false, newMo($1), $3, $5);
-  }
-  | MOL300 "^" closedTerm "_" closedTerm {
-    $$ = newScript(false, newMo($1), $5, $3);
-  }
-  | MOL300 "_" closedTerm {
-    $$ = newScript(false, newMo($1), $3, null);
-  }
-  | MOL300 "^" closedTerm {
-    $$ = newScript(false, newMo($1), null, $3);
-  }
-  | MOL300 { $$ = newMo($1); }
-  ;
-
-mo310
-  : MOLM310 "_" closedTerm "^" closedTerm {
-    $$ = newScript(true, newMo($1), $3, $5);
-  }
-  | MOLM310 "^" closedTerm "_" closedTerm {
-    $$ = newScript(true, newMo($1), $5, $3);
-  }
-  | MOLM310 "_" closedTerm {
-    $$ = newScript(true, newMo($1), $3, null);
-  }
-  | MOLM310 "^" closedTerm {
-    $$ = newScript(true, newMo($1), null, $3);
-  }
-  | MOLM310 { $$ = newMo($1); }
-  | MOL310 "_" closedTerm "^" closedTerm {
-    $$ = newScript(false, newMo($1), $3, $5);
-  }
-  | MOL310 "^" closedTerm "_" closedTerm {
-    $$ = newScript(false, newMo($1), $5, $3);
-  }
-  | MOL310 "_" closedTerm {
-    $$ = newScript(false, newMo($1), $3, null);
-  }
-  | MOL310 "^" closedTerm {
-    $$ = newScript(false, newMo($1), null, $3);
-  }
-  | MOL310 { $$ = newMo($1); }
-  ;
-
-mo320
-  : MOLM320 "_" closedTerm "^" closedTerm {
-    $$ = newScript(true, newMo($1), $3, $5);
-  }
-  | MOLM320 "^" closedTerm "_" closedTerm {
-    $$ = newScript(true, newMo($1), $5, $3);
-  }
-  | MOLM320 "_" closedTerm {
-    $$ = newScript(true, newMo($1), $3, null);
-  }
-  | MOLM320 "^" closedTerm {
-    $$ = newScript(true, newMo($1), null, $3);
-  }
-  | MOLM320 { $$ = newMo($1); }
-  ;
-
-mo330
-  : MOLM330 "_" closedTerm "^" closedTerm {
-    $$ = newScript(true, newMo($1), $3, $5);
-  }
-  | MOLM330 "^" closedTerm "_" closedTerm {
-    $$ = newScript(true, newMo($1), $5, $3);
-  }
-  | MOLM330 "_" closedTerm {
-    $$ = newScript(true, newMo($1), $3, null);
-  }
-  | MOLM330 "^" closedTerm {
-    $$ = newScript(true, newMo($1), null, $3);
-  }
-  | MOLM330 { $$ = newMo($1); }
-  ;
-
-mo350
-  : MOLM350 "_" closedTerm "^" closedTerm {
-    $$ = newScript(true, newMo($1), $3, $5);
-  }
-  | MOLM350 "^" closedTerm "_" closedTerm {
-    $$ = newScript(true, newMo($1), $5, $3);
-  }
-  | MOLM350 "_" closedTerm {
-    $$ = newScript(true, newMo($1), $3, null);
-  }
-  | MOLM350 "^" closedTerm {
-    $$ = newScript(true, newMo($1), null, $3);
-  }
-  | MOLM350 { $$ = newMo($1); }
   ;
 
 tableRowList
@@ -1025,13 +548,5 @@ subsupTerm
 
 subsupTermScript
   : closedTerm { $$ = $1; }
-  | MOLM290 { $$ = newMo($1); }
-  | MOL290 { $$ = newMo($1); }
-  | MOLM300 { $$ = newMo($1); }
-  | MOL300 { $$ = newMo($1); }
-  | MOLM310 { $$ = newMo($1); }
-  | MOL310 { $$ = newMo($1); }
-  | MOLM320 { $$ = newMo($1); }
-  | MOLM330 { $$ = newMo($1); }
-  | MOLM350 { $$ = newMo($1); }
+  | OPM { $$ = newMo($1); }
   ;

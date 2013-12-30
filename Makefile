@@ -23,8 +23,12 @@ help:
 	@echo "make help"
 	@echo "  Display this help message."
 	@echo ""
-	@echo "make TeXZilla"
+	@echo "make build"
+	@echo "  Build the TeXZilla.js parser."
+	@echo
+	@echo "make minify"
 	@echo "  Build the TeXZilla-min.js parser."
+	@echo "  (This requires Java and Google Closure Compiler)"
 	@echo ""
 	@echo "make tests"
 	@echo "  Run the unit tests."
@@ -64,12 +68,14 @@ TeXZilla-min.js: TeXZilla.js
 # Minify the Javascript parser using Google's Closure Compiler.
 	$(JAVA) -jar $(CLOSURE_COMPILER) $< > $@
 
-tests: unit-tests.js TeXZilla-min.js
+tests: unit-tests.js TeXZilla.js
 	$(SLIMERJS) $<
 
-TeXZilla: TeXZilla-min.js
+build: TeXZilla.js
 
-all: tests TeXZilla
+minify: TeXZilla-min.js
+
+all: tests build
 
 clean:
 # Remove all generated files except unicode.xml and LaTeX-min.js

@@ -23,35 +23,15 @@
     <xsl:if test="operator-dictionary">
       <xsl:value-of select="@id"/>
       <xsl:text> </xsl:text>
-      <xsl:text>MO</xsl:text>
-      <xsl:if test="operator-dictionary/@accent">
-        <xsl:text>A</xsl:text>
-      </xsl:if>
+      <xsl:text>OP</xsl:text>
       <xsl:if test="operator-dictionary/@fence">
         <xsl:text>F</xsl:text>
-      </xsl:if>
-      <xsl:if test="operator-dictionary/@largeop">
-        <xsl:text>L</xsl:text>
       </xsl:if>
       <xsl:if test="operator-dictionary/@movablelimits">
         <xsl:text>M</xsl:text>
       </xsl:if>
       <xsl:if test="operator-dictionary/@stretchy">
         <xsl:text>S</xsl:text>
-      </xsl:if>
-      <xsl:text>_</xsl:text>
-      <xsl:if test="operator-dictionary[@form = 'infix']">
-        <xsl:text>INF</xsl:text>
-      </xsl:if>
-      <xsl:if test="operator-dictionary[@form = 'prefix']">
-        <xsl:text>PRE</xsl:text>
-      </xsl:if>
-      <xsl:if test="operator-dictionary[@form = 'postfix']">
-        <xsl:text>POS</xsl:text>
-      </xsl:if>
-      <xsl:text>_</xsl:text>
-      <xsl:if test="operator-dictionary/@priority">
-        <xsl:value-of select="operator-dictionary/@priority"/>
       </xsl:if>
       <xsl:text> </xsl:text>
       <xsl:value-of select="latex"/>
@@ -67,7 +47,6 @@
       <xsl:value-of select="@id"/>
       <xsl:text> </xsl:text>
       <xsl:value-of select="unicodedata/@mathclass"/>
-      <xsl:text>__</xsl:text>
       <xsl:text> </xsl:text>
       <xsl:value-of select="latex"/>
       <xsl:text> </xsl:text>
