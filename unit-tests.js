@@ -69,12 +69,6 @@ var tests = [
     ["a+b+c", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>+</mo><mi>b</mi><mo>+</mo><mi>c</mi></mrow><annotation encoding="TeX">a+b+c</annotation></semantics></math>'],
     /* sum with more complex terms */
     ["3 + \\frac x y + \\sqrt z", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>+</mo><mfrac><mi>x</mi><mi>y</mi></mfrac><mo>+</mo><msqrt><mi>z</mi></msqrt></mrow><annotation encoding="TeX">3 + \\frac x y + \\sqrt z</annotation></semantics></math>'],
-    /* operator priority and grouping */
-    ["2×x+3×y×z+7×x×3", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mn>2</mn><mo>×</mo><mi>x</mi></mrow><mo>+</mo><mrow><mn>3</mn><mo>×</mo><mi>y</mi><mo>×</mo><mi>z</mi></mrow><mo>+</mo><mrow><mn>7</mn><mo>×</mo><mi>x</mi><mo>×</mo><mn>3</mn></mrow></mrow><annotation encoding="TeX">2×x+3×y×z+7×x×3</annotation></semantics></math>'],
-    /* operator priority and grouping */
-    ["a + b = c ; e + f = g", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mo>=</mo><mi>c</mi></mrow><mo>;</mo><mrow><mrow><mi>e</mi><mo>+</mo><mi>f</mi></mrow><mo>=</mo><mi>g</mi></mrow></mrow><annotation encoding="TeX">a + b = c ; e + f = g</annotation></semantics></math>'],
-    /* operator priority and grouping */
-    ["-1+-2+-3",'<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo>-</mo><mn>1</mn></mrow><mo>+</mo><mrow><mo>-</mo><mn>2</mn></mrow><mo>+</mo><mrow><mo>-</mo><mn>3</mn></mrow></mrow><annotation encoding="TeX">-1+-2+-3</annotation></semantics></math>'],
     /* scripts */
     ["a_b^c + a^c_b + a_b + a^c", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup><mo>+</mo><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup><mo>+</mo><msub><mi>a</mi><mi>b</mi></msub><mo>+</mo><msup><mi>a</mi><mi>c</mi></msup></mrow><annotation encoding="TeX">a_b^c + a^c_b + a_b + a^c</annotation></semantics></math>'],
     /* Greek letters */
