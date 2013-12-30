@@ -26,9 +26,9 @@ help:
 	@echo "make build"
 	@echo "  Build the TeXZilla.js parser."
 	@echo
-	@echo "make min"
+	@echo "make minify"
 	@echo "  Build the TeXZilla-min.js parser."
-	@echo "  (This require Java and Google Closure Compiler)"
+	@echo "  (This requires Java and Google Closure Compiler)"
 	@echo ""
 	@echo "make tests"
 	@echo "  Run the unit tests."
@@ -68,16 +68,14 @@ TeXZilla-min.js: TeXZilla.js
 # Minify the Javascript parser using Google's Closure Compiler.
 	$(JAVA) -jar $(CLOSURE_COMPILER) $< > $@
 
-tests: unit-tests.js TeXZilla-min.js
+tests: unit-tests.js TeXZilla.js
 	$(SLIMERJS) $<
 
 build: TeXZilla.js
-	$(SED) -i 's/TeXZilla-min.js/TeXZilla.js/g' index.html
 
-min: TeXZilla-min.js
-	$(SED) -i 's/TeXZilla.js/TeXZilla-min.js/g' index.html
+minify: TeXZilla-min.js
 
-all: tests TeXZilla
+all: tests build
 
 clean:
 # Remove all generated files except unicode.xml and LaTeX-min.js
