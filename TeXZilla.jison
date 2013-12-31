@@ -311,10 +311,6 @@ closedTerm
     $$ = newTag("mo", $2,
                 "lspace=\"thickmathspace\" rspace=\"thickmathspace\"");
   }
-  | NEGSPACE { $$ = "<mspace width=\"negativethinmathspace\">"; }
-  | THINSPACE { $$ = "<mspace width=\"thinmathspace\"/>"; }
-  | MEDSPACE { $$ = "<mspace width=\"mediummathspace\"/>"; }
-  | THICKSPACE { $$ = "<mspace width=\"thickmathspace\"/>"; }
   | FRAC closedTerm closedTerm { $$ = newTag("mfrac", $2 + $3); }
   | ROOT closedTerm closedTerm { $$ = newTag("mroot", $3 + $2); }
   | SQRT closedTerm { $$ = newTag("msqrt", $2); }
@@ -356,11 +352,19 @@ closedTerm
   | ACCENTNS closedTerm {
     $$ = newTag("mover", $2 + newTag("mo", $1, "stretchy=\"false\""));
   }
-  | QUAD { $$ = "<mspace width=\"1em\"/>"; }
-  | QQUAD { $$ = "<mspace width=\"2em\"/>"; }
   | BOXED closedTerm { $$ = newTag("menclose", $2, "notation=\"box\""); }
   | SLASH closedTerm {
     $$ = newTag("menclose", $2, "notation=\"updiagonalstrike\"");
+  }
+  | QUAD { $$ = "<mspace width=\"1em\"/>"; }
+  | QQUAD { $$ = "<mspace width=\"2em\"/>"; }
+  | NEGSPACE { $$ = "<mspace width=\"negativethinmathspace\">"; }
+  | THINSPACE { $$ = "<mspace width=\"thinmathspace\"/>"; }
+  | MEDSPACE { $$ = "<mspace width=\"mediummathspace\"/>"; }
+  | THICKSPACE { $$ = "<mspace width=\"thickmathspace\"/>"; }
+  | SPACE textArg textArg textArg {
+    $$ = "<mspace height=\"." + $2 + "ex\" depth=\"." + $3 + "ex\" " +
+                  "width=\"." + $4 + "em\"/>";
   }
   | MATHRAISEBOX lengthArg lengthOptArg lengthOptArg closedTerm {
     $$ = newTag("mpadded", $5,
