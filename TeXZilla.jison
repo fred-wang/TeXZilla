@@ -28,6 +28,18 @@ function escapeQuote(aString)
   return aString.replace(/"/g, "&#x22;");
 }
 
+function parseLength(aString)
+{
+  // See http://www.w3.org/Math/draft-spec/appendixa.html#parsing_length
+  // FIXME: should namedspaces be accepted too?
+  var lengthRegexp = /\s*(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?\s*/;
+  var result = lengthRegexp.exec(aString);
+  if (result) {
+    result = { l: parseFloat(result[1]), u: result[2] };
+  }
+  return result;
+}
+
 function newTag(aTag, aContent, aAttributes)
 {
   /* Create a new tag with the specified content and attributes. */
@@ -64,16 +76,19 @@ function newScript(aUnderOver, aBase, aScriptBot, aScriptTop)
   return "<msubsup>" + aBase + aScriptBot + aScriptTop + "</msubsup>";
 }
 
-function newMrow(aList, tagName)
+function newMrow(aList, aTag, aAttributes)
 {
-  if (!tagName) {
+  if (!aTag) {
     if (aList.length == 1) {
       /* This list only has one element so we just return it. */
       return aList[0];
     }
-    tagName = "mrow";
+    aTag = "mrow";
   }
-  return "<" + tagName + ">" + aList.join("") + "</" + tagName + ">";
+  var tag = "<" + aTag;
+  if (aAttributes) tag += " " + aAttributes
+  tag += ">" + aList.join("") + "</" + aTag + ">";
+  return tag;
 }
 
 var MathMLNameSpace = "http://www.w3.org/1998/Math/MathML";
@@ -161,7 +176,7 @@ parser.toMathML = function(aTeX, aDisplay, aRTL)
 
 math
   : styledExpression EOF {
-    $$ = { source: $1, display: false };
+    $$ = { source: newMrow($1), display: false };
     return $$;
   }
   | EOF {
@@ -188,6 +203,18 @@ textArg
   }
   ;
 
+lengthOptArg
+  : "[" TEXTOPTARG "]" {
+    $$ = parseLength($2);
+  }
+  ;
+
+lengthArg
+  : "{" TEXTARG "}" {
+    $$ = parseLength($2);
+  }
+  ;
+
 tokenContent
   : textArg {
     /* Collapse the whitespace as indicated in the MathML specification. */
@@ -197,7 +224,7 @@ tokenContent
 
 closedTerm
   : "{" "}" { $$ = "<mrow/>"; }
-  | "{" styledExpression "}" { $$ = $2; }
+  | "{" styledExpression "}" { $$ = newMrow($2); }
   | BIG OPFS {
     $$ = newTag("mo", $2, "maxsize=\"1.2em\" minsize=\"1.2em\"");
   }
@@ -223,29 +250,29 @@ closedTerm
     $$ = newTag("mo", $2, "maxsize=\"3em\" minsize=\"3em\"");
   }
   | left styledExpression right {
-    $$ = newTag("mrow", $1 + $2 + $3);
+    $$ = newTag("mrow", $1 + newMrow($2) + $3);
   }
   | "{" styledExpression TEXATOP styledExpression "}" {
-    $$ = newTag("mfrac", $2 + $4, "linethickness=\"0\"");
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4), "linethickness=\"0\"");
   }
   | left styledExpression TEXATOP styledExpression right {
-    $$ = newTag("mfrac", $2 + $4, "linethickness=\"0\"");
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4), "linethickness=\"0\"");
     $$ = newTag("mrow", $1 + $$ + $3);
   }
   | "{" styledExpression TEXOVER styledExpression "}" {
-    $$ = newTag("mfrac", $2 + $4);
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4));
   }
   | left styledExpression TEXOVER styledExpression right {
-    $$ = newTag("mfrac", $2 + $4);
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4));
     $$ = newTag("mrow", $1 + $$ + $3);
   }
   | "{" styledExpression TEXCHOOSE styledExpression "}" {
-    $$ = newTag("mfrac", $2 + $4,
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4),
                 "linethickness=\"0\"");
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | left styledExpression TEXCHOOSE styledExpression right {
-    $$ = newTag("mfrac", $2 + $4,
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4),
                 "linethickness=\"0\"");
     $$ = newTag("mrow", $1 + $$ + $3);
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
@@ -292,7 +319,7 @@ closedTerm
   | ROOT closedTerm closedTerm { $$ = newTag("mroot", $3 + $2); }
   | SQRT closedTerm { $$ = newTag("msqrt", $2); }
   | SQRT "[" styledExpression "]" closedTerm {
-    $$ = newTag("mroot", $5 + $3);
+    $$ = newTag("mroot", $5 + newMrow($3));
   }
   | UNDERSET closedTerm closedTerm { $$ = newTag("munder", $3 + $2); }
   | OVERSET closedTerm closedTerm { $$ = newTag("mover", $3 + $2); }
@@ -334,6 +361,24 @@ closedTerm
   | BOXED closedTerm { $$ = newTag("menclose", $2, "notation=\"box\""); }
   | SLASH closedTerm {
     $$ = newTag("menclose", $2, "notation=\"updiagonalstrike\"");
+  }
+  | MATHRAISEBOX lengthArg lengthOptArg lengthOptArg closedTerm {
+    $$ = newTag("mpadded", $5,
+                "voffset=\"" + $2.l + $2.u + "\" " +
+                "height=\"" + $3.l + $3.u + "\" " +
+                "depth=\"" + $4.l + $4.u + "\"");
+  }
+  | MATHRAISEBOX lengthArg lengthOptArg closedTerm {
+    $$ = newTag("mpadded", $4,
+                "voffset=\"" + $2.l + $2.u + "\" " +
+                "height=\"" + $3.l + $3.u + "\" depth=\"" +
+                ($2.l < 0 ? "+" + (-$2.l) + $2.u : "depth") + "\"");
+  }
+  | MATHRAISEBOX lengthArg closedTerm {
+    $$ = newTag("mpadded", $3,
+                "voffset=\"" + $2.l + $2.u + "\" " +
+                ($2.l >= 0 ? "height=\"+" + $2.l + $2.u + "\"" :
+                 "height=\"0pt\" depth=\"+\"" + (-$2.l) + $2.u + "\""));
   }
   | MATHBB closedTerm {
     $$ = newTag("mstyle", $2, "mathvariant=\"double-struck\"");
@@ -458,8 +503,8 @@ compoundTermList
   ;
 
 styledExpression
-  : textstyle styledExpression { $$ = newTag("mstyle", $2, $1); }
-  | compoundTermList { $$ = newMrow($1); }
+  : textstyle styledExpression { $$ = [newMrow($2, "mstyle", $1)]; }
+  | compoundTermList { $$ = $1; }
   ;
 
 textstyle
@@ -488,7 +533,7 @@ simpleTableRow
 
 tableCell
   : { $$ = newTag("mtd", ""); }
-  | styledExpression { $$ = newTag("mtd", $1); }
+  | styledExpression { $$ = newMrow($1, "mtd"); }
   ;
 
 subsupList

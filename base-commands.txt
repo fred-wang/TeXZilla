@@ -138,3 +138,4 @@
 "\\widehat" { yytext = "\u005E"; return "ACCENT"; }
 "\\widetilde" { yytext = "\u02DC"; return "ACCENT"; }
 "\\widevec" { yytext = "\u21C0"; return "ACCENT"; }
+"\\mathraisebox"  { this.pushState("TEXTOPTARG"); this.pushState("TRYOPTARG"); this.pushState("TEXTOPTARG"); this.pushState("TRYOPTARG"); this.pushState("TEXTARG"); return "MATHRAISEBOX"; }
