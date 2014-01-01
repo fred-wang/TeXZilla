@@ -120,6 +120,7 @@
 "\\space" { this.pushState("TEXTARG"); this.pushState("TEXTARG"); this.pushState("TEXTARG"); return "SPACE"; }
 "\\sqrt" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); return "SQRT"; }
 "\\stackrel" return "OVERSET";
+"\\statusline" { this.pushState("TEXTARG"); return "STATUSLINE"; }
 "\\substack" return "SUBSTACK";
 "\\tensor" return "TENSOR";
 "\\text" { this.begin("TEXTARG"); return "MTEXT"; }
@@ -129,6 +130,7 @@
 "\\thickspace" return "THICKSPACE";
 "\\thinspace" return "THINSPACE";
 "\\tilde" { yytext = "\u02DC"; return "ACCENTNS"; }
+"\\tooltip" { this.pushState("TEXTARG"); return "TOOLTIP"; }
 "\\underbrace" return "UNDERBRACE";
 "\\underline" return "UNDERLINE";
 "\\underoverset"  return UNDEROVERSET;
@@ -139,3 +141,5 @@
 "\\widehat" { yytext = "\u005E"; return "ACCENT"; }
 "\\widetilde" { yytext = "\u02DC"; return "ACCENT"; }
 "\\widevec" { yytext = "\u21C0"; return "ACCENT"; }
+"\\toggle" { return "TOGGLE"; }
+"\\endtoggle" { return "ENDTOGGLE"; }

@@ -168,7 +168,7 @@ parser.toMathML = function(aTeX, aDisplay, aRTL)
 /* Operator associations and precedence. */
 %left textstyle
 %left TEXOVER TEXATOP TEXCHOOSE
-%left "^" "_"
+%right "^" "_"
 
 %start math
 
@@ -406,8 +406,19 @@ closedTerm
   | HREF textArg closedTerm {
     $$ = newTag("mrow", $3, "href=\"" + escapeQuote($2) + "\"");
   }
+  | STATUSLINE textArg closedTerm {
+    $$ = newTag("maction",
+                $3 + newTag("mtext", $2), "actiontype=\"statusline\"");
+  }
+  | TOOLTIP textArg closedTerm {
+    $$ = newTag("maction",
+                $3 + newTag("mtext", $2), "actiontype=\"tooltip\"");
+  }
+  | TOGGLE closedTermList ENDTOGGLE {
+    $$ = newTag("maction", $2, "actiontype=\"toggle\"");
+  }
   | TENSOR closedTerm "{" subsupList "}" {
-    $$ = newTag("mmultiscripts", $2, $4);
+    $$ = newTag("mmultiscripts", $2 + $4);
   }
   | MULTI "{" subsupList "}" closedTerm "{" subsupList "}" {
     $$ = newTag("mmultiscripts", $5 + $7 + "<mprescripts/>" + $3);
@@ -469,6 +480,15 @@ right
   }
   | RIGHT "." {
     $$ = "";
+  }
+  ;
+
+closedTermList
+  : closedTerm {
+    $$ = $1;
+  }
+  | closedTermList closedTerm {
+    $$ = $1 + $2;
   }
   ;
 
