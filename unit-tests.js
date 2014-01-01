@@ -85,10 +85,24 @@ var tests = [
     ["\\big(\\bigr(\\Big(\\Bigr(\\bigg(\\biggr(\\Bigg(\\Biggr(\\bigl(\\Bigl(\\biggl(\\Biggl(", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo maxsize="1.2em" minsize="1.2em">(</mo><mo maxsize="1.2em" minsize="1.2em">(</mo><mo maxsize="1.8em" minsize="1.8em">(</mo><mo maxsize="1.8em" minsize="1.8em">(</mo><mo maxsize="2.4em" minsize="2.4em">(</mo><mo maxsize="2.4em" minsize="2.4em">(</mo><mo maxsize="3em" minsize="3em">(</mo><mo maxsize="3em" minsize="3em">(</mo><mo maxsize="1.2em" minsize="1.2em">(</mo><mo maxsize="1.8em" minsize="1.8em">(</mo><mo maxsize="2.4em" minsize="2.4em">(</mo><mo maxsize="3em" minsize="3em">(</mo></mrow><annotation encoding="TeX">\\big(\\bigr(\\Big(\\Bigr(\\bigg(\\biggr(\\Bigg(\\Biggr(\\bigl(\\Bigl(\\biggl(\\Biggl(</annotation></semantics></math>'],
     /* math*lap */
     ["\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mpadded width="0em"><mi>x</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-100%width"><mi>y</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-50%width"><mi>y</mi></mpadded></mrow><annotation encoding="TeX">\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}</annotation></semantics></math>'],
+    /* space */
+    ["\\space{1}{2}{3}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mspace height=".1ex" depth=".2ex" width=".3em"/><annotation encoding="TeX">\\space{1}{2}{3}</annotation></semantics></math>'],
+    /* mathraisebox */
+    ["\\mathraisebox{1em}x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="1em" height="+1em"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{1em}x</annotation></semantics></math>'],
+    ["\\mathraisebox{-1em}x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="-1em" height="0pt" depth="+"1em"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{-1em}x</annotation></semantics></math>'],
+    ["\\mathraisebox{1em}[2em]x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="1em" height="2em" depth="depth"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{1em}[2em]x</annotation></semantics></math>'],
+    ["\\mathraisebox{-1em}[2em]x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="-1em" height="2em" depth="+1em"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{-1em}[2em]x</annotation></semantics></math>'],
+    ["\\mathraisebox{1em}[2em][3em]x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="1em" height="2em" depth="3em"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{1em}[2em][3em]x</annotation></semantics></math>'],
     /* infinity */
     ["\\infty \\infinity ∞", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>∞</mn><mn>∞</mn><mn>∞</mn></mrow><annotation encoding="TeX">\\infty \\infinity ∞</annotation></semantics></math>'],
+    /* maction */
+    ["\\tooltip{a}b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><maction actiontype="tooltip"><mi>b</mi><mtext>a</mtext></maction><annotation encoding="TeX">\\tooltip{a}b</annotation></semantics></math>'],
+    ["\\statusline{a}b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><maction actiontype="statusline"><mi>b</mi><mtext>a</mtext></maction><annotation encoding="TeX">\\statusline{a}b</annotation></semantics></math>'],
+    ["\\toggle a b c \\endtoggle", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><maction actiontype="toggle"><mi>a</mi><mi>b</mi><mi>c</mi></maction><annotation encoding="TeX">\\toggle a b c \\endtoggle</annotation></semantics></math>'],
     /* tensor */
-/*    ["", ''],*/
+    ["\\tensor x{_b^c_d^e_^f}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mmultiscripts><mi>x</mi><mi>b</mi><mi>c</mi><mi>d</mi><mi>e</mi><none/><mi>f</mi></mmultiscripts><annotation encoding="TeX">\\tensor x{_b^c_d^e_^f}</annotation></semantics></math>'],
+    /* multiscripts */
+    ["\\multiscripts{^1_2_3^4_^5}x{^1_2_3^4_^5}",'<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mmultiscripts><mi>x</mi><none/><mn>1</mn><mn>2</mn><none/><mn>3</mn><mn>4</mn><none/><mn>5</mn><mprescripts/><none/><mn>1</mn><mn>2</mn><none/><mn>3</mn><mn>4</mn><none/><mn>5</mn></mmultiscripts><annotation encoding="TeX">\\multiscripts{^1_2_3^4_^5}x{^1_2_3^4_^5}</annotation></semantics></math>'],
     /* matrix */
     ["\\begin{matrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{matrix}",
      '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable rowspacing="0.5ex"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr><mtr><mtd><mi>d</mi></mtd><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr><mtr><mtd><mi>g</mi></mtd><mtd><mi>h</mi></mtd><mtd><mi>i</mi></mtd></mtr></mtable><annotation encoding="TeX">\\begin{matrix} a &amp; b &amp; c \\\\ d &amp; e &amp; f \\\\ g &amp; h &amp; i \\end{matrix}</annotation></semantics></math>'],

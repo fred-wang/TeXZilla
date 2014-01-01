@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 "\\!" return "NEGSPACE";
 "\\," return "THINSPACE";
 "\\:" return "MEDSPACE";
@@ -90,6 +89,7 @@
 "\\mathllap" return "MATHLLAP";
 "\\mathmit" return "MATHIT";
 "\\mathop" { this.begin("TEXTARG"); return "MATHOP"; }
+"\\mathraisebox"  { this.pushState("TEXTOPTARG"); this.pushState("TRYOPTARG"); this.pushState("TEXTOPTARG"); this.pushState("TRYOPTARG"); this.pushState("TEXTARG"); return "MATHRAISEBOX"; }
 "\\mathrel" { this.begin("TEXTARG"); return "MATHREL"; }
 "\\mathrlap" return "MATHRLAP";
 "\\mathrm" return "MATHRM";
@@ -117,8 +117,10 @@
 "\\scriptscriptsize" return "SCRIPTSCRIPTSIZE";
 "\\scriptsize" return "SCRIPTSIZE";
 "\\slash" return "SLASH";
+"\\space" { this.pushState("TEXTARG"); this.pushState("TEXTARG"); this.pushState("TEXTARG"); return "SPACE"; }
 "\\sqrt" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); return "SQRT"; }
 "\\stackrel" return "OVERSET";
+"\\statusline" { this.pushState("TEXTARG"); return "STATUSLINE"; }
 "\\substack" return "SUBSTACK";
 "\\tensor" return "TENSOR";
 "\\text" { this.begin("TEXTARG"); return "MTEXT"; }
@@ -128,6 +130,7 @@
 "\\thickspace" return "THICKSPACE";
 "\\thinspace" return "THINSPACE";
 "\\tilde" { yytext = "\u02DC"; return "ACCENTNS"; }
+"\\tooltip" { this.pushState("TEXTARG"); return "TOOLTIP"; }
 "\\underbrace" return "UNDERBRACE";
 "\\underline" return "UNDERLINE";
 "\\underoverset"  return UNDEROVERSET;
@@ -138,3 +141,5 @@
 "\\widehat" { yytext = "\u005E"; return "ACCENT"; }
 "\\widetilde" { yytext = "\u02DC"; return "ACCENT"; }
 "\\widevec" { yytext = "\u21C0"; return "ACCENT"; }
+"\\toggle" { return "TOGGLE"; }
+"\\endtoggle" { return "ENDTOGGLE"; }
