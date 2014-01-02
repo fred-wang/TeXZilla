@@ -15,8 +15,8 @@ Required to generate `TeXZilla.js`:
 
 Optional:
 
-- To rununit tests: [slimerJS](http://slimerjs.org/)
-- To generate the minified version ̀TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/) and Java.
+- To run unit tests: [slimerJS](http://slimerjs.org/)
+- To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/) and Java.
 
 Compiling
 ---------

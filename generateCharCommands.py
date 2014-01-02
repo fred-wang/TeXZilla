@@ -27,17 +27,6 @@ def isValidLaTeXCommand(aCommand):
         command == "\\hat" or
         command == "{_\\ast}" or
         command == "{{/}\\!\\!{/}}" or
-        # Should these commands be filtered out?
-        # command.find("\\mathbb") != -1 or
-        # command.find("\\mathscr") != -1 or
-        # command.find("\\mathbcal") != -1 or
-        # command.find("\\mathbf") != -1 or
-        # command.find("\\mathbit") != -1 or
-        # command.find("\\mathfrak") != -1 or
-        # command.find("\\mathmit") != -1 or
-        # command.find("\\mathrm") != -1 or
-        # command.find("\\mathsf") != -1 or
-        # command.find("\\mathtt") != -1 or
         command.find("\\fontencoding") != -1 or
         command.find("\\ElsevierGlyph") != -1 or
         command.find("\\Pisymbol") != -1 or
@@ -166,6 +155,16 @@ if __name__ == "__main__":
 
         # Extract the mathclass.
         mathclass = info[1]
+        if (isSingleChar):
+            if (codePoint[0] == 0x221E):
+                # infinity
+                mathclass = "NUM"
+            elif (codePoint[0] == 0x24):
+                # $
+                mathclass = "TEXT"
+            elif (codePoint[0] in [0x2032, 0x2033, 0x2034, 0x2035, 0x2057]):
+                # primes
+                mathclass = "OP"
 
         # Extract the TeX commands for this character.
         LaTeXCommands = []
@@ -181,19 +180,18 @@ if __name__ == "__main__":
                 LaTeXCommands.append("\\}")
             elif codePoint[0] == 0x221E:
                 LaTeXCommands.append("\\infinity") # itex2MML
+            elif codePoint[0] == 0x2032:
+                LaTeXCommands.append("'");
+            elif codePoint[0] == 0x2033:
+                LaTeXCommands.append("''");
+            elif codePoint[0] == 0x2034:
+                LaTeXCommands.append("'''");
+            elif codePoint[0] == 0x2037:
+                LaTeXCommands.append("''''");
 
         # Escape the backslahes.
         for i in range(0,len(LaTeXCommands)):
             LaTeXCommands[i] = LaTeXCommands[i].replace("\\", "\\\\")
-
-        # Add some characters.
-        if (isSingleChar):
-            if (codePoint[0] == 0x221E):
-                # infinity
-                mathclass = "NUM"
-            elif (codePoint[0] == 0x24):
-                # $
-                mathclass = "TEXT"
 
         if (mathclass == "A" or mathclass[:2] == "OP" or mathclass == "NUM" or
             mathclass == "TEXT"):
