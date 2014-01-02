@@ -100,8 +100,11 @@ var tests = [
     ["\\statusline{a}b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><maction actiontype="statusline"><mi>b</mi><mtext>a</mtext></maction><annotation encoding="TeX">\\statusline{a}b</annotation></semantics></math>'],
     ["\\toggle a b c \\endtoggle", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><maction actiontype="toggle"><mi>a</mi><mi>b</mi><mi>c</mi></maction><annotation encoding="TeX">\\toggle a b c \\endtoggle</annotation></semantics></math>'],
     /* tensor */
+    ["\\tensor x_b^c_d^e_^f", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mmultiscripts><mi>x</mi><mi>b</mi><mi>c</mi><mi>d</mi><mi>e</mi><none/><mi>f</mi></mmultiscripts><annotation encoding="TeX">\\tensor x_b^c_d^e_^f</annotation></semantics></math>'],
     ["\\tensor x{_b^c_d^e_^f}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mmultiscripts><mi>x</mi><mi>b</mi><mi>c</mi><mi>d</mi><mi>e</mi><none/><mi>f</mi></mmultiscripts><annotation encoding="TeX">\\tensor x{_b^c_d^e_^f}</annotation></semantics></math>'],
     /* multiscripts */
+    ["\\multiscripts{ }x{^1_2_3^4_^5}",'<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mmultiscripts><mi>x</mi><none/><mn>1</mn><mn>2</mn><none/><mn>3</mn><mn>4</mn><none/><mn>5</mn></mmultiscripts><annotation encoding="TeX">\\multiscripts{ }x{^1_2_3^4_^5}</annotation></semantics></math>'],
+    ["\\multiscripts{^1_2_3^4_^5}x{ }",'<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mmultiscripts><mi>x</mi><mprescripts/><none/><mn>1</mn><mn>2</mn><none/><mn>3</mn><mn>4</mn><none/><mn>5</mn></mmultiscripts><annotation encoding="TeX">\\multiscripts{^1_2_3^4_^5}x{ }</annotation></semantics></math>'],
     ["\\multiscripts{^1_2_3^4_^5}x{^1_2_3^4_^5}",'<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mmultiscripts><mi>x</mi><none/><mn>1</mn><mn>2</mn><none/><mn>3</mn><mn>4</mn><none/><mn>5</mn><mprescripts/><none/><mn>1</mn><mn>2</mn><none/><mn>3</mn><mn>4</mn><none/><mn>5</mn></mmultiscripts><annotation encoding="TeX">\\multiscripts{^1_2_3^4_^5}x{^1_2_3^4_^5}</annotation></semantics></math>'],
     /* matrix */
     ["\\begin{matrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{matrix}",

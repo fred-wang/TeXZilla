@@ -59,6 +59,7 @@
 "\\ddot" { yytext = "\u0308"; return "ACCENT"; }
 "\\displaystyle" return "DISPLAYSTYLE";
 "\\dot" { yytext = "\u02D9"; return "ACCENT"; }
+"\\endtoggle" { return "ENDTOGGLE"; }
 "\\end{Bmatrix}" return "EBBMATRIX";
 "\\end{Vmatrix}" return "EVVMATRIX";
 "\\end{aligned}" return "EALIGNED";
@@ -110,6 +111,7 @@
 "\\overline" { yytext = "\u02C7"; return "ACCENT"; }
 "\\overset" return "OVERSET";
 "\\phantom" return "PHANTOM";
+"\\pmod" return "PMOD";
 "\\qquad" return "QQUAD";
 "\\quad" return "QUAD";
 "\\right" return "RIGHT";
@@ -130,6 +132,7 @@
 "\\thickspace" return "THICKSPACE";
 "\\thinspace" return "THINSPACE";
 "\\tilde" { yytext = "\u02DC"; return "ACCENTNS"; }
+"\\toggle" { return "TOGGLE"; }
 "\\tooltip" { this.pushState("TEXTARG"); return "TOOLTIP"; }
 "\\underbrace" return "UNDERBRACE";
 "\\underline" return "UNDERLINE";
@@ -141,5 +144,3 @@
 "\\widehat" { yytext = "\u005E"; return "ACCENT"; }
 "\\widetilde" { yytext = "\u02DC"; return "ACCENT"; }
 "\\widevec" { yytext = "\u21C0"; return "ACCENT"; }
-"\\toggle" { return "TOGGLE"; }
-"\\endtoggle" { return "ENDTOGGLE"; }

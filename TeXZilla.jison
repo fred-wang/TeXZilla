@@ -343,6 +343,9 @@ closedTerm
     $$ = newTag("mstyle", $$, "displaystyle=\"false\"");
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
+  | PMOD closedTerm {
+    $$ = "<mrow><mo lspace=\"mediummathspace\">(</mo><mo rspace=\"thinmathspace\">mod</mo>" + $2 + "<mo rspace=\"mediummathspace\">)</mo></mrow>";
+  }
   | UNDERBRACE closedTerm { $$ = newTag("munder", $2 + newMo("\u23DF")); }
   | UNDERLINE closedTerm { $$ = newTag("munder", $2 + newMo("_")); }
   | OVERBRACE closedTerm { $$ = newTag("mover", $2 + newMo("\u23DE")); }
@@ -423,6 +426,12 @@ closedTerm
   | MULTI "{" subsupList "}" closedTerm "{" subsupList "}" {
     $$ = newTag("mmultiscripts", $5 + $7 + "<mprescripts/>" + $3);
   }
+  | MULTI "{" subsupList "}" closedTerm "{" "}" {
+    $$ = newTag("mmultiscripts", $5 + "<mprescripts/>" + $3);
+  }
+  | MULTI "{" "}" closedTerm "{" subsupList "}" {
+    $$ = newTag("mmultiscripts", $4 + $6);
+  }
   | BMATRIX tableRowList EMATRIX {
     $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
   }
@@ -493,7 +502,10 @@ closedTermList
   ;
 
 compoundTerm
-  : closedTerm "_" closedTerm "^" closedTerm {
+  : TENSOR closedTerm subsupList {
+    $$ = newTag("mmultiscripts", $2 + $3);
+  }
+  | closedTerm "_" closedTerm "^" closedTerm {
     $$ = newScript(false, $1, $3, $5);
   }
   | closedTerm "^" closedTerm "_" closedTerm {
