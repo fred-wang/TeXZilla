@@ -222,6 +222,42 @@ tokenContent
   }
   ;
 
+arrayAlign
+  : textOptArg {
+    $1 = $1.trim();
+    if ($1 === "t") {
+      $$ = "axis 1";
+    } else if ($1 === "c") {
+      $$ = "center";
+    } else if ($1 === "b") {
+      $$ = "axis -1";
+    } else {
+      throw "Unknown array alignment";
+    }
+  }
+  ;
+
+columnAlign
+  : textArg {
+    $$ = "";
+    $1 = $1.replace(/\s+/g, "");;
+    for (var i = 0; i < $1.length; i++) {
+      if ($1[i] === "c") {
+        $$ += " center";
+      } else if ($1[i] === "l") {
+        $$ += " left";
+      } else if ($1[i] === "r") {
+        $$ += " right";
+      }
+    }
+    if ($$.length) {
+        $$ = $$.slice(1);
+    } else {
+        throw "Invalid column alignments";
+    }
+  }
+  ;
+
 closedTerm
   : "{" "}" { $$ = "<mrow/>"; }
   | "{" styledExpression "}" { $$ = newMrow($2); }
@@ -468,6 +504,17 @@ closedTerm
   }
   | BALIGNED tableRowList EALIGNED {
     $$ = newTag("mtable", $2, "columnalign=\"right left right left right left right left right left\" columnspacing=\"0em\"");
+  }
+  | BARRAY arrayAlign columnAlign tableRowList EARRAY {
+    $$ = newTag("mtable", $4,
+                "rowspacing=\"0.5ex\" " +
+                "align=\"" + $2 + "\" " +
+                "columnalign=\"" + $3 + "\"");
+  }
+  | BARRAY columnAlign tableRowList EARRAY {
+    $$ = newTag("mtable", $3,
+                "rowspacing=\"0.5ex\" " +
+                "columnalign=\"" + $2 + "\"");
   }
   | SUBSTACK "{" tableRowList "}" {
     $$ = newTag("mtable", $3, "columnalign=\"center\" rowspacing=\"0.5ex\"");

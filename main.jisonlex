@@ -20,13 +20,13 @@
 
 %%
 
-<TRYOPTARG>"[" { this.popState(); return "["; }
+<TRYOPTARG>\s*"[" { this.popState(); return "["; }
 <TRYOPTARG>. { this.unput(yytext); this.popState(); this.popState(); }
 
 <TEXTOPTARG>([^\\\]]|(\\[\\\]]))+ { return "TEXTOPTARG"; }
 <TEXTOPTARG>"]" { this.popState(); return "]"; }
 
-<TEXTARG>"{" return "{";
+<TEXTARG>\s*"{" return "{";
 <TEXTARG>([^\\\}]|(\\[\\\}]))+ return "TEXTARG";
 <TEXTARG>"}" { this.popState(); return "}"; }
 

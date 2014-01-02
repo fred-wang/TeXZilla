@@ -31,7 +31,7 @@
 "\\begin{Bmatrix}" return "BBMATRIX";
 "\\begin{Vmatrix}" return "VVMATRIX";
 "\\begin{aligned}" return "BALIGNED";
-"\\begin{array}" return "BARRAY";
+"\\begin{array}" { this.pushState("TEXTARG"); this.pushState("TEXTOPTARG"); this.pushState("TRYOPTARG"); return "BARRAY"; }
 "\\begin{bmatrix}" return "BMATRIX";
 "\\begin{cases}" return "BCASES";
 "\\begin{gathered}" return "BGATHERED";
