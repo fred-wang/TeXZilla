@@ -30,8 +30,8 @@ function escapeQuote(aString)
 
 function parseLength(aString)
 {
-  // See http://www.w3.org/Math/draft-spec/appendixa.html#parsing_length
-  // FIXME: should namedspaces be accepted too?
+  /* See http://www.w3.org/Math/draft-spec/appendixa.html#parsing_length */
+  /* FIXME: should namedspaces be accepted too? */
   var lengthRegexp = /\s*(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?\s*/;
   var result = lengthRegexp.exec(aString);
   if (result) {
@@ -76,6 +76,8 @@ function newScript(aUnderOver, aBase, aScriptBot, aScriptTop)
   return "<msubsup>" + aBase + aScriptBot + aScriptTop + "</msubsup>";
 }
 
+/* FIXME: try to restore the operator grouping when compoundTermList does not
+   contain any fences */
 function newMrow(aList, aTag, aAttributes)
 {
   if (!aTag) {
@@ -97,6 +99,7 @@ var TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
 
 function parseMathMLDocument(aString)
 {
+  /* Parse the string into a MathML document and return the <math> root. */
   return (new DOMParser()).
     parseFromString(aString, "application/xml").documentElement;
 }
@@ -161,30 +164,20 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL)
 
 parser.toMathML = function(aTeX, aDisplay, aRTL)
 {
+  /* Parse the TeX string into a <math> element. */
   return parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL));
 }
 %}
 
 /* Operator associations and precedence. */
-%left textstyle
 %left TEXOVER TEXATOP TEXCHOOSE
 %right "^" "_"
 
 %start math
 
-%% /* language grammar */
+%%
 
-math
-  : styledExpression EOF {
-    $$ = { source: newMrow($1), display: false };
-    return $$;
-  }
-  | EOF {
-    $$ = { source: "<mrow/>", display: false };
-    return $$;
-  }
-  ;
-
+/* text option argument */
 textOptArg
   : "[" TEXTOPTARG "]" {
     /* Unescape \] and \\. */
@@ -194,6 +187,7 @@ textOptArg
   }
   ;
 
+/* text argument */
 textArg
   : "{" TEXTARG "}" {
     /* Unescape \} and \\. */
@@ -203,18 +197,31 @@ textArg
   }
   ;
 
+/* length optional argument */
 lengthOptArg
   : "[" TEXTOPTARG "]" {
     $$ = parseLength($2);
   }
   ;
 
+/* length argument */
 lengthArg
   : "{" TEXTARG "}" {
     $$ = parseLength($2);
   }
   ;
 
+/* attribute optional argument */
+attrOptArg
+  : textOptArg { $$ = "\"" + escapeQuote($1) + "\""; }
+  ;
+
+/* attribute argument */
+attrArg
+  : textArg { $$ = "\"" + escapeQuote($1) + "\""; }
+  ;
+
+/* MathML token content */
 tokenContent
   : textArg {
     /* Collapse the whitespace as indicated in the MathML specification. */
@@ -222,6 +229,126 @@ tokenContent
   }
   ;
 
+/* array alignment */
+arrayAlign
+  : textOptArg {
+    $1 = $1.trim();
+    if ($1 === "t") {
+      $$ = "axis 1";
+    } else if ($1 === "c") {
+      $$ = "center";
+    } else if ($1 === "b") {
+      $$ = "axis -1";
+    } else {
+      throw "Unknown array alignment";
+    }
+  }
+  ;
+
+/* array column alignment */
+columnAlign
+  : textArg {
+    $$ = "";
+    $1 = $1.replace(/\s+/g, "");;
+    for (var i = 0; i < $1.length; i++) {
+      if ($1[i] === "c") {
+        $$ += " center";
+      } else if ($1[i] === "l") {
+        $$ += " left";
+      } else if ($1[i] === "r") {
+        $$ += " right";
+      }
+    }
+    if ($$.length) {
+        $$ = $$.slice(1);
+    } else {
+        throw "Invalid column alignments";
+    }
+  }
+  ;
+
+/* table attributes */
+/* FIXME: this may generate not well-formed XML markup when duplicate attributes are used. Try to abstract the element/attribute creation to better handle that. */
+collayout: COLLAYOUT attrArg { $$ = "columnalign=" + $2; };
+colalign: COLALIGN attrArg { $$ = "columnalign=" + $2; };
+rowalign: ROWALIGN attrArg { $$ = "rowalign=" + $2; };
+rowspan: ROWSPAN attrArg { $$ = "rowspan=" + $2; };
+colspan: COLSPAN attrArg { $$ = "colspan=" + $2; };
+align: ALIGN attrArg { $$ = "align=" + $2; };
+eqrows: EQROWS attrArg { $$ = "equalrows=" + $2; };
+eqcols: EQCOLS attrArg { $$ = "equalcolumns=" + $2; };
+rowlines: ROWLINES attrArg { $$ = "rowlines=" + $2; };
+collines: COLLINES attrArg { $$ = "columnlines=" + $2; };
+frame: FRAME attrArg { $$ = "frame=" + $2; };
+padding: PADDING attrArg { $$ = "rowspacing=" + $2 + " columnspacing=" + $2; };
+
+/* cell option */
+cellopt
+  : colalign { $$ = $1; }
+  | rowalign { $$ = $1; }
+  | rowspan { $$ = $1; }
+  | colspan { $$ = $1; }
+  ;
+
+/* list of cell options */
+celloptList
+  : cellopt { $$ = $1; }
+  | celloptList cellopt { $$ = $1 + " " + $2; }
+  ;
+
+/* row option */
+rowopt
+  : colalign { $$ = $1; }
+  | rowalign { $$ = $1; }
+  ;
+
+/* array option */
+arrayopt
+  : collayout { $$ = $1; }
+  | colalign { $$ = $1; }
+  | rowalign { $$ = $1; }
+  | align { $$ = $1; }
+  | eqrows { $$ = $1; }
+  | eqcols { $$ = $1; }
+  | rowlines { $$ = $1; }
+  | collines { $$ = $1; }
+  | frame { $$ = $1; }
+  | padding { $$ = $1; }
+  ;
+
+/* list of array options */
+arrayoptList
+  : arrayopt { $$ = $1; }
+  | arrayoptList arrayopt { $$ = $1 + " " + $2; }
+  ;
+
+/* list of row options */
+rowoptList
+  : rowopt { $$ = $1 }
+  | rowoptList rowopt { $$ = $1 + " " + $2; }
+  ;
+
+/* left fence */
+left
+  : LEFT OPFS {
+    $$ = newMo($2);
+  }
+  | LEFT "." {
+    $$ = "";
+  }
+  ;
+
+/* right fence */
+right
+  : RIGHT OPFS {
+    $$ = newMo($2);
+  }
+  | RIGHT "." {
+    $$ = "";
+  }
+  ;
+
+/* closed terms */
 closedTerm
   : "{" "}" { $$ = "<mrow/>"; }
   | "{" styledExpression "}" { $$ = newMrow($2); }
@@ -290,9 +417,8 @@ closedTerm
   | OPFS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
   | OPS tokenContent { $$ = newTag("mo", $2, "stretchy=\"false\""); }
   | MS tokenContent { $$ = newTag("ms", $2); }
-  | MS textOptArg textOptArg tokenContent {
-     $$ = newTag("ms", $4, "lquote=\"" + escapeQuote($2) +
-                           "\" rquote=\"" + escapeQuote($3) + "\"");
+  | MS attrOptArg attrOptArg tokenContent {
+     $$ = newTag("ms", $4, "lquote=" + $2 + " rquote=" + $3);
   }
   | MTEXT tokenContent { $$ = newTag("mtext", $2); }
   | UNKNOWN_TEXT { $$ = newTag("mtext", escapeText($1)); }
@@ -387,6 +513,7 @@ closedTerm
                 ($2.l >= 0 ? "height=\"+" + $2.l + $2.u + "\"" :
                  "height=\"0pt\" depth=\"+\"" + (-$2.l) + $2.u + "\""));
   }
+  /* FIXME: mathvariant should be set on token element when possible. Try to abstract the element/attribute creation to better handle that. */
   | MATHBB closedTerm {
     $$ = newTag("mstyle", $2, "mathvariant=\"double-struck\"");
   }
@@ -406,8 +533,8 @@ closedTerm
   | MATHIT closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"italic\""); }
   | MATHTT closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"monospace\""); }
   | MATHRM closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"normal\""); }
-  | HREF textArg closedTerm {
-    $$ = newTag("mrow", $3, "href=\"" + escapeQuote($2) + "\"");
+  | HREF attrArg closedTerm {
+    $$ = newTag("mrow", $3, "href=" + $2);
   }
   | STATUSLINE textArg closedTerm {
     $$ = newTag("maction",
@@ -469,29 +596,29 @@ closedTerm
   | BALIGNED tableRowList EALIGNED {
     $$ = newTag("mtable", $2, "columnalign=\"right left right left right left right left right left\" columnspacing=\"0em\"");
   }
+  | BARRAY arrayAlign columnAlign tableRowList EARRAY {
+    $$ = newTag("mtable", $4,
+                "rowspacing=\"0.5ex\" " +
+                "align=\"" + $2 + "\" " +
+                "columnalign=\"" + $3 + "\"");
+  }
+  | BARRAY columnAlign tableRowList EARRAY {
+    $$ = newTag("mtable", $3,
+                "rowspacing=\"0.5ex\" " +
+                "columnalign=\"" + $2 + "\"");
+  }
   | SUBSTACK "{" tableRowList "}" {
     $$ = newTag("mtable", $3, "columnalign=\"center\" rowspacing=\"0.5ex\"");
   }
-  ;
-
-left
-  : LEFT OPFS {
-    $$ = newMo($2);
+  | ARRAY "{" tableRowList "}" {
+    $$ = newTag("mtable", $3);
   }
-  | LEFT "." {
-    $$ = "";
+  | ARRAY "{" ARRAYOPTS "{" arrayoptList "}" tableRowList "}" {
+    $$ = newTag("mtable", $7, $5);
   }
   ;
 
-right
-  : RIGHT OPFS {
-    $$ = newMo($2);
-  }
-  | RIGHT "." {
-    $$ = "";
-  }
-  ;
-
+/* list of closed terms */
 closedTermList
   : closedTerm {
     $$ = $1;
@@ -501,6 +628,7 @@ closedTermList
   }
   ;
 
+/* compound terms (closed terms with scripts) */
 compoundTerm
   : TENSOR closedTerm subsupList {
     $$ = newTag("mmultiscripts", $2 + $3);
@@ -533,50 +661,19 @@ compoundTerm
   | OPM { $$ = newMo($1); }
   ;
 
+/* list of compound terms */
 compoundTermList
   : compoundTerm { $$ = [$1]; }
   | compoundTermList compoundTerm { $1.push($2); $$ = $1; }
   ;
 
-styledExpression
-  : textstyle styledExpression { $$ = [newMrow($2, "mstyle", $1)]; }
-  | compoundTermList { $$ = $1; }
+/* subsup term */
+subsupTermScript
+  : closedTerm { $$ = $1; }
+  | OPM { $$ = newMo($1); }
   ;
 
-textstyle
-  : DISPLAYSTYLE { $$ = "displaystyle=\"true\""; }
-  | TEXTSTYLE { $$ = "displaystyle=\"false\""; }
-  | TEXTSIZE { $$ = "scriptlevel=\"0\""; }
-  | SCRIPTSIZE { $$ = "scriptlevel=\"1\""; }
-  | SCRIPTSCRIPTSIZE { $$ = "scriptlevel=\"2\""; }
-  | COLOR textArg { $$ = "mathcolor=\"" + escapeQuote($2) + "\""; }
-  | BGCOLOR textArg { $$ = "mathbackground=\"" + escapeQuote($2) + "\""; }
-  ;
-
-tableRowList
-  : tableRow { $$ = $1; }
-  | tableRowList ROWSEP tableRow { $$ = $1 + $3 }
-  ;
-
-tableRow
-  : simpleTableRow { $$ = newTag("mtr", $1); }
-  ;
-
-simpleTableRow
-  : tableCell { $$ = $1; }
-  | simpleTableRow COLSEP tableCell { $$ = $1 + $3; }
-  ;
-
-tableCell
-  : { $$ = newTag("mtd", ""); }
-  | styledExpression { $$ = newMrow($1, "mtd"); }
-  ;
-
-subsupList
-  : subsupTerm { $$ = $1; }
-  | subsupList subsupTerm { $$ = $1 + $2 }
-  ;
-
+/* subsup term as scripts */
 subsupTerm
   : "_" subsupTermScript "^" subsupTermScript { $$ = $2 + $4; }
   | "_" subsupTermScript { $$ = $2 + "<none/>"; }
@@ -584,7 +681,66 @@ subsupTerm
   | "_" "^" subsupTermScript { $$ = "<none/>" + $3; }
   ;
 
-subsupTermScript
-  : closedTerm { $$ = $1; }
-  | OPM { $$ = newMo($1); }
+/* list of subsup terms */
+subsupList
+  : subsupTerm { $$ = $1; }
+  | subsupList subsupTerm { $$ = $1 + $2 }
+  ;
+
+/* text style */
+textstyle
+  : DISPLAYSTYLE { $$ = "displaystyle=\"true\""; }
+  | TEXTSTYLE { $$ = "displaystyle=\"false\""; }
+  | TEXTSIZE { $$ = "scriptlevel=\"0\""; }
+  | SCRIPTSIZE { $$ = "scriptlevel=\"1\""; }
+  | SCRIPTSCRIPTSIZE { $$ = "scriptlevel=\"2\""; }
+  | COLOR attrArg { $$ = "mathcolor=" + $2; }
+  | BGCOLOR attrArg { $$ = "mathbackground=" + $2; }
+  ;
+
+/* styled expression (compoundTermList with additional style) */
+styledExpression
+  : textstyle styledExpression { $$ = [newMrow($2, "mstyle", $1)]; }
+  | compoundTermList { $$ = $1; }
+  ;
+
+/* table cell */
+tableCell
+  : { $$ = newTag("mtd", ""); }
+  | CELLOPTS "{" celloptList "}" styledExpression {
+    $$ = newMrow($5, "mtd", $3);
+  }
+  | styledExpression { $$ = newMrow($1, "mtd"); }
+  ;
+
+/* list of table cells */
+tableCellList
+  : tableCell { $$ = $1; }
+  | tableCellList COLSEP tableCell { $$ = $1 + $3; }
+  ;
+
+/* table row */
+tableRow
+  : ROWOPTS "{" rowoptList "}" tableCellList {
+    $$ = $$ = newTag("mtr", $5, $3);
+  }
+  | tableCellList { $$ = newTag("mtr", $1); }
+  ;
+
+/* list of table rows */
+tableRowList
+  : tableRow { $$ = $1; }
+  | tableRowList ROWSEP tableRow { $$ = $1 + $3 }
+  ;
+
+/* main math expression (list of styled expressions) */
+math
+  : styledExpression EOF {
+    $$ = { source: newMrow($1), display: false };
+    return $$;
+  }
+  | EOF {
+    $$ = { source: "<mrow/>", display: false };
+    return $$;
+  }
   ;

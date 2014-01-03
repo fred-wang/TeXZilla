@@ -4,6 +4,132 @@
     <title>TeXZilla</title>
     <meta charset="utf-8"/>
     <script type="text/javascript" src="TeXZilla-min.js"></script>
+    <style type="text/css">
+      /* Asana */
+      .Asana ::-moz-math-stretchy {
+        font-family: Asana Math;
+      }
+    
+      .Asana math, .Asana [mathvariant] {
+        font-family: Asana Math;
+        }
+    
+      .Asana [mathvariant="sans-serif"],
+      .Asana [mathvariant="bold-sans-serif"],
+      .Asana [mathvariant="sans-serif-italic"],
+      .Asana [mathvariant="sans-serif-bold-italic"] {
+        font-family: sans-serif;
+      }
+    
+      .Asana [mathvariant="monospace"] {
+        font-family: monospace;
+      }
+    
+      /* MathJax */
+    
+      .MathJax ::-moz-math-stretchy {
+        font-family: MathJax_Main;
+      }
+    
+      .MathJax math, .MathJax [mathvariant] {
+        font-family: MathJax_Main;
+      }
+    
+      .MathJax [mathvariant="sans-serif"],
+      .MathJax [mathvariant="bold-sans-serif"],
+      .MathJax [mathvariant="sans-serif-italic"]
+      .MathJax [mathvariant="sans-serif-bold-italic"] {
+        font-family: MathJax_SansSerif;
+      }
+    
+      .MathJax [mathvariant="monospace"] {
+        font-family: MathJax_Typewriter;
+      }
+    
+      .MathJax [mathvariant="fraktur"],
+      .MathJax [mathvariant="bold-fraktur"] {
+        font-family: MathJax_Fraktur;
+      }
+    
+      .MathJax [mathvariant="script"],
+      .MathJax [mathvariant="bold-script"] {
+        font-family: MathJax_Script;
+      }
+    
+      .MathJax [mathvariant="double-struck"] {
+        font-family: MathJax_AMS;
+      }
+    
+      /* STIX */
+    
+      .STIX ::-moz-math-stretchy {
+        font-family: STIXNonUnicode, STIXSizeOneSym, STIXSize1, STIXGeneral;
+      }
+    
+      .STIX math, .STIX [mathvariant] {
+        font-family: STIXGeneral;
+      }
+    
+      .STIX [mathvariant="sans-serif"],
+      .STIX [mathvariant="bold-sans-serif"],
+      .STIX [mathvariant="sans-serif-italic"],
+      .STIX [mathvariant="sans-serif-bold-italic"] {
+        font-family: sans-serif;
+      }
+    
+      .STIX [mathvariant="monospace"] {
+        font-family: monospace;
+      }
+    
+      /**** Experimental Open Type MATH fonts ****/
+    
+      /* 
+         Lucida: Not tested (need to order the fonts to test)
+         Cambria: Enable to read the MATH table?
+         GyrePagella, GyreTermes, LatinModern: excessive ascent/descent, so
+         only applied to the stretchy operators, not the math text.
+      */
+    
+      /* Cambria */
+      .Cambria ::-moz-math-stretchy, .Cambria math {
+        font-family: Cambria Math;
+      }
+    
+      /* GyrePagella */
+      .GyrePagella ::-moz-math-stretchy/*, .GyrePagella math*/ {
+        font-family: TeX Gyre Pagella Math;
+      }
+    
+      /* GyreTermes */
+      .GyreTermes ::-moz-math-stretchy/*, .GyreTermes math*/ {
+        font-family: TeX Gyre Termes Math;
+      }
+    
+      /* LatinModern */
+      .LatinModern ::-moz-math-stretchy/*, .LatinModern math*/ {
+        font-family: Latin Modern Math;
+      }
+    
+      /* Lucida */
+      .Lucida ::-moz-math-stretchy/*, .Lucida math*/ {
+        font-family: Lucida Bright Math;
+      }
+    
+      /* NeoEuler */
+      .NeoEuler ::-moz-math-stretchy, .NeoEuler math {
+        font-family: Neo Euler;
+      }
+    
+      /* STIXWord */
+      .STIXWord ::-moz-math-stretchy /*, .STIXWord math*/ {
+        font-family: STIX Math;
+      }
+    
+      /* XITS */
+      .XITS ::-moz-math-stretchy, .XITS math {
+        font-family: XITS Math;
+      }
+    </style>
     <script type="text/javascript">
       function update(aValue)
       {
@@ -18,32 +144,78 @@
                    document.getElementById("dir").value === "RTL");
         output.appendChild(math);
       }
+
+      function updateMathFont()
+      {
+        var mathFont = document.getElementById("MathFont").value;
+        if (mathFont === "Default") {
+          document.body.removeAttribute("class");
+        } else {
+          document.body.setAttribute("class", mathFont);
+        }
+        if (!document.getElementById("output").firstElementChild) {
+          update();
+        }
+      }
+
+      function updateMode()
+      {
+        var math = document.getElementById("output").firstElementChild;
+        if (math) {
+          math.setAttribute("display",
+            document.getElementById("mode").value === "display" ?
+            "block" : "inline");
+        } else {
+          update();
+        }
+      }
+
+      function updateDir()
+      {
+        var math = document.getElementById("output").firstElementChild;
+        if (math) {
+          math.setAttribute("dir",
+            document.getElementById("dir").value === "RTL" ?
+            "rtl" : "ltr");
+        } else {
+          update();
+        }
+      }
     </script>
   </head>
   <body>
 
     <h1>TeXZilla</h1>
 
-    <p>TeXZilla is a Javascript TeX-to-MathML converter generated with
-      <a href="http://zaach.github.io/jison/">Jison</a>. It is intended to be
-      used in Mozilla products but will work as well in any standard compliant
-      Web rendering engine.</p>
+    <p>TeXZilla is a Javascript TeX-to-MathML converter which is compatible
+      with Unicode. It is generated by
+      <a href="http://zaach.github.io/jison/">Jison</a> using a grammar
+      similar to the one of
+   <a href="http://golem.ph.utexas.edu/~distler/blog/itex2MML.html">itex2MML</a>
+      (and thus it has
+   <a href="http://golem.ph.utexas.edu/~distler/blog/itex2MMLcommands.html">very
+      similar commands</a>) and the
+<a href="http://www.w3.org/TR/xml-entity-names/">XML Entity Definitions
+        for Characters</a> specification. It is intended to be
+        used in Mozilla products but will work as well in any standard-compliant
+        Web rendering engine.</p>
 
     <p>
-      <select id="mode" onchange="update();">
+      <select id="mode" onchange="updateMode()">
         <option value="display">Display Mode</option>
         <option value="inline">Inline Mode</option>
       </select> ;
 
-      <select id="dir" onchange="update();">
+      <select id="dir" onchange="updateDir()">
         <option value="LTR">LTR</option>
         <option value="RTL">RTL</option>
       </select> ;
 
-      <select id="examples" onchange="update(this.value);">
+      <select id="examples" onchange="update(this.value)">
         <option value=""  selected="selected">-- select an example --</option>
         <option value="\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1">Ellipse Equation</option>
         <option value="\sum_{n=1}^{+\infty} \frac{1}{n^2} = \frac{\pi^2}{6}">Sum 1/n²</option>
+        <option value="f(x)=\sum_{n=-\infty}^\infty c_n e^{2\pi i(n/T) x} =\sum_{n=-\infty}^\infty \hat{f}(\xi_n) e^{2\pi i\xi_n x}\Delta\xi">Fourier Transform</option>
         <option value="∑_{n=1}^{+∞} \frac{1}{n^2} = \frac{π^2}{6}">Sum 1/n² (Unicode)</option>
         <option value="x^2 y^2">Mozilla MathML Torture Test 1</option>
         <option value="\multiscripts{_2}{F}{_3}">Mozilla MathML Torture Test 2</option>
@@ -121,7 +293,21 @@ c_n & c_{n+1} & c_{n+2} & \dots & c_{2n}
 \nabla \times \vec{\mathbf{B}} -\, \frac1c\, \frac{\partial\vec{\mathbf{E}}}{\partial t} & = \frac{4\pi}{c}\vec{\mathbf{j}} \\   \nabla \cdot \vec{\mathbf{E}} & = 4 \pi \rho \\
 \nabla \times \vec{\mathbf{E}}\, +\, \frac1c\, \frac{\partial\vec{\mathbf{B}}}{\partial t} & = \vec{\mathbf{0}} \\
 \nabla \cdot \vec{\mathbf{B}} & = 0 \end{aligned}">MathJax - Maxwell’s Equations</option>
-      </select>
+      </select><br/> Font:
+  <select id="MathFont" onchange="updateMathFont()">
+    <option value="Default" selected="selected">Default fonts</option>
+    <option value="Asana">Asana</option>
+    <option value="MathJax">MathJax</option>
+    <option value="STIX">STIX General</option>
+    <option value="Cambria">Cambria (experimental)</option>
+    <option value="GyrePagella">Gyre Pagella (experimental) </option>
+    <option value="GyreTermes">Gyre Termes (experimental) </option>
+    <option value="LatinModern">Latin Modern (experimental) </option>
+    <option value="Lucida">Lucida (experimental) </option>
+    <option value="NeoEuler">Neo Euler (experimental) </option>
+    <option value="STIXWord">STIX Word (experimental) </option>
+    <option value="XITS">XITS (experimental) </option>
+  </select> ("experimental" fonts are <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=407059">not yet supported</a>)
     </p>
 
       <textarea id="input" cols="80" rows="5" onchange="update()">
