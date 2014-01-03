@@ -76,6 +76,8 @@ function newScript(aUnderOver, aBase, aScriptBot, aScriptTop)
   return "<msubsup>" + aBase + aScriptBot + aScriptTop + "</msubsup>";
 }
 
+/* FIXME: try to restore the operator grouping when compoundTermList does not
+   contain any fences */
 function newMrow(aList, aTag, aAttributes)
 {
   if (!aTag) {
@@ -266,10 +268,19 @@ columnAlign
   ;
 
 /* table attributes */
+/* FIXME: this may generate not well-formed XML markup when duplicate attributes are used. Try to abstract the element/attribute creation to better handle that. */
+collayout: COLLAYOUT attrArg { $$ = "columnalign=" + $2; };
 colalign: COLALIGN attrArg { $$ = "columnalign=" + $2; };
 rowalign: ROWALIGN attrArg { $$ = "rowalign=" + $2; };
 rowspan: ROWSPAN attrArg { $$ = "rowspan=" + $2; };
 colspan: COLSPAN attrArg { $$ = "colspan=" + $2; };
+align: ALIGN attrArg { $$ = "align=" + $2; };
+eqrows: EQROWS attrArg { $$ = "equalrows=" + $2; };
+eqcols: EQCOLS attrArg { $$ = "equalcolumns=" + $2; };
+rowlines: ROWLINES attrArg { $$ = "rowlines=" + $2; };
+collines: COLLINES attrArg { $$ = "columnlines=" + $2; };
+frame: FRAME attrArg { $$ = "frame=" + $2; };
+padding: PADDING attrArg { $$ = "rowspacing=" + $2 + " columnspacing=" + $2; };
 
 /* cell option */
 cellopt
@@ -289,6 +300,26 @@ celloptList
 rowopt
   : colalign { $$ = $1; }
   | rowalign { $$ = $1; }
+  ;
+
+/* array option */
+arrayopt
+  : collayout { $$ = $1; }
+  | colalign { $$ = $1; }
+  | rowalign { $$ = $1; }
+  | align { $$ = $1; }
+  | eqrows { $$ = $1; }
+  | eqcols { $$ = $1; }
+  | rowlines { $$ = $1; }
+  | collines { $$ = $1; }
+  | frame { $$ = $1; }
+  | padding { $$ = $1; }
+  ;
+
+/* list of array options */
+arrayoptList
+  : arrayopt { $$ = $1; }
+  | arrayoptList arrayopt { $$ = $1 + " " + $2; }
   ;
 
 /* list of row options */
@@ -482,6 +513,7 @@ closedTerm
                 ($2.l >= 0 ? "height=\"+" + $2.l + $2.u + "\"" :
                  "height=\"0pt\" depth=\"+\"" + (-$2.l) + $2.u + "\""));
   }
+  /* FIXME: mathvariant should be set on token element when possible. Try to abstract the element/attribute creation to better handle that. */
   | MATHBB closedTerm {
     $$ = newTag("mstyle", $2, "mathvariant=\"double-struck\"");
   }
@@ -577,6 +609,12 @@ closedTerm
   }
   | SUBSTACK "{" tableRowList "}" {
     $$ = newTag("mtable", $3, "columnalign=\"center\" rowspacing=\"0.5ex\"");
+  }
+  | ARRAY "{" tableRowList "}" {
+    $$ = newTag("mtable", $3);
+  }
+  | ARRAY "{" ARRAYOPTS "{" arrayoptList "}" tableRowList "}" {
+    $$ = newTag("mtable", $7, $5);
   }
   ;
 

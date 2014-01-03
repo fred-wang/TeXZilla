@@ -25,7 +25,10 @@
 "\\Biggr" return "BBIGG";
 "\\Bigl"  return "BBIGL";
 "\\Bigr" return "BBIG";
+"\\align" { this.pushState("TEXTARG"); return "ALIGN"; }
 "\\arccos"|"\\arcsin"|"\\arctan"|"\\arg"|"\\cos"|"\\cosh"|"\\cot"|"\\coth"|"\\csc"|"\\deg"|"\\dim"|"\\exp"|"\\hom"|"\\ker"|"\\lg"|"\\ln"|"\\log"|"\\sec"|"\\sin"|"\\sinh"|"\\tan"|"\\tanh"|"\\det"|"\\gcd"|"\\inf"|"\\lim"|"\\liminf"|"\\limsup"|"\\max"|"\\min"|"\\Pr"|"\\sup" { yytext = yytext.slice(1); return "F"; }
+"\\array" return "ARRAY";
+"\\arrayopts" return "ARRAYOPTS";
 "\\atop" return "TEXATOP";
 "\\bar" { yytext = "\u00AF"; return "ACCENTNS"; }
 "\\begin{Bmatrix}" return "BBMATRIX";
@@ -55,6 +58,8 @@
 "\\choose" return "TEXCHOOSE";
 "\\closure" { yytext = "\u02C7"; return "ACCENT"; }
 "\\colalign" { this.begin("TEXTARG"); return "COLALIGN"; }
+"\\collayout" { this.pushState("TEXTARG"); return "COLLAYOUT";}
+"\\collines" { this.pushState("TEXTARG"); return "COLLINES"; }
 "\\color" { this.pushState("TEXTARG"); return "COLOR"; }
 "\\colspan" { this.begin("TEXTARG"); return "COLSPAN"; }
 "\\ddddot" { yytext = "\u20DC"; return "ACCENT"; }
@@ -75,7 +80,10 @@
 "\\end{smallmatrix}" return "ESMALLMATRIX";
 "\\end{split}" return "EALIGNED";
 "\\end{vmatrix}" return "EVMATRIX";
+"\\equalcols" { this.pushState("TEXTARG"); return "EQCOLS"; }
+"\\equalrows" { this.pushState("TEXTARG"); return "EQROWS"; }
 "\\frac" return "FRAC";
+"\\frame" { this.pushState("TEXTARG"); return "FRAME"; }
 "\\hat" { yytext = "\u005E"; return "ACCENTNS"; }
 "\\href" { this.pushState("TEXTARG"); return "HREF"; }
 "\\itexnum" { this.pushState("TEXTARG"); return "MN"; }
@@ -114,6 +122,7 @@
 "\\overbrace" return "OVERBRACE";
 "\\overline" { yytext = "\u02C7"; return "ACCENT"; }
 "\\overset" return "OVERSET";
+"\\padding" { this.pushState("TEXTARG"); return "PADDING"; }
 "\\phantom" return "PHANTOM";
 "\\pmod" return "PMOD";
 "\\qquad" return "QQUAD";
@@ -121,6 +130,7 @@
 "\\right" return "RIGHT";
 "\\root" return "ROOT";
 "\\rowalign" { this.begin("TEXTARG"); return "ROWALIGN"; }
+"\\rowlines" { this.pushState("TEXTARG"); return "ROWLINES"; }
 "\\rowopts" return "ROWOPTS";
 "\\rowspan" { this.begin("TEXTARG"); return "ROWSPAN"; }
 "\\scriptscriptsize" return "SCRIPTSCRIPTSIZE";
