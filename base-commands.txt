@@ -50,10 +50,13 @@
 "\\binom" return "BINOM";
 "\\boldsymbol" return "MATHBF";
 "\\boxed" return "BOXED";
+"\\cellopts" return "CELLOPTS";
 "\\check" { yytext = "\u02C7"; return "ACCENTNS"; }
 "\\choose" return "TEXCHOOSE";
 "\\closure" { yytext = "\u02C7"; return "ACCENT"; }
+"\\colalign" { this.begin("TEXTARG"); return "COLALIGN"; }
 "\\color" { this.pushState("TEXTARG"); return "COLOR"; }
+"\\colspan" { this.begin("TEXTARG"); return "COLSPAN"; }
 "\\ddddot" { yytext = "\u20DC"; return "ACCENT"; }
 "\\dddot" { yytext = "\u30DB"; return "ACCENT"; }
 "\\ddot" { yytext = "\u0308"; return "ACCENT"; }
@@ -75,6 +78,7 @@
 "\\frac" return "FRAC";
 "\\hat" { yytext = "\u005E"; return "ACCENTNS"; }
 "\\href" { this.pushState("TEXTARG"); return "HREF"; }
+"\\itexnum" { this.pushState("TEXTARG"); return "MN"; }
 "\\left" return "LEFT";
 "\\mathbb" return "MATHBB";
 "\\mathbcal" return "MATHBSRC";
@@ -116,6 +120,9 @@
 "\\quad" return "QUAD";
 "\\right" return "RIGHT";
 "\\root" return "ROOT";
+"\\rowalign" { this.begin("TEXTARG"); return "ROWALIGN"; }
+"\\rowopts" return "ROWOPTS";
+"\\rowspan" { this.begin("TEXTARG"); return "ROWSPAN"; }
 "\\scriptscriptsize" return "SCRIPTSCRIPTSIZE";
 "\\scriptsize" return "SCRIPTSIZE";
 "\\slash" return "SLASH";

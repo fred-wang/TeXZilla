@@ -30,8 +30,8 @@ function escapeQuote(aString)
 
 function parseLength(aString)
 {
-  // See http://www.w3.org/Math/draft-spec/appendixa.html#parsing_length
-  // FIXME: should namedspaces be accepted too?
+  /* See http://www.w3.org/Math/draft-spec/appendixa.html#parsing_length */
+  /* FIXME: should namedspaces be accepted too? */
   var lengthRegexp = /\s*(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?\s*/;
   var result = lengthRegexp.exec(aString);
   if (result) {
@@ -97,6 +97,7 @@ var TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
 
 function parseMathMLDocument(aString)
 {
+  /* Parse the string into a MathML document and return the <math> root. */
   return (new DOMParser()).
     parseFromString(aString, "application/xml").documentElement;
 }
@@ -161,30 +162,20 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL)
 
 parser.toMathML = function(aTeX, aDisplay, aRTL)
 {
+  /* Parse the TeX string into a <math> element. */
   return parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL));
 }
 %}
 
 /* Operator associations and precedence. */
-%left textstyle
 %left TEXOVER TEXATOP TEXCHOOSE
 %right "^" "_"
 
 %start math
 
-%% /* language grammar */
+%%
 
-math
-  : styledExpression EOF {
-    $$ = { source: newMrow($1), display: false };
-    return $$;
-  }
-  | EOF {
-    $$ = { source: "<mrow/>", display: false };
-    return $$;
-  }
-  ;
-
+/* text option argument */
 textOptArg
   : "[" TEXTOPTARG "]" {
     /* Unescape \] and \\. */
@@ -194,6 +185,7 @@ textOptArg
   }
   ;
 
+/* text argument */
 textArg
   : "{" TEXTARG "}" {
     /* Unescape \} and \\. */
@@ -203,18 +195,31 @@ textArg
   }
   ;
 
+/* length optional argument */
 lengthOptArg
   : "[" TEXTOPTARG "]" {
     $$ = parseLength($2);
   }
   ;
 
+/* length argument */
 lengthArg
   : "{" TEXTARG "}" {
     $$ = parseLength($2);
   }
   ;
 
+/* attribute optional argument */
+attrOptArg
+  : textOptArg { $$ = "\"" + escapeQuote($1) + "\""; }
+  ;
+
+/* attribute argument */
+attrArg
+  : textArg { $$ = "\"" + escapeQuote($1) + "\""; }
+  ;
+
+/* MathML token content */
 tokenContent
   : textArg {
     /* Collapse the whitespace as indicated in the MathML specification. */
@@ -222,6 +227,7 @@ tokenContent
   }
   ;
 
+/* array alignment */
 arrayAlign
   : textOptArg {
     $1 = $1.trim();
@@ -237,6 +243,7 @@ arrayAlign
   }
   ;
 
+/* array column alignment */
 columnAlign
   : textArg {
     $$ = "";
@@ -258,6 +265,59 @@ columnAlign
   }
   ;
 
+/* table attributes */
+colalign: COLALIGN attrArg { $$ = "columnalign=" + $2; };
+rowalign: ROWALIGN attrArg { $$ = "rowalign=" + $2; };
+rowspan: ROWSPAN attrArg { $$ = "rowspan=" + $2; };
+colspan: COLSPAN attrArg { $$ = "colspan=" + $2; };
+
+/* cell option */
+cellopt
+  : colalign { $$ = $1; }
+  | rowalign { $$ = $1; }
+  | rowspan { $$ = $1; }
+  | colspan { $$ = $1; }
+  ;
+
+/* list of cell options */
+celloptList
+  : cellopt { $$ = $1; }
+  | celloptList cellopt { $$ = $1 + " " + $2; }
+  ;
+
+/* row option */
+rowopt
+  : colalign { $$ = $1; }
+  | rowalign { $$ = $1; }
+  ;
+
+/* list of row options */
+rowoptList
+  : rowopt { $$ = $1 }
+  | rowoptList rowopt { $$ = $1 + " " + $2; }
+  ;
+
+/* left fence */
+left
+  : LEFT OPFS {
+    $$ = newMo($2);
+  }
+  | LEFT "." {
+    $$ = "";
+  }
+  ;
+
+/* right fence */
+right
+  : RIGHT OPFS {
+    $$ = newMo($2);
+  }
+  | RIGHT "." {
+    $$ = "";
+  }
+  ;
+
+/* closed terms */
 closedTerm
   : "{" "}" { $$ = "<mrow/>"; }
   | "{" styledExpression "}" { $$ = newMrow($2); }
@@ -326,9 +386,8 @@ closedTerm
   | OPFS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
   | OPS tokenContent { $$ = newTag("mo", $2, "stretchy=\"false\""); }
   | MS tokenContent { $$ = newTag("ms", $2); }
-  | MS textOptArg textOptArg tokenContent {
-     $$ = newTag("ms", $4, "lquote=\"" + escapeQuote($2) +
-                           "\" rquote=\"" + escapeQuote($3) + "\"");
+  | MS attrOptArg attrOptArg tokenContent {
+     $$ = newTag("ms", $4, "lquote=" + $2 + " rquote=" + $3);
   }
   | MTEXT tokenContent { $$ = newTag("mtext", $2); }
   | UNKNOWN_TEXT { $$ = newTag("mtext", escapeText($1)); }
@@ -442,8 +501,8 @@ closedTerm
   | MATHIT closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"italic\""); }
   | MATHTT closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"monospace\""); }
   | MATHRM closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"normal\""); }
-  | HREF textArg closedTerm {
-    $$ = newTag("mrow", $3, "href=\"" + escapeQuote($2) + "\"");
+  | HREF attrArg closedTerm {
+    $$ = newTag("mrow", $3, "href=" + $2);
   }
   | STATUSLINE textArg closedTerm {
     $$ = newTag("maction",
@@ -521,24 +580,7 @@ closedTerm
   }
   ;
 
-left
-  : LEFT OPFS {
-    $$ = newMo($2);
-  }
-  | LEFT "." {
-    $$ = "";
-  }
-  ;
-
-right
-  : RIGHT OPFS {
-    $$ = newMo($2);
-  }
-  | RIGHT "." {
-    $$ = "";
-  }
-  ;
-
+/* list of closed terms */
 closedTermList
   : closedTerm {
     $$ = $1;
@@ -548,6 +590,7 @@ closedTermList
   }
   ;
 
+/* compound terms (closed terms with scripts) */
 compoundTerm
   : TENSOR closedTerm subsupList {
     $$ = newTag("mmultiscripts", $2 + $3);
@@ -580,50 +623,19 @@ compoundTerm
   | OPM { $$ = newMo($1); }
   ;
 
+/* list of compound terms */
 compoundTermList
   : compoundTerm { $$ = [$1]; }
   | compoundTermList compoundTerm { $1.push($2); $$ = $1; }
   ;
 
-styledExpression
-  : textstyle styledExpression { $$ = [newMrow($2, "mstyle", $1)]; }
-  | compoundTermList { $$ = $1; }
+/* subsup term */
+subsupTermScript
+  : closedTerm { $$ = $1; }
+  | OPM { $$ = newMo($1); }
   ;
 
-textstyle
-  : DISPLAYSTYLE { $$ = "displaystyle=\"true\""; }
-  | TEXTSTYLE { $$ = "displaystyle=\"false\""; }
-  | TEXTSIZE { $$ = "scriptlevel=\"0\""; }
-  | SCRIPTSIZE { $$ = "scriptlevel=\"1\""; }
-  | SCRIPTSCRIPTSIZE { $$ = "scriptlevel=\"2\""; }
-  | COLOR textArg { $$ = "mathcolor=\"" + escapeQuote($2) + "\""; }
-  | BGCOLOR textArg { $$ = "mathbackground=\"" + escapeQuote($2) + "\""; }
-  ;
-
-tableRowList
-  : tableRow { $$ = $1; }
-  | tableRowList ROWSEP tableRow { $$ = $1 + $3 }
-  ;
-
-tableRow
-  : simpleTableRow { $$ = newTag("mtr", $1); }
-  ;
-
-simpleTableRow
-  : tableCell { $$ = $1; }
-  | simpleTableRow COLSEP tableCell { $$ = $1 + $3; }
-  ;
-
-tableCell
-  : { $$ = newTag("mtd", ""); }
-  | styledExpression { $$ = newMrow($1, "mtd"); }
-  ;
-
-subsupList
-  : subsupTerm { $$ = $1; }
-  | subsupList subsupTerm { $$ = $1 + $2 }
-  ;
-
+/* subsup term as scripts */
 subsupTerm
   : "_" subsupTermScript "^" subsupTermScript { $$ = $2 + $4; }
   | "_" subsupTermScript { $$ = $2 + "<none/>"; }
@@ -631,7 +643,66 @@ subsupTerm
   | "_" "^" subsupTermScript { $$ = "<none/>" + $3; }
   ;
 
-subsupTermScript
-  : closedTerm { $$ = $1; }
-  | OPM { $$ = newMo($1); }
+/* list of subsup terms */
+subsupList
+  : subsupTerm { $$ = $1; }
+  | subsupList subsupTerm { $$ = $1 + $2 }
+  ;
+
+/* text style */
+textstyle
+  : DISPLAYSTYLE { $$ = "displaystyle=\"true\""; }
+  | TEXTSTYLE { $$ = "displaystyle=\"false\""; }
+  | TEXTSIZE { $$ = "scriptlevel=\"0\""; }
+  | SCRIPTSIZE { $$ = "scriptlevel=\"1\""; }
+  | SCRIPTSCRIPTSIZE { $$ = "scriptlevel=\"2\""; }
+  | COLOR attrArg { $$ = "mathcolor=" + $2; }
+  | BGCOLOR attrArg { $$ = "mathbackground=" + $2; }
+  ;
+
+/* styled expression (compoundTermList with additional style) */
+styledExpression
+  : textstyle styledExpression { $$ = [newMrow($2, "mstyle", $1)]; }
+  | compoundTermList { $$ = $1; }
+  ;
+
+/* table cell */
+tableCell
+  : { $$ = newTag("mtd", ""); }
+  | CELLOPTS "{" celloptList "}" styledExpression {
+    $$ = newMrow($5, "mtd", $3);
+  }
+  | styledExpression { $$ = newMrow($1, "mtd"); }
+  ;
+
+/* list of table cells */
+tableCellList
+  : tableCell { $$ = $1; }
+  | tableCellList COLSEP tableCell { $$ = $1 + $3; }
+  ;
+
+/* table row */
+tableRow
+  : ROWOPTS "{" rowoptList "}" tableCellList {
+    $$ = $$ = newTag("mtr", $5, $3);
+  }
+  | tableCellList { $$ = newTag("mtr", $1); }
+  ;
+
+/* list of table rows */
+tableRowList
+  : tableRow { $$ = $1; }
+  | tableRowList ROWSEP tableRow { $$ = $1 + $3 }
+  ;
+
+/* main math expression (list of styled expressions) */
+math
+  : styledExpression EOF {
+    $$ = { source: newMrow($1), display: false };
+    return $$;
+  }
+  | EOF {
+    $$ = { source: "<mrow/>", display: false };
+    return $$;
+  }
   ;
