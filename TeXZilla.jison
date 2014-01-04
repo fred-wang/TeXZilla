@@ -141,20 +141,20 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL)
   try {
     output = this.parse(aTeX);
   } catch(e) {
-    output = { source: "<merror>" + escapeText(e.message) + "</merror>" };
+    output = "<merror>" + escapeText(e.message) + "</merror>";
   }
 
   /* Add the <math> root and attach the TeX annotation. */
   var mathml = "<math xmlns=\"" + MathMLNameSpace + "\"";
-  if (output.display || aDisplay) {
-    /* Set the display mode if it has been detected or specified. */
+  if (aDisplay) {
+    /* Set the display mode if it is specified. */
     mathml += " display=\"block\""
   }
   if (aRTL) {
     /* Set the RTL mode if specified. */
     mathml += " dir=\"rtl\""
   }
-  mathml += "><semantics>" + output.source
+  mathml += "><semantics>" + output;
   mathml += "<annotation encoding=\"TeX\">";
   mathml += escapeText(aTeX);
   mathml += "</annotation></semantics></math>";
@@ -413,15 +413,15 @@ closedTerm
   | MO tokenContent { $$ = newMo($2); }
   | "." { $$ = newMo($1); }
   | OP { $$ = newMo($1); }
+  | OPS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
   | OPAS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
   | OPFS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
-  | OPS tokenContent { $$ = newTag("mo", $2, "stretchy=\"false\""); }
   | MS tokenContent { $$ = newTag("ms", $2); }
   | MS attrOptArg attrOptArg tokenContent {
      $$ = newTag("ms", $4, "lquote=" + $2 + " rquote=" + $3);
   }
   | MTEXT tokenContent { $$ = newTag("mtext", $2); }
-  | UNKNOWN_TEXT { $$ = newTag("mtext", escapeText($1)); }
+  | UNKNOWN_TEXT { $$ = newTag("merror", "Unknown text: " + escapeText($1)); }
   | OPERATORNAME textArg {
     $$ = newTag("mo", $2, "lspace=\"0em\" rspace=\"thinmathspace\"");
   }
@@ -447,6 +447,14 @@ closedTerm
   | OVERSET closedTerm closedTerm { $$ = newTag("mover", $3 + $2); }
   | UNDEROVERSET closedTerm closedTerm closedTerm {
     $$ = newTag("munderover", $4 + $2 + $3); }
+  }
+  | XARROW "[" styledExpression "]" closedTerm {
+    $$ = ($5 === "<mrow/>" ?
+          newTag("munder", newMo($1) + newMrow($3)) :
+          newTag("munderover", newMo($1) + newMrow($3) + $5));
+  }
+  | XARROW closedTerm {
+    $$ = newTag("mover", newMo($1) + $2);
   }
   | MATHRLAP closedTerm { $$ = newTag("mpadded", $2, "width=\"0em\""); }
   | MATHLLAP closedTerm {
@@ -736,11 +744,11 @@ tableRowList
 /* main math expression (list of styled expressions) */
 math
   : styledExpression EOF {
-    $$ = { source: newMrow($1), display: false };
+    $$ = newMrow($1);
     return $$;
   }
   | EOF {
-    $$ = { source: "<mrow/>", display: false };
+    $$ = "<mrow/>";
     return $$;
   }
   ;

@@ -126,6 +126,10 @@ var tests = [
   /* array */
   ["\\array{ a & b \\\\ c & d }", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><annotation encoding="TeX">\\array{ a &amp; b \\\\ c &amp; d }</annotation></semantics></math>'],
     ["\\array{ \\arrayopts{\\colalign{left right right}\\rowalign{top bottom bottom}\\align{center}\\padding{1em}\\equalrows{true}\\equalcols{true}\\rowlines{dashed}\\collines{dashed}\\frame{solid}} a & b & c}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable columnalign="left right right" rowalign="top bottom bottom" align="center" rowspacing="1em" columnspacing="1em" equalrows="true" equalcolumns="true" rowlines="dashed" columnlines="dashed" frame="solid"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr></mtable><annotation encoding="TeX">\\array{ \\arrayopts{\\colalign{left right right}\\rowalign{top bottom bottom}\\align{center}\\padding{1em}\\equalrows{true}\\equalcols{true}\\rowlines{dashed}\\collines{dashed}\\frame{solid}} a &amp; b &amp; c}</annotation></semantics></math>'],
+  /* xarrow */
+  ["\\xLeftarrow{x+y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mover><annotation encoding="TeX">\\xLeftarrow{x+y}</annotation></semantics></math>'],
+  ["\\xLeftarrow[x+y]{}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><munder><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></munder><annotation encoding="TeX">\\xLeftarrow[x+y]{}</annotation></semantics></math>'],
+  ["\\xLeftarrow[x+y]{a+b}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><munderover><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></munderover><annotation encoding="TeX">\\xLeftarrow[x+y]{a+b}</annotation></semantics></math>'],
 ]
 
 function escape(aString)
