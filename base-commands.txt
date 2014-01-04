@@ -161,3 +161,14 @@
 "\\widehat" { yytext = "\u005E"; return "ACCENT"; }
 "\\widetilde" { yytext = "\u02DC"; return "ACCENT"; }
 "\\widevec" { yytext = "\u21C0"; return "ACCENT"; }
+"\\xLeftarrow" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u21D0"; return "XARROW"; }
+"\\xLeftrightarrow" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u21D4"; return "XARROW"; }
+"\\xRightarrow" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u21D2"; return "XARROW"; }
+"\\xhookleftarrow" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u21A9"; return "XARROW"; }
+"\\xhookrightarrow" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u21AA"; return "XARROW"; }
+"\\xleftarrow" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u2190"; return "XARROW"; }
+"\\xleftrightarrow" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u2194"; return "XARROW"; }
+"\\xleftrightharpoons" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u21CB"; return "XARROW"; }
+"\\xmapsto" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u21A6"; return "XARROW"; }
+"\\xrightarrow" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u2192"; return  "XARROW"; }
+"\\xrightleftharpoons" { this.pushState("OPTARG"); this.pushState("TRYOPTARG"); yytext = "\u21CC"; return "XARROW"; }

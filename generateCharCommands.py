@@ -181,13 +181,17 @@ if __name__ == "__main__":
             elif codePoint[0] == 0x221E:
                 LaTeXCommands.append("\\infinity") # itex2MML
             elif codePoint[0] == 0x2032:
-                LaTeXCommands.append("'");
+                LaTeXCommands.append("'")
             elif codePoint[0] == 0x2033:
-                LaTeXCommands.append("''");
+                LaTeXCommands.append("''")
             elif codePoint[0] == 0x2034:
-                LaTeXCommands.append("'''");
+                LaTeXCommands.append("'''")
             elif codePoint[0] == 0x2037:
-                LaTeXCommands.append("''''");
+                LaTeXCommands.append("''''")
+            elif codePoint[0] == 0x2192:
+                LaTeXCommands.append("\\to")
+            elif codePoint[0] == 0x21A6:
+                LaTeXCommands.append("\\map")
 
         # Escape the backslahes.
         for i in range(0,len(LaTeXCommands)):
