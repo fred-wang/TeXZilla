@@ -25,6 +25,7 @@ def isValidLaTeXCommand(aCommand):
 
     if (command.find("\\") == -1 or
         command == "\\overbrace" or
+        command == "\\underbrace" or
         command == "\doublebarwedge ?" or
         command == "\\hat" or
         command == "{_\\ast}" or
@@ -164,12 +165,13 @@ if __name__ == "__main__":
                   codePoint[0] == 0x03C2):
                 # $, emptyset
                 mathclass = "A"
-            elif (codePoint[0] in [0x2032, 0x2033, 0x2034, 0x2035, 0x2057,
-                                   0x2322, 0x2323, 0x214B, 0x2661, 0x2662,
+            elif (codePoint[0] in [0x2322, 0x2323, 0x214B, 0x2661, 0x2662,
                                    0x2306, 0x2305, 0x2020, 0x2021, 0x2605,
                                    0x25CA, 0x25CB, 0x2663, 0x2660,
                                    0x23B0, 0x23B1, 0x0023]):
                 mathclass = "OP"
+            elif (codePoint[0] in [0x2032, 0x2033, 0x2034, 0x2035, 0x2057]):
+                mathclass = "OPP"
 
         if len(codePoint) == 2:
             if ((codePoint[0] == 0x228A and codePoint[1] == 0xFE00) or
@@ -199,7 +201,7 @@ if __name__ == "__main__":
                 LaTeXCommands.append("''")
             elif codePoint[0] == 0x2034:
                 LaTeXCommands.append("'''")
-            elif codePoint[0] == 0x2037:
+            elif codePoint[0] == 0x2057:
                 LaTeXCommands.append("''''")
             elif codePoint[0] == 0x2192:
                 LaTeXCommands.append("\\to")

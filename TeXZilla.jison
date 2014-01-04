@@ -171,7 +171,7 @@ parser.toMathML = function(aTeX, aDisplay, aRTL)
 
 /* Operator associations and precedence. */
 %left TEXOVER TEXATOP TEXCHOOSE
-%right "^" "_"
+%right "^" "_" "OPP"
 
 %start math
 
@@ -644,6 +644,9 @@ compoundTerm
   | closedTerm "_" closedTerm "^" closedTerm {
     $$ = newScript(false, $1, $3, $5);
   }
+  | closedTerm "_" closedTerm OPP {
+    $$ = newScript(false, $1, $3, newMo($4));
+  }
   | closedTerm "^" closedTerm "_" closedTerm {
     $$ = newScript(false, $1, $5, $3);
   }
@@ -652,6 +655,9 @@ compoundTerm
   }
   | closedTerm "^" closedTerm {
     $$ = newScript(false, $1, null, $3);
+  }
+  | closedTerm OOP {
+    $$ = newScript(false, $1, null, newMo($2));
   }
   | closedTerm { $$ = $1; }
   | OPM "_" closedTerm "^" closedTerm {
@@ -667,6 +673,7 @@ compoundTerm
     $$ = newScript(true, newMo($1), null, $3);
   }
   | OPM { $$ = newMo($1); }
+  | OPP { $$ = newMo($1); }
   ;
 
 /* list of compound terms */

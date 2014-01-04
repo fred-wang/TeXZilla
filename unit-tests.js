@@ -137,7 +137,7 @@ var tests = [
   /* char commands */
   [". - + \\# , : ! = ~ ; ? # ` *", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>.</mo><mo>-</mo><mo>+</mo><mo>#</mo><mo>,</mo><mo>:</mo><mo>!</mo><mo>=</mo><mo stretchy="false">~</mo><mo>;</mo><mo>?</mo><mo>#</mo><mo>`</mo><mo>*</mo></mrow><annotation encoding="TeX">. - + \\# , : ! = ~ ; ? # ` *</annotation></semantics></math>'],
   /* primes */
-  ["\\prime ' '' ''' ''''", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>′</mo><mo>′</mo><mo>″</mo><mo>‴</mo><mo>‴</mo><mo>′</mo></mrow><annotation encoding="TeX">\\prime \' \'\' \'\'\' \'\'\'\'</annotation></semantics></math>'],
+  ["\\prime ' '' ''' ''''", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>′</mo><mo>′</mo><mo>″</mo><mo>‴</mo><mo>⁗</mo></mrow><annotation encoding="TeX">\\prime \' \'\' \'\'\' \'\'\'\'</annotation></semantics></math>'],
   /* char commands */
   ["\\coloneqq \\Coloneqq \\coloneq \\Coloneq \\eqqcolon \\Eqqcolon \\eqcolon \\Eqcolon \\colonapprox \\Colonapprox \\colonsim \\Colonsim \\dblcolon", 'TODO', true],
   /* char commands */
