@@ -47,13 +47,18 @@
     </xsl:if>
     <xsl:if test="unicodedata/@mathclass and not(operator-dictionary) or
                   boolean(@id = 'U000F0') or
+                  boolean(@id = 'U003C2') or
                   boolean(@id = 'U0228A-0FE00') or
                   boolean(@id = 'U02268-0FE00') or
                   boolean(@id = 'U02269-0FE00') or
-                  boolean(@id = 'U0228B-0FE00')">
+                  boolean(@id = 'U0228B-0FE00') or
+                  boolean(@id = 'U02ACB-0FE00')">
       <xsl:value-of select="@id"/>
       <xsl:text> </xsl:text>
       <xsl:value-of select="unicodedata/@mathclass"/>
+      <xsl:if test="not(unicodedata/@mathclass)">
+        <xsl:text>?</xsl:text>
+      </xsl:if>
       <xsl:text> </xsl:text>
       <xsl:value-of select="latex"/>
       <xsl:text> </xsl:text>

@@ -49,7 +49,7 @@ char-commands.txt: generateCharCommands.py chars.txt
 commands.txt: char-commands.txt base-commands.txt
 # Merge the two set of commands and sort them in reverse order according to the
 # quoted key, so that e.g. Jison will treat "\\mathbb{C}" before "\\mathbb".
-	cat $^ | grep -v "#" | \
+	cat $^ | egrep -v "^#" | \
 	sort --reverse --field-separator='"' --key=2,2 > $@
 
 TeXZilla.jisonlex: main.jisonlex commands.txt

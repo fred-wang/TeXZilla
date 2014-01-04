@@ -24,6 +24,7 @@ import sys
 def isValidLaTeXCommand(aCommand):
 
     if (command.find("\\") == -1 or
+        command == "\\overbrace" or
         command == "\doublebarwedge ?" or
         command == "\\hat" or
         command == "{_\\ast}" or
@@ -159,20 +160,23 @@ if __name__ == "__main__":
                 # infinity
                 mathclass = "NUM"
             elif (codePoint[0] == 0x0024 or codePoint[0] == 0x2205 or
-                  codePoint[0] == 0x00F0 or codePoint[0] == 0x210F):
+                  codePoint[0] == 0x00F0 or codePoint[0] == 0x210F or
+                  codePoint[0] == 0x03C2):
                 # $, emptyset
                 mathclass = "A"
             elif (codePoint[0] in [0x2032, 0x2033, 0x2034, 0x2035, 0x2057,
                                    0x2322, 0x2323, 0x214B, 0x2661, 0x2662,
                                    0x2306, 0x2305, 0x2020, 0x2021, 0x2605,
-                                   0x25CA, 0x25CB, 0x2663, 0x2660]):
+                                   0x25CA, 0x25CB, 0x2663, 0x2660,
+                                   0x23B0, 0x23B1, 0x0023]):
                 mathclass = "OP"
 
         if len(codePoint) == 2:
             if ((codePoint[0] == 0x228A and codePoint[1] == 0xFE00) or
                 (codePoint[0] == 0x2268 and codePoint[1] == 0xFE00) or
                 (codePoint[0] == 0x2269 and codePoint[1] == 0xFE00) or
-                (codePoint[0] == 0x228B and codePoint[1] == 0xFE00)):
+                (codePoint[0] == 0x228B and codePoint[1] == 0xFE00) or
+                (codePoint[0] == 0x2ACB and codePoint[1] == 0xFE00)):
                 mathclass = "OP"
 
         # Extract the TeX commands for this character.
@@ -295,15 +299,37 @@ if __name__ == "__main__":
                 LaTeXCommands.append("\\triangle")
             elif codePoint[0] == 0x22C4:
                 LaTeXCommands.append("\\Diamond")
+            elif codePoint[0] == 0x2216:
+                LaTeXCommands.append("\\smallsetminus")
+            elif codePoint[0] == 0x2016:
+                LaTeXCommands.append("\\|")
+            elif codePoint[0] == 0x2AFD:
+                LaTeXCommands.append("\\sslash")
+            elif codePoint[0] == 0x27E8:
+                LaTeXCommands.append("\\lang")
+            elif codePoint[0] == 0x27E9:
+                LaTeXCommands.append("\\rang")
+            elif codePoint[0] == 0x27EA:
+                LaTeXCommands.append("\\llangle")
+            elif codePoint[0] == 0x27EB:
+                LaTeXCommands.append("\\rrangle")
+            elif codePoint[0] == 0x2254:
+                LaTeXCommands.append("\\coloneqq")
+            elif codePoint[0] == 0x2255:
+                LaTeXCommands.append("\\eqqcolon")
+            elif codePoint[0] == 0x2A74:
+                LaTeXCommands.append("\\Coloneqq")
 
         if len(codePoint) == 2:
             if codePoint[0] == 0x228A and codePoint[1] == 0xFE00:
                 LaTeXCommands.append("\\varsubsetneq")
-            if codePoint[0] == 0x2268 and codePoint[1] == 0xFE00:
+            elif codePoint[0] == 0x2ACB and codePoint[1] == 0xFE00:
+                LaTeXCommands.append("\\varsubsetneqq")
+            elif codePoint[0] == 0x2268 and codePoint[1] == 0xFE00:
                 LaTeXCommands.append("\\lvertneqq")
-            if codePoint[0] == 0x2269 and codePoint[1] == 0xFE00:
+            elif codePoint[0] == 0x2269 and codePoint[1] == 0xFE00:
                 LaTeXCommands.append("\\gvertneqq")
-                
+
         # Escape the backslahes.
         for i in range(0,len(LaTeXCommands)):
             LaTeXCommands[i] = LaTeXCommands[i].replace("\\", "\\\\")
@@ -322,9 +348,9 @@ if __name__ == "__main__":
 
             if len(codePoint) == 1:
 
-                # Skip special chars: { } ^ _ & \\ % $.
+                # Skip special chars: { } ^ _ & \\ % $ '.
                 if (codePoint[0] in [0x7B, 0x7D, 0x5E, 0x5F, 0x26, 0x5C,
-                                     0x25, 0x24, 0x2E]):
+                                     0x25, 0x24, 0x2E, 0x27]):
                     continue
 
                 # If it is a single char, add it to the appropriate unicode
