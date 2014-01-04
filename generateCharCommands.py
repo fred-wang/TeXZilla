@@ -159,11 +159,12 @@ if __name__ == "__main__":
             if (codePoint[0] == 0x221E):
                 # infinity
                 mathclass = "NUM"
-            elif (codePoint[0] == 0x24):
-                # $
-                mathclass = "TEXT"
-            elif (codePoint[0] in [0x2032, 0x2033, 0x2034, 0x2035, 0x2057]):
-                # primes
+            elif (codePoint[0] == 0x0024 or codePoint[0] == 0x2205 or
+                  codePoint[0] == 0x00F0 or codePoint[0] == 0x210F):
+                # $, emptyset
+                mathclass = "A"
+            elif (codePoint[0] in [0x2032, 0x2033, 0x2034, 0x2035, 0x2057,
+                                   0x2322, 0x2323, 0x214B, 0x2661, 0x2662]):
                 mathclass = "OP"
 
         # Extract the TeX commands for this character.
@@ -192,7 +193,79 @@ if __name__ == "__main__":
                 LaTeXCommands.append("\\to")
             elif codePoint[0] == 0x21A6:
                 LaTeXCommands.append("\\map")
-
+            elif codePoint[0] == 0x22A5:
+                LaTeXCommands.append("\\bottom")
+            elif codePoint[0] == 0x2223:
+                LaTeXCommands.append("\\shortmid")
+            elif codePoint[0] == 0x222B:
+                LaTeXCommands.append("\\integral")
+            elif codePoint[0] == 0x222C:
+                LaTeXCommands.append("\\doubleintegral")
+            elif codePoint[0] == 0x222D:
+                LaTeXCommands.append("\\tripleintegral")
+            elif codePoint[0] == 0x2A0C:
+                LaTeXCommands.append("\\quadrupleintegral")
+            elif codePoint[0] == 0x222E:
+                LaTeXCommands.append("\\conint")
+                LaTeXCommands.append("\\contourintegral")
+            elif codePoint[0] == 0x229D:
+                LaTeXCommands.append("\\odash")
+            elif codePoint[0] == 0x2322:
+                LaTeXCommands.append("\\smallfrown")
+            elif codePoint[0] == 0x2323:
+                LaTeXCommands.append("\\smallsmile")
+            elif codePoint[0] == 0x229E:
+                LaTeXCommands.append("\\plusb")
+            elif codePoint[0] == 0x22A0:
+                LaTeXCommands.append("\\timesb")
+            elif codePoint[0] == 0x229F:
+                LaTeXCommands.append("\\minusb")
+            elif codePoint[0] == 0x2A34:
+                LaTeXCommands.append("\\Otimes")
+            elif codePoint[0] == 0x2A2D:
+                LaTeXCommands.append("\\Oplus")
+            elif codePoint[0] == 0x2AFC:
+                LaTeXCommands.append("\\biginterleave")
+            elif codePoint[0] == 0x22C0:
+                LaTeXCommands.append("\\Wedge")
+            elif codePoint[0] == 0x22C1:
+                LaTeXCommands.append("\\Vee")
+            elif codePoint[0] == 0x214B:
+                LaTeXCommands.append("\\invamp")
+                LaTeXCommands.append("\\parr")
+            elif codePoint[0] == 0x2260:
+                LaTeXCommands.append("\\neq")
+            elif codePoint[0] == 0x220F:
+                LaTeXCommands.append("\\product")
+            elif codePoint[0] == 0x2210:
+                LaTeXCommands.append("\\coproduct")
+            elif codePoint[0] == 0x2AEB:
+                LaTeXCommands.append("\\Perp")
+                LaTeXCommands.append("\\Vbar")
+            elif codePoint[0] == 0x25A1:
+                LaTeXCommands.append("\\Box")
+            elif codePoint[0] == 0x2205:
+                LaTeXCommands.append("\\empty")
+                LaTeXCommands.append("\\emptyset")
+            elif codePoint[0] == 0x22B2:
+                LaTeXCommands.append("\\lhd")
+            elif codePoint[0] == 0x22B3:
+                LaTeXCommands.append("\\rhd")
+            elif codePoint[0] == 0x22D8:
+                LaTeXCommands.append("\\lll")
+            elif codePoint[0] == 0x22B4:
+                LaTeXCommands.append("\\unlhd")
+            elif codePoint[0] == 0x22B5:
+                LaTeXCommands.append("\\unrhd")
+            elif codePoint[0] == 0x2207:
+                LaTeXCommands.append("\\Del")
+            elif codePoint[0] == 0x25AA:
+                LaTeXCommands.append("\\qed")
+            elif codePoint[0] == 0x00F0:
+                LaTeXCommands.append("\\eth")
+            elif codePoint[0] == 0x0237:
+                LaTeXCommands.append("\\jmath")
+                
         # Escape the backslahes.
         for i in range(0,len(LaTeXCommands)):
             LaTeXCommands[i] = LaTeXCommands[i].replace("\\", "\\\\")

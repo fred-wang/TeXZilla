@@ -40,10 +40,11 @@
       <xsl:text> </xsl:text>
       <xsl:value-of select="AMS"/>
       <xsl:text> </xsl:text>
-      <xsl:value-of select="IIEE"/>
+      <xsl:value-of select="IEEE"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
-    <xsl:if test="unicodedata/@mathclass and not(operator-dictionary)">
+    <xsl:if test="unicodedata/@mathclass and not(operator-dictionary) or
+                  boolean(@id = 'U000F0')">
       <xsl:value-of select="@id"/>
       <xsl:text> </xsl:text>
       <xsl:value-of select="unicodedata/@mathclass"/>
@@ -54,7 +55,7 @@
       <xsl:text> </xsl:text>
       <xsl:value-of select="AMS"/>
       <xsl:text> </xsl:text>
-      <xsl:value-of select="IIEE"/>
+      <xsl:value-of select="IEEE"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
   </xsl:template>

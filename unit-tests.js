@@ -32,7 +32,8 @@ var tests = [
     /* multiple variable */
     ["xyz", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mi>y</mi><mi>z</mi></mrow><annotation encoding="TeX">xyz</annotation></semantics></math>'],
     /* Arabic variables */
-    ["غظضذخثتشرقصفعسنملكيطحزوهدجب", 'TODO'],
+    /* FIXME: make these characters mathclass="A" in unicode.xml. */
+    ["غظضذخثتشرقصفعسنملكيطحزوهدجب", 'TODO', true],
     /* variable and numbers */
     ["2xy", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>x</mi><mi>y</mi></mrow><annotation encoding="TeX">2xy</annotation></semantics></math>'],
     /* \\mn */
@@ -46,7 +47,7 @@ var tests = [
     /* escaped characters */
     ["\\mtext{2i\\}fzx\\\\}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext>2i}fzx\\</mtext><annotation encoding="TeX">\\mtext{2i\\}fzx\\\\}</annotation></semantics></math>'],
     /* escaped characters */
-    ["\\& \\% \\$", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&amp;</mo><mo>%</mo><mtext>$</mtext></mrow><annotation encoding="TeX">\\&amp; \\% \\$</annotation></semantics></math>'],
+    ["\\& \\% \\$", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&amp;</mo><mo>%</mo><mi>$</mi></mrow><annotation encoding="TeX">\\&amp; \\% \\$</annotation></semantics></math>'],
     /* \frac */
     ["\\frac x y", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>x</mi><mi>y</mi></mfrac><annotation encoding="TeX">\\frac x y</annotation></semantics></math>'],
     /* \sqrt */
@@ -130,6 +131,14 @@ var tests = [
   ["\\xLeftarrow{x+y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mover><annotation encoding="TeX">\\xLeftarrow{x+y}</annotation></semantics></math>'],
   ["\\xLeftarrow[x+y]{}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><munder><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></munder><annotation encoding="TeX">\\xLeftarrow[x+y]{}</annotation></semantics></math>'],
   ["\\xLeftarrow[x+y]{a+b}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><munderover><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></munderover><annotation encoding="TeX">\\xLeftarrow[x+y]{a+b}</annotation></semantics></math>'],
+  /* char commands */
+  ["\\aleph \\beth \\eth \\ell \\hbar \\Im \\imath \\jmath \\wp \\Re", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℵ</mi><mi>ℶ</mi><mi>ð</mi><mi>ℓ</mi><mi>ℏ</mi><mi>ℑ</mi><mi>ı</mi><mi>ȷ</mi><mi>℘</mi><mi>ℜ</mi></mrow><annotation encoding="TeX">\\aleph \\beth \\eth \\ell \\hbar \\Im \\imath \\jmath \\wp \\Re</annotation></semantics></math>'],
+
+  /* char commands */
+  /* FIXME: unicode.xml maps \nabla to different characters. */
+    ["\\Perp \\Vbar \\boxdot \\Box \\square \\emptyset \\empty \\exists \\circ \\rhd \\lhd \\lll \\unrhd \\unlhd \\Del \\nabla \\sphericalangle \\heartsuit \\diamondsuit \\partial \\qed", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⫫</mo><mo>⫫</mo><mo>⊡</mo><mo>□</mo><mo>□</mo><mi>∅</mi><mi>∅</mi><mo>∃</mo><mo>∘</mo><mo>⊳</mo><mo>⊲</mo><mo>⋘</mo><mo>⊵</mo><mo>⊴</mo><mo>∇</mo><mo>∇</mo><mo>∢</mo><mo>♡</mo><mo>♢</mo><mi>∂</mi><mo>▪</mo></mrow><annotation encoding="TeX">\\Perp \\Vbar \\boxdot \\Box \\square \\emptyset \\empty \\exists \\circ \\rhd \\lhd \\lll \\unrhd \\unlhd \\Del \\nabla \\sphericalangle \\heartsuit \\diamondsuit \\partial \\qed</annotation></semantics></math>', true],
+  /* char commands */
+  ["\\bottom \\neg \\neq \\ne \\shortmid \\mid \\int \\integral \\iint \\doubleintegral \\iiint \\tripleintegral \\iiiint \\quadrupleintegral \\oint \\conint \\contourintegral \\times \\star \\circleddash \\odash \\intercal \\smallfrown \\smallsmile \\boxminus \\minusb \\boxplus \\plusb \\boxtimes \\timesb \\sum \\prod \\product \\coprod \\coproduct \\otimes \\Otimes \\bigotimes \\ominus \\oslash \\oplus \\Oplus \\bigoplus \\bigodot \\bigsqcup \\bigsqcap \\biginterleave \\biguplus \\wedge \\Wedge \\bigwedge \\Vee \\bigvee \\invamp \\parr", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⊥</mo><mo>¬</mo><mo>≠</mo><mo>≠</mo><mo>∣</mo><mo>∣</mo><mo>∫</mo><mo>∫</mo><mo>∬</mo><mo>∬</mo><mo>∭</mo><mo>∭</mo><mo>⨌</mo><mo>⨌</mo><mo>∮</mo><mo>∮</mo><mo>∮</mo><mo>×</mo><mo>⋆</mo><mo>⊝</mo><mo>⊝</mo><mo>⊺</mo><mo>⌢</mo><mo>⌣</mo><mo>⊟</mo><mo>⊟</mo><mo>⊞</mo><mo>⊞</mo><mo>⊠</mo><mo>⊠</mo><mo>∑</mo><mo>∏</mo><mo>∏</mo><mo>∐</mo><mo>∐</mo><mo>⊗</mo><mo>⨴</mo><mo>⨂</mo><mo>⊖</mo><mo>⊘</mo><mo>⊕</mo><mo>⨭</mo><mo>⨁</mo><mo>⨀</mo><mo>⨆</mo><mo>⨅</mo><mo>⫼</mo><mo>⨄</mo><mo>∧</mo><mo>⋀</mo><mo>⋀</mo><mo>⋁</mo><mo>⋁</mo><mo>⅋</mo><mo>⅋</mo></mrow><annotation encoding="TeX">\\bottom \\neg \\neq \\ne \\shortmid \\mid \\int \\integral \\iint \\doubleintegral \\iiint \\tripleintegral \\iiiint \\quadrupleintegral \\oint \\conint \\contourintegral \\times \\star \\circleddash \\odash \\intercal \\smallfrown \\smallsmile \\boxminus \\minusb \\boxplus \\plusb \\boxtimes \\timesb \\sum \\prod \\product \\coprod \\coproduct \\otimes \\Otimes \\bigotimes \\ominus \\oslash \\oplus \\Oplus \\bigoplus \\bigodot \\bigsqcup \\bigsqcap \\biginterleave \\biguplus \\wedge \\Wedge \\bigwedge \\Vee \\bigvee \\invamp \\parr</annotation></semantics></math>']
 ]
 
 function escape(aString)
@@ -137,7 +146,7 @@ function escape(aString)
     return aString.replace(/([\\\'])/g, "\\$1");
 }
 
-var failures = 0;
+var failures = 0, unexpectedfailures = 0;
 for (var i = 0; i < tests.length; i++) {
     try {
         var output = parser.toMathMLString(tests[i][0]);
@@ -148,14 +157,17 @@ for (var i = 0; i < tests.length; i++) {
         }
         console.log("Test " + (i + 1) + "... PASS");
     } catch(e) {
-        console.log("Test " + (i + 1) + "... FAIL");
+        console.log("Test " + (i + 1) + "... " +
+                    (tests[i][2] ? "EXPECTED FAIL" : "FAIL"));
         console.log(e);
         failures++;
+        if (!tests[i][2]) unexpectedfailures++;
     }
 }
 
 if (failures > 0) {
-    console.log(failures + " test(s) failed!")
+    console.log(failures + " test(s) failed (" +
+                unexpectedfailures + " unexpected).")
 } else {
     console.log("All tests passed.")
 }

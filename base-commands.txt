@@ -124,6 +124,7 @@
 "\\overset" return "OVERSET";
 "\\padding" { this.pushState("TEXTARG"); return "PADDING"; }
 "\\phantom" return "PHANTOM";
+"\\mod" { yytext = "mod"; return "MO"; }
 "\\pmod" return "PMOD";
 "\\qquad" return "QQUAD";
 "\\quad" return "QUAD";
