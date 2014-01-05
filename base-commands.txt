@@ -67,7 +67,7 @@
 "\\ddot" { yytext = "\u0308"; return "ACCENT"; }
 "\\displaystyle" return "DISPLAYSTYLE";
 "\\dot" { yytext = "\u02D9"; return "ACCENT"; }
-"\\endtoggle" { return "ENDTOGGLE"; }
+"\\endtoggle" { return "ETOGGLE"; }
 "\\end{Bmatrix}" return "EBBMATRIX";
 "\\end{Vmatrix}" return "EVVMATRIX";
 "\\end{aligned}" return "EALIGNED";
@@ -117,6 +117,8 @@
 "\\mtext" { this.begin("TEXTARG"); return "MTEXT"; }
 "\\multiscripts" return "MULTI";
 "\\negspace" return "NEGSPACE";
+"\\negmedspace" return "NEGMEDSPACE";
+"\\negthickspace" return "NEGTHICKSPACE";
 "\\operatorname" { this.begin("TEXTARG"); return "OPERATORNAME"; }
 "\\over" return "TEXOVER";
 "\\overbrace" return "OVERBRACE";
@@ -151,6 +153,7 @@
 "\\thinspace" return "THINSPACE";
 "\\tilde" { yytext = "\u02DC"; return "ACCENTNS"; }
 "\\toggle" { return "TOGGLE"; }
+"\\begintoggle" { return "BTOGGLE"; }
 "\\tooltip" { this.pushState("TEXTARG"); return "TOOLTIP"; }
 "\\underbrace" return "UNDERBRACE";
 "\\underline" return "UNDERLINE";
