@@ -496,6 +496,8 @@ closedTerm
   | QUAD { $$ = "<mspace width=\"1em\"/>"; }
   | QQUAD { $$ = "<mspace width=\"2em\"/>"; }
   | NEGSPACE { $$ = "<mspace width=\"negativethinmathspace\">"; }
+  | NEGMEDSPACE { $$ = "<mspace width=\"negativemediummathspace\"/>"; }
+  | NEGTHICKSPACE { $$ = "<mspace width=\"negativethickmathspace\"/>"; }
   | THINSPACE { $$ = "<mspace width=\"thinmathspace\"/>"; }
   | MEDSPACE { $$ = "<mspace width=\"mediummathspace\"/>"; }
   | THICKSPACE { $$ = "<mspace width=\"thickmathspace\"/>"; }
@@ -528,8 +530,8 @@ closedTerm
   | MATHBF closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"bold\""); }
   | MATHBIT closedTerm { $$ = newTag("mstyle", $2,
                                      "mathvariant=\"bold-italic\""); }
-  | MATHSRC closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"script\""); }
-  | MATHBSRC closedTerm {
+  | MATHSCR closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"script\""); }
+  | MATHBSCR closedTerm {
     $$ = newTag("mstyle", $2, "mathvariant=\"bold-script\"");
   }
   | MATHSF closedTerm {
@@ -552,7 +554,11 @@ closedTerm
     $$ = newTag("maction",
                 $3 + newTag("mtext", $2), "actiontype=\"tooltip\"");
   }
-  | TOGGLE closedTermList ENDTOGGLE {
+  | TOGGLE closedTerm closedTerm {
+    /* Backward compatibility with itex2MML */
+    $$ = newTag("maction", $2 + $3, "actiontype=\"toggle\" selection=\"2\"");
+  }
+  | BTOGGLE closedTermList ETOGGLE {
     $$ = newTag("maction", $2, "actiontype=\"toggle\"");
   }
   | TENSOR closedTerm "{" subsupList "}" {

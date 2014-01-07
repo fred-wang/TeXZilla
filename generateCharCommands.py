@@ -321,6 +321,20 @@ if __name__ == "__main__":
                 LaTeXCommands.append("\\eqqcolon")
             elif codePoint[0] == 0x2A74:
                 LaTeXCommands.append("\\Coloneqq")
+            elif codePoint[0] == 0x2237:
+                LaTeXCommands.append("\\dblcolon")
+            elif codePoint[0] == 0x22F0:
+                LaTeXCommands.append("\\udots")
+            elif codePoint[0] == 0x222A:
+                LaTeXCommands.append("\\union")
+            elif codePoint[0] == 0x22C3:
+                LaTeXCommands.append("\\Union")
+            elif codePoint[0] == 0x2229:
+                LaTeXCommands.append("\\intersection")
+            elif codePoint[0] == 0x22C2:
+                LaTeXCommands.append("\\Intersection")
+            elif codePoint[0] == 0x2134:
+                LaTeXCommands.append("\\omicron")
 
         if len(codePoint) == 2:
             if codePoint[0] == 0x228A and codePoint[1] == 0xFE00:

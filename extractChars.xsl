@@ -18,7 +18,75 @@
   <xsl:strip-space elements="*"/>
   <xsl:output method="text"/>
 
-  <xsl:template match="charlist"><xsl:apply-templates select="character"/></xsl:template>
+  <xsl:template match="charlist">
+
+    <xsl:apply-templates select="character"/>
+
+    <xsl:text>U0003D-02237</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>OP</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>\Eqcolon</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>&#xa;</xsl:text>
+
+    <xsl:text>U02237-02212</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>OP</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>\Coloneq</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>&#xa;</xsl:text>
+
+    <xsl:text>U0003D-02237</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>OP</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>\Eqqcolon</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>&#xa;</xsl:text>
+
+    <xsl:text>U02212-02237</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>OP</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>\Eqcolon</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>&#xa;</xsl:text>
+
+    <xsl:text>U02236-02248</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>OP</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>\colonapprox</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>&#xa;</xsl:text>
+
+    <xsl:text>U2237-02248</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>OP</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>\Colonapprox</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>&#xa;</xsl:text>
+
+    <xsl:text>U02236-0223C</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>OP</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>\colonsim</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>&#xa;</xsl:text>
+
+    <xsl:text>U02237-0223C</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>OP</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>\Colonsim</xsl:text>
+    <xsl:text> </xsl:text>
+    <xsl:text>&#xa;</xsl:text>
+
+  </xsl:template>
   <xsl:template match="character">
     <xsl:if test="operator-dictionary">
       <xsl:value-of select="@id"/>
