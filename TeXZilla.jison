@@ -530,8 +530,8 @@ closedTerm
   | MATHBF closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"bold\""); }
   | MATHBIT closedTerm { $$ = newTag("mstyle", $2,
                                      "mathvariant=\"bold-italic\""); }
-  | MATHSRC closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"script\""); }
-  | MATHBSRC closedTerm {
+  | MATHSCR closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"script\""); }
+  | MATHBSCR closedTerm {
     $$ = newTag("mstyle", $2, "mathvariant=\"bold-script\"");
   }
   | MATHSF closedTerm {

@@ -89,12 +89,12 @@
 "\\itexnum" { this.pushState("TEXTARG"); return "MN"; }
 "\\left" return "LEFT";
 "\\mathbb" return "MATHBB";
-"\\mathbcal" return "MATHBSRC";
+"\\mathbcal" return "MATHBSCR";
 "\\mathbf" return "MATHBF";
 "\\mathbin" { this.begin("TEXTARG"); return "MATHBIN"; }
 "\\mathbit" return "MATHBIT";
-"\\mathbsrc" return "MATHBSRC";
-"\\mathcal" return "MATHSRC";
+"\\mathbscr" return "MATHBSCR";
+"\\mathcal" return "MATHSCR";
 "\\mathclap" return "MATHCLAP";
 "\\mathfr" return "MATHFRAK";
 "\\mathfrak" return "MATHFRAK";
@@ -107,7 +107,7 @@
 "\\mathrlap" return "MATHRLAP";
 "\\mathrm" return "MATHRM";
 "\\mathsf" return "MATHSF";
-"\\mathsrc" return "MATHSRC";
+"\\mathscr" return "MATHSCR";
 "\\mathtt" return "MATHTT";
 "\\medspace" return "MEDSPACE";
 "\\mi" { this.pushState("TEXTARG"); return "MI"; }
