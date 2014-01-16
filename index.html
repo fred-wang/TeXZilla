@@ -83,28 +83,26 @@
     
       /**** Experimental Open Type MATH fonts ****/
     
-      /* 
-         Lucida: Not tested (need to order the fonts to test)
-         Cambria: Enable to read the MATH table?
-         GyrePagella, GyreTermes, LatinModern: excessive ascent/descent, so
-         only applied to the stretchy operators, not the math text.
-      */
-    
       /* Cambria */
       .Cambria ::-moz-math-stretchy, .Cambria math {
         font-family: Cambria Math;
       }
     
-      /* GyrePagella */
-      .GyrePagella ::-moz-math-stretchy/*, .GyrePagella math*/ {
+      /* TeXGyreBonum */
+      .TeXGyreBonum ::-moz-math-stretchy/*, .TeXGyreBonum math*/ {
+        font-family: TeX Gyre Bonum Math;
+      }
+
+      /* TeXGyrePagella */
+      .TeXGyrePagella ::-moz-math-stretchy/*, .TeXGyrePagella math*/ {
         font-family: TeX Gyre Pagella Math;
       }
     
-      /* GyreTermes */
-      .GyreTermes ::-moz-math-stretchy/*, .GyreTermes math*/ {
+      /* TeXGyreTermes */
+      .TeXGyreTermes ::-moz-math-stretchy/*, .TeXGyreTermes math*/ {
         font-family: TeX Gyre Termes Math;
       }
-    
+
       /* LatinModern */
       .LatinModern ::-moz-math-stretchy/*, .LatinModern math*/ {
         font-family: Latin Modern Math;
@@ -218,7 +216,7 @@
         <option value="∑_{n=1}^{+∞} \frac{1}{n^2} = \frac{π^2}{6}">Sum 1/n² (Unicode)</option>
         <option value="f(x)=\sum_{n=-\infty}^\infty c_n e^{2\pi i(n/T) x} =\sum_{n=-\infty}^\infty \hat{f}(\xi_n) e^{2\pi i\xi_n x}\Delta\xi">Fourier Transform</option>
         <option value="\Gamma(t) = \lim_{n \to \infty} \frac{n! \; n^t}{t \; (t+1)\cdots(t+n)}= \frac{1}{t} \prod_{n=1}^\infty \frac{\left(1+\frac{1}{n}\right)^t}{1+\frac{t}{n}} = \frac{e^{-\gamma t}}{t} \prod_{n=1}^\infty \left(1 + \frac{t}{n}\right)^{-1} e^{\frac{t}{n}}">Gamma function</option>
-        <option value="\mathfrak{sl}(n, F) = \left\{ A \in \mathscr{M}_n(F) : \operatorname{Tr}(A) = 0 \right\}">Lie Algebra</option>
+        <option value="\mathfrak{sl}(n, \mathbb{F}) = \left\{ A \in \mathscr{M}_n(\mathbb{F}) : \operatorname{Tr}(A) = 0 \right\}">Lie Algebra</option>
         <option value="x^2 y^2">Mozilla MathML Torture Test 1</option>
         <option value="\multiscripts{_2}{F}{_3}">Mozilla MathML Torture Test 2</option>
         <option value="\frac{x+y^2}{k+1}">Mozilla MathML Torture Test 3</option>
@@ -302,13 +300,14 @@ c_n & c_{n+1} & c_{n+2} & \dots & c_{2n}
     <option value="MathJax">MathJax</option>
     <option value="STIX">STIX General</option>
     <option value="Cambria">Cambria (experimental)</option>
-    <option value="GyrePagella">Gyre Pagella (experimental) </option>
-    <option value="GyreTermes">Gyre Termes (experimental) </option>
-    <option value="LatinModern">Latin Modern (experimental) </option>
-    <option value="Lucida">Lucida (experimental) </option>
-    <option value="NeoEuler">Neo Euler (experimental) </option>
-    <option value="STIXWord">STIX Word (experimental) </option>
-    <option value="XITS">XITS (experimental) </option>
+    <option value="TeXGyreBonum">TeX Gyre Bonum (experimental)</option>
+    <option value="TeXGyrePagella">TeX Gyre Pagella (experimental)</option>
+    <option value="TeXGyreTermes">TeX Gyre Termes (experimental)</option>
+    <option value="LatinModern">Latin Modern (experimental)</option>
+    <option value="Lucida">Lucida (experimental)</option>
+    <option value="NeoEuler">Neo Euler (experimental)</option>
+    <option value="STIXWord">STIX Word (experimental)</option>
+    <option value="XITS">XITS (experimental)</option>
   </select> ("experimental" fonts are <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=407059">not yet supported</a>)
     </p>
 
