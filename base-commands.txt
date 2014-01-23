@@ -26,9 +26,14 @@
 "\\Bigl"  return "BBIGL";
 "\\Bigr" return "BBIG";
 "\\align" { this.pushState("TEXTARG"); return "ALIGN"; }
-# These functions should actually be operators, some of them with movablelimits
-# See https://github.com/fred-wang/TeXZilla/issues/12
-"\\arccos"|"\\arcsin"|"\\arctan"|"\\arg"|"\\cos"|"\\cosh"|"\\cot"|"\\coth"|"\\csc"|"\\deg"|"\\dim"|"\\exp"|"\\hom"|"\\ker"|"\\lg"|"\\ln"|"\\log"|"\\sec"|"\\sin"|"\\sinh"|"\\tan"|"\\tanh"|"\\det"|"\\gcd"|"\\inf"|"\\lim"|"\\liminf"|"\\limsup"|"\\max"|"\\min"|"\\Pr"|"\\sup" { yytext = yytext.slice(1); return "F"; }
+
+# Prefix (e.g cos) should be placed after longer words (e.g cosh)
+"\\arccos"|"\\arcsin"|"\\arctan"|"\\arg"|"\\cosh"|"\\cos"|"\\coth"|"\\cot"|"\\csc"|"\\deg"|"\\dim"|"\\exp"|"\\hom"|"\\ker"|"\\lg"|"\\ln"|"\\log"|"\\sec"|"\\sinh"|"\\sin"|"\\tanh"|"\\tan" { yytext = yytext.slice(1); return "F"; }
+"\\det"|"\\gcd"|"\\liminf"|"\\limsup"|"\\lim"|"\\max"|"\\Pr"|"\\sup" { yytext = yytext.slice(1); return "FM"; }
+# These have their own rules because of \mi and \in.
+"\\min" { yytext = yytext.slice(1); return "FM"; }
+"\\inf" { yytext = yytext.slice(1); return "FM"; }
+
 "\\array" return "ARRAY";
 "\\arrayopts" return "ARRAYOPTS";
 "\\atop" return "TEXATOP";

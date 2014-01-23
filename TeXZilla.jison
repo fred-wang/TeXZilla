@@ -50,10 +50,14 @@ function newTag(aTag, aContent, aAttributes)
   return tag;
 }
 
-function newMo(aContent)
+function newMo(aContent, aLeftSpace, aRightSpace)
 {
   /* Create a new operator */
-  return "<mo>" + escapeText(aContent) + "</mo>";
+  var tag =  "<mo";
+  if (aLeftSpace) tag += " lspace=\"" + aLeftSpace + "\"";
+  if (aRightSpace) tag += " rspace=\"" + aRightSpace + "\"";
+  tag += ">" + escapeText(aContent) + "</mo>";
+  return tag;
 }
 
 function newScript(aUnderOver, aBase, aScriptBot, aScriptTop)
@@ -412,7 +416,7 @@ closedTerm
   | NUM { $$ = newTag("mn", $1); }
   | TEXT { $$ = newTag("mtext", $1); }
   | A { $$ = newTag("mi", $1); }
-  | F { $$ = newTag("mi", $1); }
+  | F { $$ = newMo($1, "0em", "0em"); }
   | MI tokenContent { $$ = newTag("mi", $2); }
   | MN tokenContent { $$ = newTag("mn", $2); }
   | MO tokenContent { $$ = newMo($2); }
@@ -428,19 +432,16 @@ closedTerm
   | MTEXT tokenContent { $$ = newTag("mtext", $2); }
   | UNKNOWN_TEXT { $$ = newTag("merror", "Unknown text: " + escapeText($1)); }
   | OPERATORNAME textArg {
-    $$ = newTag("mo", $2, "lspace=\"0em\" rspace=\"thinmathspace\"");
+    $$ = newMo($2, "0em", "thinmathspace");
   }
   | MATHOP textArg {
-    $$ = newTag("mo", $2,
-                "lspace=\"thinmathspace\" rspace=\"thinmathspace\"");
+    $$ = newMo($2, "thinmathspace", "thinmathspace");
   }
   | MATHBIN textArg {
-    $$ = newTag("mo", $2,
-                "lspace=\"mediummathspace\" rspace=\"mediummathspace\"");
+    $$ = newMo($2, "mediummathspace", "mediummathspace");
   }
   | MATHREL textArg {
-    $$ = newTag("mo", $2,
-                "lspace=\"thickmathspace\" rspace=\"thickmathspace\"");
+    $$ = newMo($2, "thickmathspace", "thickmathspace");
   }
   | FRAC closedTerm closedTerm { $$ = newTag("mfrac", $2 + $3); }
   | ROOT closedTerm closedTerm { $$ = newTag("mroot", $3 + $2); }
@@ -673,20 +674,25 @@ compoundTerm
     $$ = newScript(false, $1, null, newMo($2));
   }
   | closedTerm { $$ = $1; }
-  | OPM "_" closedTerm "^" closedTerm {
-    $$ = newScript(true, newMo($1), $3, $5);
+  | opm "_" closedTerm "^" closedTerm {
+    $$ = newScript(true, $1, $3, $5);
   }
-  | OPM "^" closedTerm "_" closedTerm {
-    $$ = newScript(true, newMo($1), $5, $3);
+  | opm "^" closedTerm "_" closedTerm {
+    $$ = newScript(true, $1, $5, $3);
   }
-  | OPM "_" closedTerm {
-    $$ = newScript(true, newMo($1), $3, null);
+  | opm "_" closedTerm {
+    $$ = newScript(true, $1, $3, null);
   }
-  | OPM "^" closedTerm {
-    $$ = newScript(true, newMo($1), null, $3);
+  | opm "^" closedTerm {
+    $$ = newScript(true, $1, null, $3);
   }
-  | OPM { $$ = newMo($1); }
+  | opm { $$ = $1; }
   | OPP { $$ = newMo($1); }
+  ;
+
+opm
+  : OPM { $$ = newMo($1); }
+  | FM { $$ = newMo($1, "0em", "0em"); }
   ;
 
 /* list of compound terms */
@@ -698,7 +704,7 @@ compoundTermList
 /* subsup term */
 subsupTermScript
   : closedTerm { $$ = $1; }
-  | OPM { $$ = newMo($1); }
+  | opm { $$ = $1; }
   ;
 
 /* subsup term as scripts */
