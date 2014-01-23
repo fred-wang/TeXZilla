@@ -30,8 +30,9 @@ function escapeQuote(aString)
 
 function parseLength(aString)
 {
-  /* See http://www.w3.org/Math/draft-spec/appendixa.html#parsing_length */
-  /* FIXME: should namedspaces be accepted too? */
+  /* See http://www.w3.org/TR/MathML3/appendixa.html#parsing_length */
+  /* FIXME: should namedspaces be accepted too?
+    https://github.com/fred-wang/TeXZilla/issues/8 */
   var lengthRegexp = /\s*(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?\s*/;
   var result = lengthRegexp.exec(aString);
   if (result) {
@@ -77,7 +78,8 @@ function newScript(aUnderOver, aBase, aScriptBot, aScriptTop)
 }
 
 /* FIXME: try to restore the operator grouping when compoundTermList does not
-   contain any fences */
+   contain any fences.
+   https://github.com/fred-wang/TeXZilla/issues/9 */
 function newMrow(aList, aTag, aAttributes)
 {
   if (!aTag) {
@@ -268,7 +270,10 @@ columnAlign
   ;
 
 /* table attributes */
-/* FIXME: this may generate not well-formed XML markup when duplicate attributes are used. Try to abstract the element/attribute creation to better handle that. */
+/* FIXME: this may generate not well-formed XML markup when duplicate
+   attributes are used. Try to abstract the element/attribute creation to
+   better handle that.
+   https://github.com/fred-wang/TeXZilla/issues/10 */
 collayout: COLLAYOUT attrArg { $$ = "columnalign=" + $2; };
 colalign: COLALIGN attrArg { $$ = "columnalign=" + $2; };
 rowalign: ROWALIGN attrArg { $$ = "rowalign=" + $2; };
@@ -523,7 +528,9 @@ closedTerm
                 ($2.l >= 0 ? "height=\"+" + $2.l + $2.u + "\"" :
                  "height=\"0pt\" depth=\"+\"" + (-$2.l) + $2.u + "\""));
   }
-  /* FIXME: mathvariant should be set on token element when possible. Try to abstract the element/attribute creation to better handle that. */
+  /* FIXME: mathvariant should be set on token element when possible.
+     Try to abstract the element/attribute creation to better handle that.
+     https://github.com/fred-wang/TeXZilla/issues/10 */
   | MATHBB closedTerm {
     $$ = newTag("mstyle", $2, "mathvariant=\"double-struck\"");
   }

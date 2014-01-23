@@ -32,7 +32,8 @@ var tests = [
     /* multiple variable */
     ["xyz", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mi>y</mi><mi>z</mi></mrow><annotation encoding="TeX">xyz</annotation></semantics></math>'],
     /* Arabic variables */
-    /* FIXME: make these characters mathclass="A" in unicode.xml. */
+    /* FIXME: make these characters mathclass="A" in unicode.xml.
+       https://github.com/fred-wang/TeXZilla/issues/4 */
     ["غظضذخثتشرقصفعسنملكيطحزوهدجب", 'TODO', true],
     /* variable and numbers */
     ["2xy", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>x</mi><mi>y</mi></mrow><annotation encoding="TeX">2xy</annotation></semantics></math>'],
@@ -74,7 +75,8 @@ var tests = [
     ["a_b^c + a^c_b + a_b + a^c", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup><mo>+</mo><msubsup><mi>a</mi><mi>b</mi><mi>c</mi></msubsup><mo>+</mo><msub><mi>a</mi><mi>b</mi></msub><mo>+</mo><msup><mi>a</mi><mi>c</mi></msup></mrow><annotation encoding="TeX">a_b^c + a^c_b + a_b + a^c</annotation></semantics></math>'],
     /* Greek letters */
     ["\\alpha \\beta \\gamma \\delta \\zeta \\eta \\theta \\iota \\kappa \\lambda \\mu \\nu \\xi \\pi \\rho \\sigma \\tau \\upsilon \\chi \\psi \\omega \\backepsilon \\varkappa \\varpi \\varrho \\varsigma \\vartheta \\varepsilon \\phi \\varphi", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mi>β</mi><mi>γ</mi><mi>δ</mi><mi>ζ</mi><mi>η</mi><mi>θ</mi><mi>ι</mi><mi>κ</mi><mi>λ</mi><mi>μ</mi><mi>ν</mi><mi>ξ</mi><mi>π</mi><mi>ρ</mi><mi>σ</mi><mi>τ</mi><mi>υ</mi><mi>χ</mi><mi>ψ</mi><mi>ω</mi><mo>϶</mo><mi>ϰ</mi><mi>ϖ</mi><mi>ϱ</mi><mi>ς</mi><mi>ϑ</mi><mi>ε</mi><mi>ϕ</mi><mi>φ</mi></mrow><annotation encoding="TeX">\\alpha \\beta \\gamma \\delta \\zeta \\eta \\theta \\iota \\kappa \\lambda \\mu \\nu \\xi \\pi \\rho \\sigma \\tau \\upsilon \\chi \\psi \\omega \\backepsilon \\varkappa \\varpi \\varrho \\varsigma \\vartheta \\varepsilon \\phi \\varphi</annotation></semantics></math>'],
-    /* FIXME: errors in unicode.xml for \Mu, \Nu etc */
+    /* FIXME: errors in unicode.xml for \Mu, \Nu etc
+     https://github.com/fred-wang/TeXZilla/issues/5 */
     ["\\Alpha \\Beta \\Delta \\Gamma \\digamma \\Lambda \\Pi \\Phi \\Psi \\Sigma \\Theta \\Xi \\Zeta \\Eta \\Iota \\Kappa \\Mu \\Nu \\Rho \\Tau \\mho \\Omega \\Upsilon \\Upsi", 'TODO', true],
     ["ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσΤτυΦφΧχΨψΩω", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Α</mi><mi>α</mi><mi>Β</mi><mi>β</mi><mi>Γ</mi><mi>γ</mi><mi>Δ</mi><mi>δ</mi><mi>Ε</mi><mi>ε</mi><mi>Ζ</mi><mi>ζ</mi><mi>Η</mi><mi>η</mi><mi>Θ</mi><mi>θ</mi><mi>Ι</mi><mi>ι</mi><mi>Κ</mi><mi>κ</mi><mi>Λ</mi><mi>λ</mi><mi>Μ</mi><mi>μ</mi><mi>Ν</mi><mi>ν</mi><mi>Ξ</mi><mi>ξ</mi><mi>Ο</mi><mi>ο</mi><mi>Π</mi><mi>π</mi><mi>Ρ</mi><mi>ρ</mi><mi>Σ</mi><mi>σ</mi><mi>Τ</mi><mi>τ</mi><mi>υ</mi><mi>Φ</mi><mi>φ</mi><mi>Χ</mi><mi>χ</mi><mi>Ψ</mi><mi>ψ</mi><mi>Ω</mi><mi>ω</mi></mrow><annotation encoding="TeX">ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσΤτυΦφΧχΨψΩω</annotation></semantics></math>'],
     /* Empty mrow */
@@ -164,7 +166,8 @@ var tests = [
   ["\\aleph \\beth \\eth \\ell \\hbar \\Im \\imath \\jmath \\wp \\Re", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℵ</mi><mi>ℶ</mi><mi>ð</mi><mi>ℓ</mi><mi>ℏ</mi><mi>ℑ</mi><mi>ı</mi><mi>ȷ</mi><mi>℘</mi><mi>ℜ</mi></mrow><annotation encoding="TeX">\\aleph \\beth \\eth \\ell \\hbar \\Im \\imath \\jmath \\wp \\Re</annotation></semantics></math>'],
 
   /* char commands */
-  /* FIXME: unicode.xml maps \nabla to different characters. */
+  /* FIXME: unicode.xml maps \nabla to different characters.
+     https://github.com/fred-wang/TeXZilla/issues/5 */
     ["\\Perp \\Vbar \\boxdot \\Box \\square \\emptyset \\empty \\exists \\circ \\rhd \\lhd \\lll \\unrhd \\unlhd \\Del \\nabla \\sphericalangle \\heartsuit \\diamondsuit \\partial \\qed", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⫫</mo><mo>⫫</mo><mo>⊡</mo><mo>□</mo><mo>□</mo><mi>∅</mi><mi>∅</mi><mo>∃</mo><mo>∘</mo><mo>⊳</mo><mo>⊲</mo><mo>⋘</mo><mo>⊵</mo><mo>⊴</mo><mo>∇</mo><mo>∇</mo><mo>∢</mo><mo>♡</mo><mo>♢</mo><mi>∂</mi><mo>▪</mo></mrow><annotation encoding="TeX">\\Perp \\Vbar \\boxdot \\Box \\square \\emptyset \\empty \\exists \\circ \\rhd \\lhd \\lll \\unrhd \\unlhd \\Del \\nabla \\sphericalangle \\heartsuit \\diamondsuit \\partial \\qed</annotation></semantics></math>', true],
   /* char commands */
   ["\\bottom \\neg \\neq \\ne \\shortmid \\mid \\int \\integral \\iint \\doubleintegral \\iiint \\tripleintegral \\iiiint \\quadrupleintegral \\oint \\conint \\contourintegral \\times \\star \\circleddash \\odash \\intercal \\smallfrown \\smallsmile \\boxminus \\minusb \\boxplus \\plusb \\boxtimes \\timesb \\sum \\prod \\product \\coprod \\coproduct \\otimes \\Otimes \\bigotimes \\ominus \\oslash \\oplus \\Oplus \\bigoplus \\bigodot \\bigsqcup \\bigsqcap \\biginterleave \\biguplus \\wedge \\Wedge \\bigwedge \\Vee \\bigvee \\invamp \\parr", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⊥</mo><mo>¬</mo><mo>≠</mo><mo>≠</mo><mo>∣</mo><mo>∣</mo><mo>∫</mo><mo>∫</mo><mo>∬</mo><mo>∬</mo><mo>∭</mo><mo>∭</mo><mo>⨌</mo><mo>⨌</mo><mo>∮</mo><mo>∮</mo><mo>∮</mo><mo>×</mo><mo>⋆</mo><mo>⊝</mo><mo>⊝</mo><mo>⊺</mo><mo>⌢</mo><mo>⌣</mo><mo>⊟</mo><mo>⊟</mo><mo>⊞</mo><mo>⊞</mo><mo>⊠</mo><mo>⊠</mo><mo>∑</mo><mo>∏</mo><mo>∏</mo><mo>∐</mo><mo>∐</mo><mo>⊗</mo><mo>⨴</mo><mo>⨂</mo><mo>⊖</mo><mo>⊘</mo><mo>⊕</mo><mo>⨭</mo><mo>⨁</mo><mo>⨀</mo><mo>⨆</mo><mo>⨅</mo><mo>⫼</mo><mo>⨄</mo><mo>∧</mo><mo>⋀</mo><mo>⋀</mo><mo>⋁</mo><mo>⋁</mo><mo>⅋</mo><mo>⅋</mo></mrow><annotation encoding="TeX">\\bottom \\neg \\neq \\ne \\shortmid \\mid \\int \\integral \\iint \\doubleintegral \\iiint \\tripleintegral \\iiiint \\quadrupleintegral \\oint \\conint \\contourintegral \\times \\star \\circleddash \\odash \\intercal \\smallfrown \\smallsmile \\boxminus \\minusb \\boxplus \\plusb \\boxtimes \\timesb \\sum \\prod \\product \\coprod \\coproduct \\otimes \\Otimes \\bigotimes \\ominus \\oslash \\oplus \\Oplus \\bigoplus \\bigodot \\bigsqcup \\bigsqcap \\biginterleave \\biguplus \\wedge \\Wedge \\bigwedge \\Vee \\bigvee \\invamp \\parr</annotation></semantics></math>']
@@ -202,4 +205,5 @@ if (failures > 0) {
 }
 
 // FIXME: use a standard commonJS exit() command?
+// https://github.com/fred-wang/TeXZilla/issues/6
 slimer.exit()

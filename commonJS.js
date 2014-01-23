@@ -31,10 +31,6 @@ if (typeof require !== "undefined" && typeof exports !== "undefined") {
     return TeXZilla.toMathML.apply(TeXZilla, arguments);
   };
 
-  /* TODO: add some command line API.
-     - as a stream filter?
-     - running a server?
-     http://wiki.commonjs.org/wiki/System/1.0
-     http://wiki.commonjs.org/wiki/JSGI
-   */ 
+  /* FIXME: add some commonJS command line API.
+     https://github.com/fred-wang/TeXZilla/issues/7 */
 }
