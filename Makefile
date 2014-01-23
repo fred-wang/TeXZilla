@@ -37,6 +37,8 @@ help:
 unicode.xml:
 # Download the unicode.xml file from the "XML Entity Definitions for Characters"
 	$(WGET) http://www.w3.org/2003/entities/2007xml/unicode.xml
+# Workaround for https://github.com/fred-wang/TeXZilla/issues/5
+	patch < unicode.patch
 
 chars.txt: extractChars.xsl unicode.xml
 # Extract the relevant information on characters from unicode.xml
