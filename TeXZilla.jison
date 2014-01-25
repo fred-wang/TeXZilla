@@ -430,7 +430,8 @@ closedTerm
      $$ = newTag("ms", $4, "lquote=" + $2 + " rquote=" + $3);
   }
   | MTEXT tokenContent { $$ = newTag("mtext", $2); }
-  | UNKNOWN_TEXT { $$ = newTag("merror", "Unknown text: " + escapeText($1)); }
+  | HIGH_SURROGATE LOW_SURROGATE { $$ = newTag("mtext", $1 + $2); }
+  | BMP_CHARACTER { $$ = newTag("mtext", $1); }
   | OPERATORNAME textArg {
     $$ = newMo($2, "0em", "thinmathspace");
   }

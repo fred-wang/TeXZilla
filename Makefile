@@ -57,7 +57,9 @@ commands.txt: char-commands.txt base-commands.txt
 TeXZilla.jisonlex: main.jisonlex commands.txt
 # Generate the Jison lexical grammar.
 	cat $^ > $@
-	echo ".+ return \"UNKNOWN_TEXT\";" >> $@
+	echo "[\uD800-\uDBFF] return \"HIGH_SURROGATE\";" >> $@
+	echo "[\uDC00-\uDFFF] return \"LOW_SURROGATE\";" >> $@
+	echo ". return \"BMP_CHARACTER\";" >> $@
 
 TeXZilla.js: TeXZilla.jison TeXZilla.jisonlex commonJS.js
 # Generate the Javascript parser from the Jison grammars.
