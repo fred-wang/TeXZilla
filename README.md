@@ -18,8 +18,8 @@ See https://github.com/fred-wang/TeXZilla/releases for archives.
 
 You can use TeXZilla in a commonJS program:
 
-      var parser = require("./TeXZilla").parser;
-      console.log(parser.toMathMLString("\\sqrt{\\frac{x}{2}+y}"));
+      var TeXZilla = require("./TeXZilla");
+      console.log(TeXZilla.toMathMLString("\\sqrt{\\frac{x}{2}+y}"));
 
 or from a Web page:
 

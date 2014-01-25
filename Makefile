@@ -52,7 +52,7 @@ TeXZilla.jisonlex: main.jisonlex commands.txt
 TeXZilla.js: TeXZilla.jison TeXZilla.jisonlex commonJS.js
 # Generate the Javascript parser from the Jison grammars.
 	@echo "Generating the parser, this may take some time..."
-	$(JISON) --outfile $@ TeXZilla.jison TeXZilla.jisonlex
+	$(JISON) --outfile $@ --module-type js TeXZilla.jison TeXZilla.jisonlex
 	$(SED) -i "s|\\\\b)/|)/|g" $@ # jison issue 204
 	cat commonJS.js >> $@
 
