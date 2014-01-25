@@ -32,9 +32,9 @@ var tests = [
     /* multiple variable */
     ["xyz", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mi>y</mi><mi>z</mi></mrow><annotation encoding="TeX">xyz</annotation></semantics></math>'],
     /* Arabic variables */
-    /* FIXME: make these characters mathclass="A" in unicode.xml.
-       https://github.com/fred-wang/TeXZilla/issues/4 */
-    ["غظضذخثتشرقصفعسنملكيطحزوهدجب", 'TODO', true],
+    ["غظضذخثتشرقصفعسنملكيطحزوهدجب", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>غ</mi><mi>ظ</mi><mi>ض</mi><mi>ذ</mi><mi>خ</mi><mi>ث</mi><mi>ت</mi><mi>ش</mi><mi>ر</mi><mtext>ق</mtext><mi>ص</mi><mtext>ف</mtext><mi>ع</mi><mi>س</mi><mtext>ن</mtext><mtext>م</mtext><mtext>ل</mtext><mtext>ك</mtext><mtext>ي</mtext><mi>ط</mi><mi>ح</mi><mi>ز</mi><mtext>و</mtext><mtext>ه</mtext><mi>د</mi><mi>ج</mi><mi>ب</mi></mrow><annotation encoding="TeX">غظضذخثتشرقصفعسنملكيطحزوهدجب</annotation></semantics></math>'],
+    /* Unknown characters (BMP and non-BMP) */
+    ["𝀸", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext></mtext><mtext>𝀸</mtext></mrow><annotation encoding="TeX">𝀸</annotation></semantics></math>'],
     /* variable and numbers */
     ["2xy", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>x</mi><mi>y</mi></mrow><annotation encoding="TeX">2xy</annotation></semantics></math>'],
     /* \\mn */
