@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var parser = require("./TeXZilla").parser;
+var TeXZilla = require("./TeXZilla");
 var tests = [
     /* Empty content */
     ["", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow/><annotation encoding="TeX"></annotation></semantics></math>'],
@@ -80,12 +80,12 @@ var tests = [
     /* math*lap */
     ["\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mpadded width="0em"><mi>x</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-100%width"><mi>y</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-50%width"><mi>y</mi></mpadded></mrow><annotation encoding="TeX">\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}</annotation></semantics></math>'],
     /* spaces */
-    ["\\! \\, \\: \\; \\medspace \\negspace \\negmedspace \\negthickspace \\thickspace \\thinspace", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mspace width="negativethinmathspace"><mspace width="thinmathspace"/><mspace width="mediummathspace"/><mspace width="thickmathspace"/><mspace width="mediummathspace"/><mspace width="negativethinmathspace"><mspace width="negativemediummathspace"/><mspace width="negativethickmathspace"/><mspace width="thickmathspace"/><mspace width="thinmathspace"/></mrow><annotation encoding="TeX">\\! \\, \\: \\; \\medspace \\negspace \\negmedspace \\negthickspace \\thickspace \\thinspace</annotation></semantics></math>'],
+    ["\\! \\, \\: \\; \\medspace \\negspace \\negmedspace \\negthickspace \\thickspace \\thinspace", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mspace width="negativethinmathspace"/><mspace width="thinmathspace"/><mspace width="mediummathspace"/><mspace width="thickmathspace"/><mspace width="mediummathspace"/><mspace width="negativethinmathspace"/><mspace width="negativemediummathspace"/><mspace width="negativethickmathspace"/><mspace width="thickmathspace"/><mspace width="thinmathspace"/></mrow><annotation encoding="TeX">\\! \\, \\: \\; \\medspace \\negspace \\negmedspace \\negthickspace \\thickspace \\thinspace</annotation></semantics></math>'],
     /* space */
     ["\\space{1}{2}{3}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mspace height=".1ex" depth=".2ex" width=".3em"/><annotation encoding="TeX">\\space{1}{2}{3}</annotation></semantics></math>'],
     /* mathraisebox */
     ["\\mathraisebox{1em}x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="1em" height="+1em"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{1em}x</annotation></semantics></math>'],
-    ["\\mathraisebox{-1em}x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="-1em" height="0pt" depth="+"1em"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{-1em}x</annotation></semantics></math>'],
+    ["\\mathraisebox{-1em}x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="-1em" height="0pt" depth="+1em"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{-1em}x</annotation></semantics></math>'],
     ["\\mathraisebox{1em}[2em]x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="1em" height="2em" depth="depth"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{1em}[2em]x</annotation></semantics></math>'],
     ["\\mathraisebox{-1em}[2em]x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="-1em" height="2em" depth="+1em"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{-1em}[2em]x</annotation></semantics></math>'],
     ["\\mathraisebox{1em}[2em][3em]x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mpadded voffset="1em" height="2em" depth="3em"><mi>x</mi></mpadded><annotation encoding="TeX">\\mathraisebox{1em}[2em][3em]x</annotation></semantics></math>'],
@@ -167,17 +167,23 @@ var tests = [
 
 function escape(aString)
 {
-    return aString.replace(/([\\\'])/g, "\\$1");
+    return aString ? aString.replace(/([\\\'])/g, "\\$1") : aString;
 }
 
 var failures = 0, unexpectedfailures = 0;
 for (var i = 0; i < tests.length; i++) {
     try {
-        var output = parser.toMathMLString(tests[i][0]);
+        var output = TeXZilla.toMathMLString(tests[i][0]);
         if (output !== tests[i][1]) {
-            throw ("Unexpected output:\n" +
+            throw ("TeXZilla.toMathMLString, unexpected result:\n" +
                    "  Actual: '" + escape(output) + "'\n" +
                    "  Expected: '" + escape(tests[i][1]) + "'");
+        }
+        var input = TeXZilla.getTeXSource(TeXZilla.toMathML(tests[i][0]));
+        if (input !== tests[i][0]) {
+            throw ("TeXZilla.getTeXSource, unexpected result:\n" +
+                   "  Actual: '" + escape(input) + "'\n" +
+                   "  Expected: '" + escape(tests[i][0]) + "'");
         }
         console.log("Test " + (i + 1) + "... PASS");
     } catch(e) {

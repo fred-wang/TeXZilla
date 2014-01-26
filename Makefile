@@ -52,13 +52,15 @@ TeXZilla.jisonlex: main.jisonlex commands.txt
 TeXZilla.js: TeXZilla.jison TeXZilla.jisonlex commonJS.js
 # Generate the Javascript parser from the Jison grammars.
 	@echo "Generating the parser, this may take some time..."
-	$(JISON) --outfile $@ TeXZilla.jison TeXZilla.jisonlex
+	$(JISON) --outfile $@ --module-type js TeXZilla.jison TeXZilla.jisonlex
 	$(SED) -i "s|\\\\b)/|)/|g" $@ # jison issue 204
-	cat commonJS.js >> $@
+	cat MPL-header.js $@ commonJS.js > tmp.js
+	mv tmp.js $@
 
 TeXZilla-min.js: TeXZilla.js
 # Minify the Javascript parser using Google's Closure Compiler.
-	$(JAVA) -jar $(CLOSURE_COMPILER) $< > $@
+	$(JAVA) -jar $(CLOSURE_COMPILER) $< > tmp.js
+	cat MPL-header.js tmp.js > $@
 
 tests: unit-tests.js TeXZilla.js
 	$(SLIMERJS) $<

@@ -3,8 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 if (typeof require !== "undefined" && typeof exports !== "undefined") {
-  exports.parser = TeXZilla;
-  exports.Parser = TeXZilla.Parser;
+
+  exports.setDOMParser = function (aDOMParser) {
+    TeXZilla.DOMParser = aDOMParser;
+  }
 
   exports.getTeXSource = function () {
     return TeXZilla.getTeXSource.apply(TeXZilla, arguments);
