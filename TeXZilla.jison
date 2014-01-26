@@ -90,25 +90,20 @@ var MathMLNameSpace = "http://www.w3.org/1998/Math/MathML";
 var TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
                     "application/x-tex", "application/x-latex"];
 
-function parseMathMLDocument(aString)
-{
-  /* Parse the string into a MathML document and return the <math> root. */
-  return (new DOMParser()).
-    parseFromString(aString, "application/xml").documentElement;
-}
-
 function getTeXSourceInternal(aMathMLElement)
 {
-  if (!(aMathMLElement instanceof Element) ||
+  if (!aMathMLElement ||
       aMathMLElement.namespaceURI !== MathMLNameSpace) {
     return null;
   }
 
   if (aMathMLElement.tagName === "semantics") {
-    var tags = aMathMLElement.getElementsByTagName("annotation");
-    for (var i = 0; i < tags.length; i++) {
-      if (TeXMimeTypes.indexOf(tags[i].getAttribute("encoding")) !== -1) {
-        return tags[i].textContent;
+    var children = aMathMLElement.children;
+    for (var i = 0; i < children.length; i++) {
+      if (children[i].namespaceURI === MathMLNameSpace &&
+          children[i].localName === "annotation" &&
+          TeXMimeTypes.indexOf(children[i].getAttribute("encoding")) !== -1) {
+        return children[i].textContent;
       }
     }
   } else if (aMathMLElement.childElementCount === 1) {
@@ -118,10 +113,29 @@ function getTeXSourceInternal(aMathMLElement)
   return null;
 }
 
+try {
+  // Try to create a DOM Parser object if it exists (e.g. in a Web page,
+  // in a chrome script running in a window etc)
+  parser.DOMParser = new DOMParser();
+} catch (e) {
+  // Leave the DOMParser unset.
+  parser.DOMParser = null;
+}
+
+parser.parseMathMLDocument = function (aString)
+{
+  /* Parse the string into a MathML document and return the <math> root. */
+  if (this.DOMParser) {
+    return this.DOMParser.
+      parseFromString(aString, "application/xml").documentElement;
+  }
+  throw "TeXZilla.DOMParser has not been set!";
+}
+
 parser.getTeXSource = function(aMathMLElement)
 {
   if (typeof aMathMLElement === "string") {
-    aMathMLElement = parseMathMLDocument(aMathMLElement);
+    aMathMLElement = this.parseMathMLDocument(aMathMLElement);
   }
 
   return getTeXSourceInternal(aMathMLElement);
@@ -158,7 +172,7 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL)
 parser.toMathML = function(aTeX, aDisplay, aRTL)
 {
   /* Parse the TeX string into a <math> element. */
-  return parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL));
+  return this.parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL));
 }
 %}
 
@@ -489,7 +503,7 @@ closedTerm
   }
   | QUAD { $$ = "<mspace width=\"1em\"/>"; }
   | QQUAD { $$ = "<mspace width=\"2em\"/>"; }
-  | NEGSPACE { $$ = "<mspace width=\"negativethinmathspace\">"; }
+  | NEGSPACE { $$ = "<mspace width=\"negativethinmathspace\"/>"; }
   | NEGMEDSPACE { $$ = "<mspace width=\"negativemediummathspace\"/>"; }
   | NEGTHICKSPACE { $$ = "<mspace width=\"negativethickmathspace\"/>"; }
   | THINSPACE { $$ = "<mspace width=\"thinmathspace\"/>"; }
@@ -515,7 +529,7 @@ closedTerm
     $$ = newTag("mpadded", $3,
                 "voffset=\"" + $2.l + $2.u + "\" " +
                 ($2.l >= 0 ? "height=\"+" + $2.l + $2.u + "\"" :
-                 "height=\"0pt\" depth=\"+\"" + (-$2.l) + $2.u + "\""));
+                 "height=\"0pt\" depth=\"+" + (-$2.l) + $2.u + "\""));
   }
   /* FIXME: mathvariant should be set on token element when possible.
      Try to abstract the element/attribute creation to better handle that.
