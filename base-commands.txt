@@ -25,11 +25,11 @@
 "\\arrayopts" return "ARRAYOPTS";
 "\\atop" return "TEXATOP";
 "\\bar" { yytext = "\u00AF"; return "ACCENTNS"; }
-"\\begin{Bmatrix}" return "BBMATRIX";
-"\\begin{Vmatrix}" return "VVMATRIX";
+"\\begin{Bmatrix}" return "BBBMATRIX";
+"\\begin{Vmatrix}" return "BVVMATRIX";
 "\\begin{aligned}" return "BALIGNED";
 "\\begin{array}" { this.pushState("TEXTARG"); this.pushState("TEXTOPTARG"); this.pushState("TRYOPTARG"); return "BARRAY"; }
-"\\begin{bmatrix}" return "BMATRIX";
+"\\begin{bmatrix}" return "BBMATRIX";
 "\\begin{cases}" return "BCASES";
 "\\begin{gathered}" return "BGATHERED";
 "\\begin{matrix}" return "BMATRIX";
