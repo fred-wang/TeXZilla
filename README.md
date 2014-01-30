@@ -13,8 +13,17 @@ Description
 
 TeXZilla is a Javascript TeX-to-MathML converter compatible
 with Unicode. This is still a work in progress and things may change in the
-future. See https://github.com/fred-wang/TeXZilla/issues for known issues.
-See https://github.com/fred-wang/TeXZilla/releases for archives.
+future.
+
+You can try a [http://fred-wang.github.io/TeXZilla/](live demo),
+[https://addons.mozilla.org/en-US/firefox/addon/texzilla/](a Firefox
+add-on) or [pre-releases](https://github.com/fred-wang/TeXZilla/releases).
+
+You can also check the [user documentation](https://github.com/fred-wang/TeXZilla/wiki)
+and [bug tracker](https://github.com/fred-wang/TeXZilla/issues?state=open).
+
+Usage
+-----
 
 You can use TeXZilla in a commonJS program:
 
@@ -26,8 +35,6 @@ or from a Web page:
       <script type="text/javascript" src="TeXZilla-min.js"></script>
       ...
       var MathMLElement = TeXZilla.toMathML("\\sqrt{\\frac{x}{2}+y}");
-
-See also http://fred-wang.github.io/TeXZilla/ for a live demo.
 
 The public API is:
 
