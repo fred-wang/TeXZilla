@@ -16,6 +16,29 @@ with Unicode. This is still a work in progress and things may change in the
 future. See https://github.com/fred-wang/TeXZilla/issues for known issues.
 See https://github.com/fred-wang/TeXZilla/releases for archives.
 
+Dependencies
+------------
+
+Required to generate `TeXZilla.js`:
+
+- [coreutils](https://www.gnu.org/software/coreutils/), [sed](https://www.gnu.org/software/sed/), [wget](https://www.gnu.org/software/wget/), [make](https://www.gnu.org/software/make/)
+- [xsltproc](http://xmlsoft.org/XSLT/xsltproc2.html)
+- [Python](http://www.python.org/)
+- [Jison](http://zaach.github.io/jison) and NodeJS.
+
+Optional:
+
+- To run unit tests: [slimerJS](http://slimerjs.org/)
+- To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/) and Java.
+
+Compiling
+---------
+
+Update config.cfg and try "make help".
+
+Usage
+-----
+
 You can use TeXZilla in a commonJS program:
 
       var TeXZilla = require("./TeXZilla");
@@ -66,22 +89,26 @@ The public API is:
       TeXZilla.setDOMParser(Cc["@mozilla.org/xmlextras/domparser;1"].
                             createInstance(Ci.nsIDOMParser));
 
-Dependencies
-------------
+(La)TeX Compatibility Notes
+---------------------------
 
-Required to generate `TeXZilla.js`:
+TeXZilla support most of (La)TeX symbols (the full list can be found in
+`chars.txt`) and commands (the full list can be found in `base-commands.txt`).
 
-- [coreutils](https://www.gnu.org/software/coreutils/), [sed](https://www.gnu.org/software/sed/), [wget](https://www.gnu.org/software/wget/), [make](https://www.gnu.org/software/make/)
-- [xsltproc](http://xmlsoft.org/XSLT/xsltproc2.html)
-- [Python](http://www.python.org/)
-- [Jison](http://zaach.github.io/jison) and NodeJS.
+The follow (La)TeX environments are available:
 
-Optional:
+- array
 
-- To run unit tests: [slimerJS](http://slimerjs.org/)
-- To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/) and Java.
+The follow environments from amsmath package are available:
 
-Compiling
----------
-
-Update config.cfg and try "make help".
+- aligned
+- cases
+- gathered
+- matrix
+- pmatrix
+- bmatrix
+- Bmatrix
+- vmatrix
+- Vmatrix
+- smallmatrix
+- split
