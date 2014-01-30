@@ -15,9 +15,8 @@ TeXZilla is a Javascript TeX-to-MathML converter compatible
 with Unicode. This is still a work in progress and things may change in the
 future.
 
-You can try a [http://fred-wang.github.io/TeXZilla/](live demo),
-[https://addons.mozilla.org/en-US/firefox/addon/texzilla/](a Firefox
-add-on) or [pre-releases](https://github.com/fred-wang/TeXZilla/releases).
+You can try a [live demo](http://fred-wang.github.io/TeXZilla/),
+[an add-on](https://addons.mozilla.org/en-US/firefox/addon/texzilla/) or [pre-releases](https://github.com/fred-wang/TeXZilla/releases).
 
 You can also check the [user documentation](https://github.com/fred-wang/TeXZilla/wiki)
 and [bug tracker](https://github.com/fred-wang/TeXZilla/issues?state=open).
