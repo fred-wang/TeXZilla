@@ -601,11 +601,11 @@ closedTerm
     $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
     $$ = newTag("mrow", newMo("|") + $$ + newMo("|"));
   }
-  | BBBVMATRIX tableRowList EBBMATRIX {
+  | BBBMATRIX tableRowList EBBMATRIX {
     $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
     $$ = newTag("mrow", newMo("{") + $$ + newMo("}"));
   }
-  | BVVVMATRIX tableRowList EVVMATRIX {
+  | BVVMATRIX tableRowList EVVMATRIX {
     $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
     $$ = newTag("mrow", newMo("\u2016") + $$ + newMo("\u2016"));
   }
