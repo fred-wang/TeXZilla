@@ -29,6 +29,10 @@ $MAKE minify
 rm .gitignore
 ls | egrep -v "README.md|TeXZilla.js|TeXZilla-min.js" | xargs rm
 
+# Remove the Build Instructions from the README file.
+$SED -n "/Build Instructions/q;p" README.md > README.tmp
+mv README.tmp README.md
+
 # Commit the changes.
 $GIT add --no-ignore-removal .
 $GIT commit -m "TeXZilla Release $RELEASENUMBER"
