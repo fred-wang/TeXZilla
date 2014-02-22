@@ -98,12 +98,14 @@ function getTeXSourceInternal(aMathMLElement)
   }
 
   if (aMathMLElement.tagName === "semantics") {
-    var children = aMathMLElement.children;
-    for (var i = 0; i < children.length; i++) {
-      if (children[i].namespaceURI === MathMLNameSpace &&
-          children[i].localName === "annotation" &&
-          TeXMimeTypes.indexOf(children[i].getAttribute("encoding")) !== -1) {
-        return children[i].textContent;
+    // Note: we can't use aMathMLElement.children on WebKit/Blink because of
+    // https://bugs.webkit.org/show_bug.cgi?id=109556.
+    for (var child = aMathMLElement.firstElementChild; child;
+         child = child.nextElementSibling) {
+      if (child.namespaceURI === MathMLNameSpace &&
+          child.localName === "annotation" &&
+          TeXMimeTypes.indexOf(child.getAttribute("encoding")) !== -1) {
+        return child.textContent;
       }
     }
   } else if (aMathMLElement.childElementCount === 1) {
