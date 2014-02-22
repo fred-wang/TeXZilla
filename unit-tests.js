@@ -51,18 +51,34 @@ var tests = [
     ["\\& \\% \\$", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&amp;</mo><mo>%</mo><mi>$</mi></mrow><annotation encoding="TeX">\\&amp; \\% \\$</annotation></semantics></math>'],
     /* escape > that could lead to invalid XML */
     ["\\text{]]>}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext>]]&gt;</mtext><annotation encoding="TeX">\\text{]]&gt;}</annotation></semantics></math>'],
+    /* \operatorname, \mathop, \mathbin, \mathrel */
+    ["\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="thinmathspace">x</mo><mo lspace="thinmathspace" rspace="thinmathspace">x</mo><mo lspace="mediummathspace" rspace="mediummathspace">x</mo><mo lspace="thickmathspace" rspace="thickmathspace">x</mo></mrow><annotation encoding="TeX">\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}</annotation></semantics></math>'],
     /* \frac */
     ["\\frac x y", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>x</mi><mi>y</mi></mfrac><annotation encoding="TeX">\\frac x y</annotation></semantics></math>'],
     /* \sqrt */
     ["\\sqrt x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msqrt><mi>x</mi></msqrt><annotation encoding="TeX">\\sqrt x</annotation></semantics></math>'],
+    /* \root */
+    ["\\root 3 x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mroot><mi>x</mi><mn>3</mn></mroot><annotation encoding="TeX">\\root 3 x</annotation></semantics></math>'],
     /* \sqrt with optional parameter */
     ["\\sqrt[3]x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mroot><mi>x</mi><mn>3</mn></mroot><annotation encoding="TeX">\\sqrt[3]x</annotation></semantics></math>'],
     /* \sqrt nested optional arguments */
     ["\\sqrt[\\sqrt[\\frac{1}{2}]\\frac 3 4]\\frac 5 6", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mroot><mfrac><mn>5</mn><mn>6</mn></mfrac><mroot><mfrac><mn>3</mn><mn>4</mn></mfrac><mfrac><mn>1</mn><mn>2</mn></mfrac></mroot></mroot><annotation encoding="TeX">\\sqrt[\\sqrt[\\frac{1}{2}]\\frac 3 4]\\frac 5 6</annotation></semantics></math>'],
-    /* \root */
-    ["\\root 3 x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mroot><mi>x</mi><mn>3</mn></mroot><annotation encoding="TeX">\\root 3 x</annotation></semantics></math>'],
+    /* \underset, \overset, \underoverset */
+    ["\\underset{x}{y} \\overset{x}{y} \\underoverset{x}{y}{z}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mi>y</mi><mi>x</mi></munder><mover><mi>y</mi><mi>x</mi></mover><munderover><mi>z</mi><mi>x</mi><mi>y</mi></munderover></mrow><annotation encoding="TeX">\\underset{x}{y} \\overset{x}{y} \\underoverset{x}{y}{z}</annotation></semantics></math>'],
+    /* \xarrow */
+    ["\\xLeftarrow{x+y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mover><annotation encoding="TeX">\\xLeftarrow{x+y}</annotation></semantics></math>'],
+    ["\\xLeftarrow[x+y]{}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><munder><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></munder><annotation encoding="TeX">\\xLeftarrow[x+y]{}</annotation></semantics></math>'],
+    ["\\xLeftarrow[x+y]{a+b}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><munderover><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></munderover><annotation encoding="TeX">\\xLeftarrow[x+y]{a+b}</annotation></semantics></math>'],
+    /* \math*lap */
+    ["\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mpadded width="0em"><mi>x</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-100%width"><mi>y</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-50%width"><mi>y</mi></mpadded></mrow><annotation encoding="TeX">\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}</annotation></semantics></math>'],
+    /* \phantom */
+    ["\\phantom{x}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mphantom><mi>x</mi></mphantom><annotation encoding="TeX">\\phantom{x}</annotation></semantics></math>'],
+    /* \tfrac */
+    ["\\tfrac a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="false"><mfrac><mi>a</mi><mi>b</mi></mfrac></mstyle><annotation encoding="TeX">\\tfrac a b</annotation></semantics></math>'],
     /* \binom */
     ["\\binom a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mfrac linethickness="0"><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><annotation encoding="TeX">\\binom a b</annotation></semantics></math>'],
+    /* \\tbinom */
+    ["\\tbinom a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mstyle displaystyle="false"><mfrac linethickness="0"><mi>a</mi><mi>b</mi></mfrac></mstyle><mo>)</mo></mrow><annotation encoding="TeX">\\tbinom a b</annotation></semantics></math>'],
     /* \href */
     ["\\href{http://www.myurl.org}{\\frac a b}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow href="http://www.myurl.org"><mfrac><mi>a</mi><mi>b</mi></mfrac></mrow><annotation encoding="TeX">\\href{http://www.myurl.org}{\\frac a b}</annotation></semantics></math>'],
     /* isolated + */
@@ -92,8 +108,6 @@ var tests = [
     ["\\mathbb{x+y} \\mathbf{x+y} \\mathit{x+y} \\mathscr{x+y} \\mathcal{x+y}  \\mathscr{x+y} \\mathbscr{x+y} \\mathsf{x+y} \\mathfrak{x+y} \\mathit{x+y} \\mathtt{x+y} \\mathrm{x+y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathvariant="double-struck"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="bold"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="italic"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="script"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="script"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="script"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="bold-script"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="sans-serif"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="fraktur"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="italic"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="monospace"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle><mstyle mathvariant="normal"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mstyle></mrow><annotation encoding="TeX">\\mathbb{x+y} \\mathbf{x+y} \\mathit{x+y} \\mathscr{x+y} \\mathcal{x+y}  \\mathscr{x+y} \\mathbscr{x+y} \\mathsf{x+y} \\mathfrak{x+y} \\mathit{x+y} \\mathtt{x+y} \\mathrm{x+y}</annotation></semantics></math>'],
     /* *big* */
     ["\\big(\\bigr(\\Big(\\Bigr(\\bigg(\\biggr(\\Bigg(\\Biggr(\\bigl(\\Bigl(\\biggl(\\Biggl(", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo maxsize="1.2em" minsize="1.2em">(</mo><mo maxsize="1.2em" minsize="1.2em">(</mo><mo maxsize="1.8em" minsize="1.8em">(</mo><mo maxsize="1.8em" minsize="1.8em">(</mo><mo maxsize="2.4em" minsize="2.4em">(</mo><mo maxsize="2.4em" minsize="2.4em">(</mo><mo maxsize="3em" minsize="3em">(</mo><mo maxsize="3em" minsize="3em">(</mo><mo maxsize="1.2em" minsize="1.2em">(</mo><mo maxsize="1.8em" minsize="1.8em">(</mo><mo maxsize="2.4em" minsize="2.4em">(</mo><mo maxsize="3em" minsize="3em">(</mo></mrow><annotation encoding="TeX">\\big(\\bigr(\\Big(\\Bigr(\\bigg(\\biggr(\\Bigg(\\Biggr(\\bigl(\\Bigl(\\biggl(\\Biggl(</annotation></semantics></math>'],
-    /* math*lap */
-    ["\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mpadded width="0em"><mi>x</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-100%width"><mi>y</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-50%width"><mi>y</mi></mpadded></mrow><annotation encoding="TeX">\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}</annotation></semantics></math>'],
     /* spaces */
     ["\\! \\, \\: \\; \\medspace \\negspace \\negmedspace \\negthickspace \\thickspace \\thinspace", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mspace width="negativethinmathspace"/><mspace width="thinmathspace"/><mspace width="mediummathspace"/><mspace width="thickmathspace"/><mspace width="mediummathspace"/><mspace width="negativethinmathspace"/><mspace width="negativemediummathspace"/><mspace width="negativethickmathspace"/><mspace width="thickmathspace"/><mspace width="thinmathspace"/></mrow><annotation encoding="TeX">\\! \\, \\: \\; \\medspace \\negspace \\negmedspace \\negthickspace \\thickspace \\thinspace</annotation></semantics></math>'],
     /* space */
@@ -148,10 +162,6 @@ var tests = [
   /* array */
   ["\\array{ a & b \\\\ c & d }", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><annotation encoding="TeX">\\array{ a &amp; b \\\\ c &amp; d }</annotation></semantics></math>'],
     ["\\array{ \\arrayopts{\\colalign{left right right}\\rowalign{top bottom bottom}\\align{center}\\padding{1em}\\equalrows{true}\\equalcols{true}\\rowlines{dashed}\\collines{dashed}\\frame{solid}} a & b & c}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable columnalign="left right right" rowalign="top bottom bottom" align="center" rowspacing="1em" columnspacing="1em" equalrows="true" equalcolumns="true" rowlines="dashed" columnlines="dashed" frame="solid"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr></mtable><annotation encoding="TeX">\\array{ \\arrayopts{\\colalign{left right right}\\rowalign{top bottom bottom}\\align{center}\\padding{1em}\\equalrows{true}\\equalcols{true}\\rowlines{dashed}\\collines{dashed}\\frame{solid}} a &amp; b &amp; c}</annotation></semantics></math>'],
-  /* xarrow */
-  ["\\xLeftarrow{x+y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mover><annotation encoding="TeX">\\xLeftarrow{x+y}</annotation></semantics></math>'],
-  ["\\xLeftarrow[x+y]{}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><munder><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></munder><annotation encoding="TeX">\\xLeftarrow[x+y]{}</annotation></semantics></math>'],
-  ["\\xLeftarrow[x+y]{a+b}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><munderover><mo>⇐</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></munderover><annotation encoding="TeX">\\xLeftarrow[x+y]{a+b}</annotation></semantics></math>'],
   /* infinity */
   ["\\infty \\infinity ∞", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>∞</mn><mn>∞</mn><mn>∞</mn></mrow><annotation encoding="TeX">\\infty \\infinity ∞</annotation></semantics></math>'],
   /* char commands */

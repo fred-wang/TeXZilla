@@ -142,6 +142,7 @@
 "\\text" { this.begin("TEXTARG"); return "MTEXT"; }
 "\\textsize" return "TEXTSIZE";
 "\\textstyle" return "TEXTSTYLE";
+"\\tbinom" return "TBINOM";
 "\\tfrac" return "TFRAC";
 "\\thickspace" return "THICKSPACE";
 "\\thinspace" return "THINSPACE";
@@ -151,7 +152,7 @@
 "\\tooltip" { this.pushState("TEXTARG"); return "TOOLTIP"; }
 "\\underbrace" return "UNDERBRACE";
 "\\underline" return "UNDERLINE";
-"\\underoverset"  return UNDEROVERSET;
+"\\underoverset"  return "UNDEROVERSET";
 "\\underset" return "UNDERSET";
 "\\vec" { yytext = "\u21C0"; return "ACCENTNS"; }
 "\\widebar" { yytext = "\u00AF"; return "ACCENT"; }
