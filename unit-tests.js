@@ -42,8 +42,9 @@ var tests = [
     ["\\ms{x}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><ms>x</ms><annotation encoding="TeX">\\ms{x}</annotation></semantics></math>'],
     /* \ms with quotes and escaped characters */
     ["\\ms[<2][&\\]x]{a&b}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><ms lquote="&lt;2" rquote="&amp;]x">a&amp;b</ms><annotation encoding="TeX">\\ms[&lt;2][&amp;\\]x]{a&amp;b}</annotation></semantics></math>'],
-    /* whitespace collapse */
-    ["\\mtext{  x   y  }", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext>x y</mtext><annotation encoding="TeX">\\mtext{  x   y  }</annotation></semantics></math>'],
+    /* whitespace collapse. Note: the leading/trailing space in the mtext
+       output are no-break space. */
+    ["\\mtext{  x   y  }", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext> x y </mtext><annotation encoding="TeX">\\mtext{  x   y  }</annotation></semantics></math>'],
     /* escaped characters */
     ["\\mtext{2i\\}fzx\\\\}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext>2i}fzx\\</mtext><annotation encoding="TeX">\\mtext{2i\\}fzx\\\\}</annotation></semantics></math>'],
     /* escaped characters */

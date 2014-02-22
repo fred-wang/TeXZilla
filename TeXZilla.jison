@@ -233,8 +233,12 @@ attrArg
 /* MathML token content */
 tokenContent
   : textArg {
-    /* Collapse the whitespace as indicated in the MathML specification. */
-    $$ = $1.trim().replace(/\s+/g, " ");
+    /* The MathML specification indicates that trailing/leading whitespaces
+       should be removed and that inner whitespace should be collapsed. Let's
+       replace trailing/leading whitespace by no-break space so that people can
+       write e.g. \text{ if }. We also collapse internal whitespace here.
+       See https://github.com/fred-wang/TeXZilla/issues/25. */
+    $$ = $1.replace(/^\s+|\s+$/g, "\u00A0").replace(/\s+/g, " ");
   }
   ;
 
