@@ -6,7 +6,7 @@
 function escapeText(aString)
 {
   /* Escape reserved XML characters for use as text nodes. */
-  return aString.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return aString.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function escapeQuote(aString)
