@@ -233,16 +233,20 @@ function escape(aString)
     return aString ? aString.replace(/([\\\'])/g, "\\$1") : aString;
 }
 
-var failures = 0, unexpectedfailures = 0;
-for (var i = 0; i < tests.length; i++) {
+var failures = 0, unexpectedfailures = 0, i = 0, output, input;
+
+for (i = 0; i < tests.length; i++) {
     try {
-        var output = TeXZilla.toMathMLString(tests[i][0]);
+        /* Test TeXZilla.toMathMLString against a reference output. */
+        output = TeXZilla.toMathMLString(tests[i][0]);
         if (output !== tests[i][1]) {
             throw ("TeXZilla.toMathMLString, unexpected result:\n" +
                    "  Actual: '" + escape(output) + "'\n" +
                    "  Expected: '" + escape(tests[i][1]) + "'");
         }
-        var input = TeXZilla.getTeXSource(TeXZilla.toMathML(tests[i][0]));
+        /* Do the same conversion with TeXZilla.toMathML and try to extract
+           the original input again with TeXZilla.getTeXSource */
+        input = TeXZilla.getTeXSource(TeXZilla.toMathML(tests[i][0]));
         if (input !== tests[i][0]) {
             throw ("TeXZilla.getTeXSource, unexpected result:\n" +
                    "  Actual: '" + escape(input) + "'\n" +
@@ -258,6 +262,50 @@ for (var i = 0; i < tests.length; i++) {
     }
 }
 
+/* Test error handling */
+// FIXME: Improve testing when we have better error messages?
+// https://github.com/fred-wang/TeXZilla/issues/16
+var badsource= "\\frac";
+var error = "Parse error on line 1";
+var success;
+
+/* 1) with <merror> */
+success = false;
+try {
+    output = TeXZilla.toMathMLString(badsource, false, false);
+} catch(e) {
+    console.log(e)
+}
+success = (output.indexOf(error) != -1 && output.indexOf("<merror>") != -1);
+console.log("Test " + (i + 1) + "... " + (success ? "PASS" : "FAIL"));
+i++;
+
+if (!success) {
+    failures++;
+    unexpectedfailures++;
+}
+
+/* 2) with exception */
+success = false;
+try {
+    TeXZilla.toMathMLString(badsource, false, false, true);
+} catch(e) {
+    try {
+        if (e.message.indexOf(error) != -1) {
+            success = true;
+        }
+    } catch(e) {
+        console.log(e);
+    }
+}
+console.log("Test " + (i + 1) + "... " + (success ? "PASS" : "FAIL"));
+i++;
+if (!success) {
+    failures++;
+    unexpectedfailures++;
+}
+
+/* Print test results */
 if (failures > 0) {
     console.log(failures + " test(s) failed (" +
                 unexpectedfailures + " unexpected).")
