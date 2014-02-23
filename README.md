@@ -19,7 +19,8 @@ future. Please report any bug you find to the
 For a quick overview, you can try a
 [live demo](http://fred-wang.github.io/TeXZilla/), install
 [a Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/texzilla/),
-try [a Firefox OS webapp](http://r-gaia-cs.github.io/TeXZilla-webapp/)
+try [a Firefox OS webapp](http://r-gaia-cs.github.io/TeXZilla-webapp/),
+check this page with [custom &lt;x-tex&gt; tag]
 or download the [pre-releases](https://github.com/fred-wang/TeXZilla/releases).
 
 Please read the [wiki](https://github.com/fred-wang/TeXZilla/wiki) to get more
