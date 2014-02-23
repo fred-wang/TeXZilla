@@ -1,0 +1,796 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Extracting the TeX source using getTeXSource</title>
+    <meta charset="utf-8"/>
+    <script type="text/javascript" src="../TeXZilla-min.js"></script>
+    <script type="text/javascript" src="TeXZilla-show-source.js"></script>
+  </head>
+  <body>
+
+<h1>Extracting the TeX source using getTeXSource</h1>
+
+<p>This page contains MathML equations that have been generated using TeXZilla.
+  Double-click on any of them to get the original TeX source.</p>
+
+<h2>Copyright</h2>
+
+<pre>Copyright (C) 2013 Frédéric Wang
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.3
+    or any later version published by the Free Software Foundation;
+    with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+    A copy of the license is included in the section entitled "GNU
+    Free Documentation License".
+</pre>
+
+<h2>Basic Integration</h2>
+
+<h3>Ideas</h3>
+
+<p>If <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="TeX">F</annotation></semantics></math> is a primitive of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="TeX">f</annotation></semantics></math> then <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mi>a</mi><mi>b</mi></msubsup><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi><mo>=</mo><mi>F</mi><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo><mo>-</mo><mi>F</mi><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\int_{a}^b f(x) d x = F(b) - F(a)</annotation></semantics></math>,
+provided the integrand and integral have no singularities on the path of
+integration. As a consequence, we can use a table of derivatives:</p>
+
+<table style="margin-left: auto; margin-right: auto;" border="1">
+<tbody><tr><td></td><td>Function</td><td>Derivative</td></tr>
+<tr><td>Linearity  </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>f</mi><mo>+</mo><mi>b</mi><mi>g</mi></mrow><annotation encoding="TeX">a f + b g</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>f</mi><mo>′</mo><mo>+</mo><mi>b</mi><mi>g</mi><mo>′</mo></mrow><annotation encoding="TeX">a f' + b g'</annotation></semantics></math> </td></tr>
+<tr><td>Leibniz rule </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mi>g</mi></mrow><annotation encoding="TeX">f g</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>′</mo><mi>g</mi><mo>+</mo><mi>g</mi><mi>f</mi><mo>′</mo></mrow><annotation encoding="TeX">f' g + g f'</annotation></semantics></math> </td></tr>
+<tr><td>Reciprocal rule </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mn>1</mn><mi>f</mi></mfrac><annotation encoding="TeX">\frac{1}{f}</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>-</mo><mfrac><mrow><mi>f</mi><mo>′</mo></mrow><msup><mi>f</mi><mn>2</mn></msup></mfrac></mrow><annotation encoding="TeX">-\frac{f'}{f^2}</annotation></semantics></math> </td></tr>
+<tr><td>Chain Rule </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>∘</mo><mi>g</mi></mrow><annotation encoding="TeX">f \circ g</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>f</mi><mo>′</mo><mo>∘</mo><mi>g</mi><mo stretchy="false">)</mo><mi>g</mi><mo>′</mo></mrow><annotation encoding="TeX">(f' \circ g) g'</annotation></semantics></math> </td></tr>
+<tr><td>Inverse function rule </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>f</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><annotation encoding="TeX">f^{-1}</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mn>1</mn><mrow><mi>f</mi><mo>′</mo><mo>∘</mo><msup><mi>f</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup></mrow></mfrac><annotation encoding="TeX">\frac{1}{f' \circ f^{-1}}</annotation></semantics></math> </td></tr>
+<tr><td>Elementary power rule </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>x</mi><mi>n</mi></msup><annotation encoding="TeX">x^n</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><msup><mi>x</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="TeX">n x^{n-1}</annotation></semantics></math> </td></tr>
+<tr><td>Generalized power rule </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>f</mi><mi>g</mi></msup><mo>=</mo><msup><mi>e</mi><mrow><mi>g</mi><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="TeX">f^g = e^{g \ln(f)}</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>f</mi><mi>g</mi></msup><mrow><mo>(</mo><mrow><mi>f</mi><mo>′</mo><mfrac><mi>g</mi><mi>f</mi></mfrac><mo>+</mo><mi>g</mi><mo>′</mo><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow><mo>)</mo></mrow></mrow><annotation encoding="TeX">f^g \left( f' \frac{g}{f} + g' \ln(f) \right)</annotation></semantics></math> </td></tr>
+<tr><td> Exponential </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">exp</mo><mi>x</mi></mrow><annotation encoding="TeX">\exp x</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">exp</mo><mi>x</mi></mrow><annotation encoding="TeX">\exp x</annotation></semantics></math> </td></tr>
+<tr><td> Logarithm </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">ln</mo><mi>x</mi></mrow><annotation encoding="TeX">\ln x</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mn>1</mn><mi>x</mi></mfrac><annotation encoding="TeX">\frac{1}{x}</annotation></semantics></math> </td></tr>
+<tr><td> Sine </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">sin</mo><mi>x</mi></mrow><annotation encoding="TeX">\sin x</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">cos</mo><mi>x</mi></mrow><annotation encoding="TeX">\cos x</annotation></semantics></math> </td></tr>
+<tr><td> Cosine </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">cos</mo><mi>x</mi></mrow><annotation encoding="TeX">\cos x</annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>-</mo><mo rspace="0em" lspace="0em">sin</mo><mi>x</mi></mrow><annotation encoding="TeX">-\sin x</annotation></semantics></math> </td></tr>
+<tr><td> Tangent </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">tan</mo><mi>x</mi></mrow><annotation encoding="TeX">\tan x </annotation></semantics></math> </td><td> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mn>1</mn><mrow><msup><mo rspace="0em" lspace="0em">cos</mo><mn>2</mn></msup><mi>x</mi></mrow></mfrac><mo>=</mo><mn>1</mn><mo>+</mo><msup><mo rspace="0em" lspace="0em">tan</mo><mn>2</mn></msup><mi>x</mi></mrow><annotation encoding="TeX">\frac{1}{\cos^2 x} = 1+\tan^2 x</annotation></semantics></math> </td></tr>
+</tbody></table>
+
+<h3>Examples</h3>
+
+<p>Using linearity and elementary power rule:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup><msup><mi>u</mi><mn>4</mn></msup><mo>-</mo><mn>2</mn><msup><mi>u</mi><mn>3</mn></msup><mo>+</mo><mn>5</mn><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn><mi>d</mi><mi>u</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mfrac><msup><mi>u</mi><mn>5</mn></msup><mn>5</mn></mfrac><mo>-</mo><mn>2</mn><mfrac><msup><mi>u</mi><mn>4</mn></msup><mn>4</mn></mfrac><mo>+</mo><mn>5</mn><mfrac><msup><mi>u</mi><mn>3</mn></msup><mn>3</mn></mfrac><mo>+</mo><mn>4</mn><mi>u</mi></mrow><mo>]</mo></mrow><mrow><mi>u</mi><mo>=</mo><mn>0</mn></mrow><mn>1</mn></msubsup><mo>=</mo><mfrac><mn>161</mn><mn>30</mn></mfrac></mrow><annotation encoding="TeX">
+\int_0^{1} u^4 - 2u^3 + 5u^2 + 4 du =
+\left[ \frac{u^5}{5} - 2 \frac{u^4}{4} + 5 \frac{u^3}{3} + 4u \right]_{u=0}^1 =
+\frac{161}{30}
+</annotation></semantics></math>
+
+<p>Using linearity and sine/cosine:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mi>π</mi></msubsup><mn>2</mn><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>-</mo><mn>3</mn><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>θ</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mn>2</mn><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>+</mo><mn>3</mn><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo></mrow><mo>]</mo></mrow><mrow><mi>θ</mi><mo>=</mo><mn>0</mn></mrow><mi>π</mi></msubsup><mo>=</mo><mo>-</mo><mn>6</mn></mrow><annotation encoding="TeX">\int_0^{\pi} 2 \cos(\theta) - 3 \sin(\theta) d\theta =
+\left[ 2 \sin(\theta) + 3 \cos(\theta) \right]_{\theta=0}^\pi = -6</annotation></semantics></math>
+
+<p>Using Leibniz rule, Chain rule and Exponential/Power:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mn>2</mn></msubsup><mn>2</mn><mi>x</mi><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mo>-</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mi>d</mi><mi>x</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><msup><mi>x</mi><mn>2</mn></msup><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup></mrow><mo>]</mo></mrow><mn>0</mn><mn>2</mn></msubsup><mo>=</mo><mfrac><mn>4</mn><msup><mi>e</mi><mn>12</mn></msup></mfrac></mrow><annotation encoding="TeX">
+\int_{0}^{2} 2x e^{-3x} - 3 x^2 e^{-3x} d x = 
+\left[ x^2 e^{-3x}  \right]_0^2 = \frac{4}{e^{12}}
+</annotation></semantics></math>
+
+<p>Using the inverse function rule and tangent:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup></mrow></mfrac><mi>d</mi><mi>x</mi><mo>=</mo><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup><mfrac><mn>1</mn><mrow><mo rspace="0em" lspace="0em">tan</mo><mo>′</mo><mo stretchy="false">(</mo><mo rspace="0em" lspace="0em">arctan</mo><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></mfrac><mi>d</mi><mi>x</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mo rspace="0em" lspace="0em">arctan</mo><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><mo>]</mo></mrow><mn>0</mn><mn>1</mn></msubsup><mo>=</mo><mfrac><mi>π</mi><mn>4</mn></mfrac></mrow><annotation encoding="TeX">
+\int_{0}^{1} \frac{1}{1 + x^2} d x = 
+\int_{0}^{1} \frac{1}{\tan'(\arctan(x))} d x = \left[ \arctan(x) \right]_0^1 = \frac{\pi}{4}
+</annotation></semantics></math>
+
+<p>Using linearity, reciprocal rule and logarithm:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>2</mn><mn>3</mn></msubsup><mfrac><mn>1</mn><mrow><mi>v</mi><mo stretchy="false">(</mo><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mi>d</mi><mi>v</mi><mo>=</mo><mo>-</mo><msubsup><mo>∫</mo><mn>2</mn><mn>3</mn></msubsup><mo>-</mo><mfrac><mfrac><mn>1</mn><mi>v</mi></mfrac><mrow><mo stretchy="false">(</mo><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mi>d</mi><mi>v</mi><mo>=</mo><mo>-</mo><msubsup><mrow><mo>[</mo><mfrac><mn>1</mn><mrow><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow></mfrac><mo>]</mo></mrow><mn>2</mn><mn>3</mn></msubsup><mo>=</mo><mfrac><mn>1</mn><mrow><mo rspace="0em" lspace="0em">ln</mo><mn>2</mn></mrow></mfrac><mo>-</mo><mfrac><mn>1</mn><mrow><mo rspace="0em" lspace="0em">ln</mo><mn>3</mn></mrow></mfrac></mrow><annotation encoding="TeX">
+\int_{2}^{3} \frac{1}{v (\ln(v))^2} d v = 
+- \int_{2}^{3} - \frac{\frac{1}{v}}{(\ln(v))^2} d v =
+- \left[ \frac{1}{\ln(v)}  \right]_2^3 = \frac{1}{\ln 2} - \frac{1}{\ln 3}
+</annotation></semantics></math>
+
+<p>Using the power rules and chain rule:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup><mfrac><mrow><mn>3</mn><msup><mi>t</mi><mn>2</mn></msup></mrow><mrow><mo stretchy="false">(</mo><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>5</mn></msup></mrow></mfrac><mi>d</mi><mi>t</mi><mo>=</mo><mo>-</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup><mo stretchy="false">(</mo><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mrow><mo>-</mo><mn>4</mn></mrow></msup><mrow><mo>(</mo><mrow><mn>3</mn><msup><mi>t</mi><mn>2</mn></msup><mfrac><mrow><mo>-</mo><mn>4</mn></mrow><mrow><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac><mo>+</mo><mn>0</mn></mrow><mo>)</mo></mrow><mi>d</mi><mi>t</mi><mo>=</mo><mo>-</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><msubsup><mrow><mo>[</mo><mrow><mo stretchy="false">(</mo><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mrow><mo>-</mo><mn>4</mn></mrow></msup></mrow><mo>]</mo></mrow><mn>0</mn><mn>1</mn></msubsup><mo>=</mo><mfrac><mn>15</mn><mn>64</mn></mfrac></mrow><annotation encoding="TeX">
+\int_{0}^1
+\frac{3t^2}{(t^3+1)^5} d t = 
+-\frac{1}{4}
+\int_0^1
+(t^3+1)^{-4} \left( 3t^2 \frac{-4}{t^3+1} + 0 \right) d t =
+-\frac{1}{4} \left[ (t^3+1)^{-4} \right]_0^1 = \frac{15}{64}
+</annotation></semantics></math>
+
+<h2>Integration by Substitution</h2>
+
+<h3>Idea</h3>
+
+<p>Do a substitution <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mi>g</mi><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">x = g(y)</annotation></semantics></math> to simplify an integral. We have
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><mi>x</mi></mrow><mrow><mi>d</mi><mi>y</mi></mrow></mfrac><mo>=</mo><mi>g</mi><mo>′</mo><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">\frac{dx}{dy} = g'(y)</annotation></semantics></math> and
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∫</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi><mo>=</mo><mo>∫</mo><mi>f</mi><mo stretchy="false">(</mo><mi>g</mi><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mi>g</mi><mo>′</mo><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo><mi>d</mi><mi>y</mi></mrow><annotation encoding="TeX">\int f(x) dx = \int f(g(y)) g'(y) dy</annotation></semantics></math>: this is the chain rule!</p>
+
+<h3>Example 1</h3>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup><mi>x</mi><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\int_{0}^1 x (x^2 - 1) dx
+</annotation></semantics></math>
+
+<p>Let <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>1</mn></mrow><annotation encoding="TeX">y = x^2 - 1</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>y</mi><mo>=</mo><mn>2</mn><mi>x</mi><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">dy = 2 x dx</annotation></semantics></math> then we get</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><msubsup><mo>∫</mo><mrow><mi>y</mi><mo>=</mo><mo>-</mo><mn>1</mn></mrow><mn>0</mn></msubsup><mi>y</mi><mi>d</mi><mi>y</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mfrac><msup><mi>y</mi><mn>2</mn></msup><mn>4</mn></mfrac><mo>]</mo></mrow><mrow><mi>y</mi><mo>=</mo><mo>-</mo><mn>1</mn></mrow><mn>0</mn></msubsup><mo>=</mo><mo>-</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow><annotation encoding="TeX">
+\frac{1}{2} \int_{y=-1}^0 y dy = \left[\frac{y^2}{4}\right]_{y=-1}^0 = -\frac{1}{4}
+</annotation></semantics></math>
+
+<p>We find the same result as </p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mn>1</mn></msubsup><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mi>x</mi><mi>d</mi><mi>x</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mfrac><msup><mi>x</mi><mn>4</mn></msup><mn>4</mn></mfrac><mo>-</mo><mfrac><msup><mi>x</mi><mn>2</mn></msup><mn>2</mn></mfrac></mrow><mo>]</mo></mrow><mrow><mi>x</mi><mo>=</mo><mn>0</mn></mrow><mn>1</mn></msubsup><mo>=</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>-</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>=</mo><mo>-</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow><annotation encoding="TeX">
+\int_{0}^1 x^3 - x dx = \left[ \frac{x^4}{4} - \frac{x^2}{2} \right]_{x=0}^1
+= \frac{1}{4} - \frac{1}{2} = -\frac{1}{4}
+</annotation></semantics></math>
+
+<h3>Example 2</h3>
+
+<p>Consider</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>2</mn><mn>3</mn></msubsup><mn>6</mn><msup><mi>x</mi><mn>2</mn></msup><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mn>2</mn><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\int_2^3 6x^2 \cos(x^3 - 2) d x 
+</annotation></semantics></math>
+
+<p>Let <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mn>2</mn></mrow><annotation encoding="TeX">y = x^3 - 2</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>y</mi><mo>=</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">dy = 3x^2 dx</annotation></semantics></math> so</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>2</mn><mn>3</mn></msubsup><mn>6</mn><msup><mi>x</mi><mn>2</mn></msup><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mn>2</mn><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi><mo>=</mo><mn>2</mn><msubsup><mo>∫</mo><mrow><mi>y</mi><mo>=</mo><mn>6</mn></mrow><mn>25</mn></msubsup><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo><mi>d</mi><mi>y</mi><mo>=</mo><mn>2</mn><mo stretchy="false">[</mo><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo><msubsup><mo stretchy="false">]</mo><mrow><mi>y</mi><mo>=</mo><mn>6</mn></mrow><mn>25</mn></msubsup><mo>=</mo><mn>2</mn><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>25</mn><mo stretchy="false">)</mo><mo>-</mo><mn>2</mn><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>6</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">
+\int_{2}^{3} 6 x^2 \cos(x^3 - 2) d x =
+2 \int_{y=6}^{25} \cos(y) d y = 2 [\sin(y)]_{y=6}^{25}
+= 2 \sin(25) - 2 \sin(6)
+</annotation></semantics></math>
+
+<h3>Example 3</h3>
+
+<p>Consider </p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>v</mi><mo>=</mo><mn>1</mn></mrow><mn>2</mn></msubsup><mfrac><mrow><mi>d</mi><mi>v</mi></mrow><mrow><msup><mi>v</mi><mn>3</mn></msup><msup><mi>e</mi><mfrac><mn>1</mn><msup><mi>v</mi><mn>2</mn></msup></mfrac></msup></mrow></mfrac></mrow><annotation encoding="TeX">
+\int_{v=1}^2 \frac{dv}{v^3 e^{\frac{1}{v^2}}}
+</annotation></semantics></math>
+
+<p>Let <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>=</mo><mo>-</mo><mfrac><mn>1</mn><msup><mi>v</mi><mn>2</mn></msup></mfrac></mrow><annotation encoding="TeX">u = -\frac{1}{v^2}</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>u</mi><mo>=</mo><mfrac><mn>2</mn><msup><mi>v</mi><mn>3</mn></msup></mfrac><mi>d</mi><mi>v</mi></mrow><annotation encoding="TeX">du = \frac{2}{v^3} dv</annotation></semantics></math>:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>v</mi><mo>=</mo><mn>1</mn></mrow><mn>2</mn></msubsup><mfrac><mrow><mi>d</mi><mi>v</mi></mrow><mrow><msup><mi>v</mi><mn>3</mn></msup><msup><mi>e</mi><mfrac><mn>1</mn><msup><mi>v</mi><mn>2</mn></msup></mfrac></msup></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msubsup><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mo>-</mo><mn>1</mn></mrow><mrow><mo>-</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow></msubsup><msup><mi>e</mi><mi>u</mi></msup><mi>d</mi><mi>u</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mrow><mo>(</mo><mrow><mfrac><mn>1</mn><mroot><mi>e</mi><mn>4</mn></mroot></mfrac><mo>-</mo><mfrac><mn>1</mn><mi>e</mi></mfrac></mrow><mo>)</mo></mrow></mrow><annotation encoding="TeX">
+\int_{v=1}^2 \frac{dv}{v^3 e^{\frac{1}{v^2}}} = \frac{1}{2} 
+\int_{u=-1}^{-\frac{1}{4}} e^{u} du =
+\frac{1}{2} \left(\frac{1}{\sqrt[4]{e}} - \frac{1}{e}\right)
+</annotation></semantics></math>
+
+<h3>Example 4</h3>
+
+<p>Consider</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mo>-</mo><msqrt><mn>2</mn></msqrt></mrow><mrow><mo>-</mo><mn>1</mn></mrow></msubsup><mfrac><mrow><mn>5</mn><mi>t</mi></mrow><msqrt><mrow><mn>4</mn><mo>-</mo><msup><mi>t</mi><mn>2</mn></msup></mrow></msqrt></mfrac><mi>d</mi><mi>t</mi></mrow><annotation encoding="TeX">
+\int_{-\sqrt{2}}^{-1} \frac{5t}{\sqrt{4 - t^2}} d t
+</annotation></semantics></math>
+
+<p>Let <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>=</mo><mn>2</mn><mo rspace="0em" lspace="0em">sin</mo><mi>θ</mi></mrow><annotation encoding="TeX">t = 2 \sin \theta</annotation></semantics></math> and so <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>t</mi><mo>=</mo><mn>2</mn><mo rspace="0em" lspace="0em">cos</mo><mi>θ</mi><mi>d</mi><mi>θ</mi></mrow><annotation encoding="TeX">dt = 2 \cos \theta d \theta</annotation></semantics></math>. We have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mfrac><mrow><mn>3</mn><mi>π</mi></mrow><mn>4</mn></mfrac><mfrac><mrow><mn>7</mn><mi>π</mi></mrow><mn>6</mn></mfrac></msubsup><mfrac><mrow><mn>10</mn><mo rspace="0em" lspace="0em">sin</mo><mi>θ</mi></mrow><msqrt><mrow><mn>4</mn><mo>-</mo><mn>4</mn><msup><mo rspace="0em" lspace="0em">sin</mo><mn>2</mn></msup><mi>θ</mi></mrow></msqrt></mfrac><mn>2</mn><mo rspace="0em" lspace="0em">cos</mo><mi>θ</mi><mi>d</mi><mi>θ</mi><mo>=</mo><mn>10</mn><msubsup><mo>∫</mo><mfrac><mrow><mn>3</mn><mi>π</mi></mrow><mn>4</mn></mfrac><mfrac><mrow><mn>7</mn><mi>π</mi></mrow><mn>6</mn></mfrac></msubsup><mo rspace="0em" lspace="0em">sin</mo><mi>θ</mi><mfrac><mrow><mo rspace="0em" lspace="0em">cos</mo><mi>θ</mi></mrow><msqrt><mrow><msup><mo rspace="0em" lspace="0em">cos</mo><mn>2</mn></msup><mi>θ</mi></mrow></msqrt></mfrac><mi>d</mi><mi>θ</mi></mrow><annotation encoding="TeX">
+\int_{\frac{3\pi}{4}}^{\frac{7\pi}{6}} \frac{10 \sin \theta}{\sqrt{4 - 4\sin^2 {\theta}}} 2 \cos \theta d \theta =
+10 \int_\frac{3\pi}{4}^{\frac{7\pi}{6}} \sin \theta \frac{\cos \theta}{\sqrt{\cos^2 \theta}} d \theta
+</annotation></semantics></math>
+
+<p>We have <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>-</mo><mn>1</mn><mo>&lt;</mo><mo rspace="0em" lspace="0em">cos</mo><mi>θ</mi><mo>&lt;</mo><mn>0</mn></mrow><annotation encoding="TeX">-1 &lt; \cos \theta &lt; 0</annotation></semantics></math> on
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>[</mo><mrow><mfrac><mrow><mn>3</mn><mi>π</mi></mrow><mn>4</mn></mfrac><mo>,</mo><mfrac><mrow><mn>7</mn><mi>π</mi></mrow><mn>6</mn></mfrac></mrow><mo>]</mo></mrow><annotation encoding="TeX">\left[\frac{3\pi}{4},\frac{7\pi}{6}\right]</annotation></semantics></math> and so</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mo>-</mo><msqrt><mn>2</mn></msqrt></mrow><mrow><mo>-</mo><mn>1</mn></mrow></msubsup><mfrac><mrow><mn>5</mn><mi>t</mi></mrow><msqrt><mrow><mn>4</mn><mo>-</mo><msup><mi>t</mi><mn>2</mn></msup></mrow></msqrt></mfrac><mi>d</mi><mi>t</mi><mo>=</mo><mo>-</mo><mn>10</mn><msubsup><mo>∫</mo><mfrac><mrow><mn>3</mn><mi>π</mi></mrow><mn>4</mn></mfrac><mfrac><mrow><mn>7</mn><mi>π</mi></mrow><mn>6</mn></mfrac></msubsup><mo rspace="0em" lspace="0em">sin</mo><mi>θ</mi><mi>d</mi><mi>θ</mi><mo>=</mo><mn>10</mn><msubsup><mrow><mo>[</mo><mrow><mo rspace="0em" lspace="0em">cos</mo><mi>θ</mi></mrow><mo>]</mo></mrow><mfrac><mrow><mn>3</mn><mi>π</mi></mrow><mn>4</mn></mfrac><mfrac><mrow><mn>7</mn><mi>π</mi></mrow><mn>6</mn></mfrac></msubsup><mo>=</mo><mn>5</mn><mo stretchy="false">(</mo><msqrt><mn>2</mn></msqrt><mo>-</mo><msqrt><mn>3</mn></msqrt><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">
+\int_{-\sqrt{2}}^{-1} \frac{5t}{\sqrt{4 - t^2}} d t = 
+-10 \int_\frac{3\pi}{4}^{\frac{7\pi}{6}} \sin \theta d \theta =
+10 \left[\cos \theta\right]_\frac{3\pi}{4}^{\frac{7\pi}{6}} =
+5 (\sqrt{2} - \sqrt{3})
+</annotation></semantics></math>
+
+<h3>Example 5</h3>
+
+<p>Consider</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mfrac><mn>3</mn><mn>2</mn></mfrac><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mfrac><mrow><mi>d</mi><mi>x</mi></mrow><mrow><mn>2</mn><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>6</mn><mi>x</mi><mo>+</mo><mn>7</mn></mrow></mfrac></mrow><annotation encoding="TeX">
+\int_{\frac{3}{2}}^{+\infty} \frac{dx}{2x^2 - 6x + 7}
+</annotation></semantics></math>
+
+<p>We first write</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>6</mn><mi>x</mi><mo>+</mo><mn>7</mn><mo>=</mo><mn>2</mn><mrow><mo>(</mo><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>3</mn><mi>x</mi><mo>+</mo><mfrac><mn>7</mn><mn>2</mn></mfrac></mrow><mo>)</mo></mrow><mo>=</mo><mn>2</mn><mrow><mo>(</mo><mrow><msup><mrow><mo>(</mo><mrow><mi>x</mi><mo>-</mo><mfrac><mn>3</mn><mn>2</mn></mfrac></mrow><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><mfrac><mn>5</mn><mn>4</mn></mfrac></mrow><mo>)</mo></mrow><mo>=</mo><mfrac><mn>5</mn><mn>2</mn></mfrac><mrow><mo>(</mo><mrow><msup><mrow><mo>(</mo><mfrac><mrow><mi>x</mi><mo>-</mo><mfrac><mn>3</mn><mn>2</mn></mfrac></mrow><msqrt><mfrac><mn>5</mn><mn>4</mn></mfrac></msqrt></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow><mo>)</mo></mrow></mrow><annotation encoding="TeX">2x^2 - 6x + 7 = 2\left(x^2 - 3x + \frac{7}{2}\right) =
+2\left( \left(x - \frac{3}{2}\right)^2 + \frac{5}{4} \right) =
+\frac{5}{2} \left( \left(\frac{x - \frac{3}{2}}{\sqrt{\frac{5}{4}}}\right)^2 + 1 \right)
+</annotation></semantics></math>
+
+<p>Now doing the substitution <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mfrac><mrow><mi>x</mi><mo>-</mo><mfrac><mn>3</mn><mn>2</mn></mfrac></mrow><msqrt><mfrac><mn>5</mn><mn>4</mn></mfrac></msqrt></mfrac></mrow><annotation encoding="TeX">y = \frac{x - \frac{3}{2}}{\sqrt{\frac{5}{4}}}</annotation></semantics></math>,
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>y</mi><mo>=</mo><mfrac><mrow><mi>d</mi><mi>x</mi></mrow><msqrt><mfrac><mn>5</mn><mn>4</mn></mfrac></msqrt></mfrac></mrow><annotation encoding="TeX">dy = \frac{dx}{\sqrt{\frac{5}{4}}}</annotation></semantics></math> we get</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mfrac><mrow><msqrt><mfrac><mn>5</mn><mn>4</mn></mfrac></msqrt><mi>d</mi><mi>y</mi></mrow><mrow><mfrac><mn>5</mn><mn>2</mn></mfrac><mo stretchy="false">(</mo><msup><mi>y</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>5</mn></msqrt></mfrac><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><msup><mi>y</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac></mrow><annotation encoding="TeX">
+\int_0^{+\infty} \frac{\sqrt{\frac{5}{4}} dy}{\frac{5}{2}(y^2+1)} = 
+\frac{1}{\sqrt{5}} \int_0^{+\infty} \frac{dy}{y^2+1}
+</annotation></semantics></math>
+
+<p>But we have already met this integral in the basic methods:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mfrac><mn>3</mn><mn>2</mn></mfrac><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mfrac><mrow><mi>d</mi><mi>x</mi></mrow><mrow><mn>2</mn><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>6</mn><mi>x</mi><mo>+</mo><mn>7</mn></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>5</mn></msqrt></mfrac><mo stretchy="false">[</mo><mo rspace="0em" lspace="0em">arctan</mo><mi>y</mi><msubsup><mo stretchy="false">]</mo><mrow><mi>y</mi><mo>=</mo><mn>0</mn></mrow><mn>∞</mn></msubsup><mo>=</mo><mfrac><mi>π</mi><mrow><mn>2</mn><msqrt><mn>5</mn></msqrt></mrow></mfrac></mrow><annotation encoding="TeX">
+\int_{\frac{3}{2}}^{+\infty} \frac{dx}{2x^2 - 6x + 7} = \frac{1}{\sqrt{5}}
+[\arctan y]_{y=0}^{\infty} = \frac{\pi}{2 \sqrt{5}}
+</annotation></semantics></math>
+
+<h3>Example 6</h3>
+
+<p>Consider</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mfrac><mi>π</mi><mn>6</mn></mfrac><mfrac><mi>π</mi><mn>3</mn></mfrac></msubsup><mo rspace="0em" lspace="0em">tan</mo><mrow><mo>(</mo><mfrac><mi>θ</mi><mn>2</mn></mfrac><mo>)</mo></mrow><mfrac><msup><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mo rspace="0em" lspace="0em">cos</mo><mi>θ</mi><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mrow><msup><mo rspace="0em" lspace="0em">sin</mo><mn>3</mn></msup><mi>θ</mi></mrow></mfrac><mi>d</mi><mi>θ</mi></mrow><annotation encoding="TeX">
+\int_{\frac{\pi}{6}}^{\frac{\pi}{3}}
+\tan\left(\frac{\theta}{2}\right) \frac{{(1 + \cos \theta)}^2}{\sin^3 \theta} d \theta
+</annotation></semantics></math>
+
+<p>We do the substitution <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>=</mo><mo rspace="0em" lspace="0em">tan</mo><mrow><mo>(</mo><mfrac><mi>θ</mi><mn>2</mn></mfrac><mo>)</mo></mrow></mrow><annotation encoding="TeX">t = \tan\left(\frac{\theta}{2}\right)</annotation></semantics></math>. We have
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>θ</mi><mo>=</mo><mfrac><mrow><mn>2</mn><mi>d</mi><mi>t</mi></mrow><mrow><mn>1</mn><mo>+</mo><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="TeX">d \theta = \frac{2 dt}{1+t^2}</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">cos</mo><mi>θ</mi><mo>=</mo><mfrac><mrow><mn>1</mn><mo>-</mo><msup><mi>t</mi><mn>2</mn></msup></mrow><mrow><mn>1</mn><mo>+</mo><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="TeX">\cos \theta = \frac{1-t^2}{1+t^2}</annotation></semantics></math> and
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">sin</mo><mi>θ</mi><mo>=</mo><mfrac><mrow><mn>2</mn><mi>t</mi></mrow><mrow><mn>1</mn><mo>+</mo><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="TeX">\sin \theta = \frac{2t}{1+t^2}</annotation></semantics></math>. Also, we have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo rspace="0em" lspace="0em">tan</mo><mrow><mo>(</mo><mfrac><mi>π</mi><mn>12</mn></mfrac><mo>)</mo></mrow><mo>=</mo><mfrac><mrow><mn>1</mn><mo>-</mo><mo rspace="0em" lspace="0em">cos</mo><mrow><mo>(</mo><mfrac><mi>π</mi><mn>6</mn></mfrac><mo>)</mo></mrow></mrow><mrow><mn>1</mn><mo>-</mo><mo rspace="0em" lspace="0em">sin</mo><mrow><mo>(</mo><mfrac><mi>π</mi><mn>6</mn></mfrac><mo>)</mo></mrow></mrow></mfrac><mo>=</mo><mn>2</mn><mo>-</mo><msqrt><mn>3</mn></msqrt></mrow><annotation encoding="TeX">\tan\left(\frac{\pi}{12}\right) =
+\frac{1-\cos\left(\frac{\pi}{6}\right)}{1-\sin\left(\frac{\pi}{6}\right)}
+= 2 - \sqrt{3}
+</annotation></semantics></math>
+
+<p>and so</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mn>2</mn><mo>-</mo><msqrt><mn>3</mn></msqrt></mrow><mfrac><mn>1</mn><msqrt><mn>3</mn></msqrt></mfrac></msubsup><mi>t</mi><mfrac><msup><mrow><mo>(</mo><mfrac><mn>2</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>)</mo></mrow><mn>2</mn></msup><msup><mrow><mo>(</mo><mfrac><mrow><mn>2</mn><mi>t</mi></mrow><mrow><mn>1</mn><mo>+</mo><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>)</mo></mrow><mn>3</mn></msup></mfrac><mfrac><mrow><mn>2</mn><mi>d</mi><mi>t</mi></mrow><mrow><mn>1</mn><mo>+</mo><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msubsup><mo>∫</mo><mrow><mn>2</mn><mo>-</mo><msqrt><mn>3</mn></msqrt></mrow><mfrac><mn>1</mn><msqrt><mn>3</mn></msqrt></mfrac></msubsup><mfrac><mn>1</mn><msup><mi>t</mi><mn>2</mn></msup></mfrac><mi>d</mi><mi>t</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mo>-</mo><mfrac><mn>1</mn><mi>t</mi></mfrac></mrow><mo>]</mo></mrow><mrow><mn>2</mn><mo>-</mo><msqrt><mn>3</mn></msqrt></mrow><mfrac><mn>1</mn><msqrt><mn>3</mn></msqrt></mfrac></msubsup><mo>=</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mo>-</mo><msqrt><mn>3</mn></msqrt></mrow></mfrac><mo>-</mo><msqrt><mn>3</mn></msqrt></mrow><annotation encoding="TeX">
+\int_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}}
+t \frac{\left(\frac{2}{1+t^2}\right)^2}{\left( \frac{2t}{1+t^2}\right)^3} \frac{2 dt}{1+t^2} =
+\int_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}}
+\frac{1}{t^2} dt = 
+\left[ -\frac{1}{t} \right]_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}} =
+\frac{1}{2-\sqrt{3}}-\sqrt{3}
+</annotation></semantics></math>
+
+
+<p>and finally</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mfrac><mi>π</mi><mn>6</mn></mfrac><mfrac><mi>π</mi><mn>3</mn></mfrac></msubsup><mo rspace="0em" lspace="0em">tan</mo><mrow><mo>(</mo><mfrac><mi>θ</mi><mn>2</mn></mfrac><mo>)</mo></mrow><mfrac><msup><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mo rspace="0em" lspace="0em">cos</mo><mi>θ</mi><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mrow><msup><mo rspace="0em" lspace="0em">sin</mo><mn>3</mn></msup><mi>θ</mi></mrow></mfrac><mi>d</mi><mi>θ</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="TeX">
+\int_{\frac{\pi}{6}}^{\frac{\pi}{3}}
+\tan\left(\frac{\theta}{2}\right) \frac{{(1 + \cos \theta)}^2}{\sin^3 \theta} d \theta = 2
+</annotation></semantics></math>
+
+<h2>Integration by parts</h2>
+
+<h3>Idea</h3>
+
+<p>Given a two function <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>,</mo><mi>g</mi></mrow><annotation encoding="TeX">f, g</annotation></semantics></math> we have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∫</mo><mi>f</mi><mi>g</mi><mo>′</mo><mo>=</mo><mi>f</mi><mi>g</mi><mo>-</mo><mo>∫</mo><mi>f</mi><mo>′</mo><mi>g</mi></mrow><annotation encoding="TeX">
+\int f g'  = f g - \int f' g
+</annotation></semantics></math>
+
+<p>this is Leibniz rule!</p>
+
+<h3>Example 1</h3>
+
+<p>Consider</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\int_{0}^{+\infty} (x^2 + x + 1) e^{-3x} d x
+</annotation></semantics></math>
+
+<p>We consider <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>x</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="TeX">f(x) = x^2 + x + 1</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mrow><mo>-</mo><mn>3</mn></mrow></mfrac></mrow><annotation encoding="TeX">g(x) = \frac{e^{-3x}}{-3}</annotation></semantics></math> that is
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>′</mo><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="TeX">f'(x) = 2x+1</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo>′</mo><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup></mrow><annotation encoding="TeX">g'(x) = e^{-3x}</annotation></semantics></math>. The integral
+can be written <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∫</mo><mi>f</mi><mi>g</mi><mo>′</mo><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">\int f g' dx</annotation></semantics></math> and hence we get</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mrow><mo>[</mo><mrow><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mfrac><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mrow><mo>-</mo><mn>3</mn></mrow></mfrac></mrow><mo>]</mo></mrow><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mo>-</mo><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mo stretchy="false">(</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mfrac><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mrow><mo>-</mo><mn>3</mn></mrow></mfrac><mi>d</mi><mi>x</mi><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mo stretchy="false">(</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\left[(x^2 + x + 1) \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} -
+\int_{0}^{+\infty}
+(2x+1) \frac{e^{-3x}}{-3}
+  d x = \frac{1}{3} + \frac{1}{3}
+\int_{0}^{+\infty}
+(2x+1) e^{-3x}
+  d x
+</annotation></semantics></math>
+ 
+<p>We now consider <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn><mo>,</mo><mi>h</mi><mo>′</mo><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn></mrow><annotation encoding="TeX">h(x) = 2x+1, h'(x)=2</annotation></semantics></math> the second integral can be written
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∫</mo><mi>h</mi><mi>g</mi><mo>′</mo><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">\int h g' dx</annotation></semantics></math> and hence </p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mo stretchy="false">(</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mi>d</mi><mi>x</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mo stretchy="false">(</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mfrac><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mrow><mo>-</mo><mn>3</mn></mrow></mfrac></mrow><mo>]</mo></mrow><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mo>-</mo><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mn>2</mn><mfrac><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mrow><mo>-</mo><mn>3</mn></mrow></mfrac><mi>d</mi><mi>x</mi><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>+</mo><mfrac><mn>2</mn><mn>3</mn></mfrac><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\int_{0}^{+\infty}
+(2x+1) e^{-3x}
+  d x
+= \left[(2x + 1) \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} -
+\int_{0}^{+\infty}
+2 \frac{e^{-3x}}{-3}
+  d x = \frac{1}{3} + \frac{2}{3}
+\int_{0}^{+\infty} e^{-3x} d x
+</annotation></semantics></math>
+
+<p>We now recognize <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo>′</mo></mrow><annotation encoding="TeX">g'</annotation></semantics></math> in the last integral and so</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mi>d</mi><mi>x</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mfrac><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mrow><mo>-</mo><mn>3</mn></mrow></mfrac><mo>]</mo></mrow><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow><annotation encoding="TeX">
+\int_{0}^{+\infty} e^{-3x} d x = 
+\left[ \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} = \frac{1}{3}
+</annotation></semantics></math>
+
+<p>Finally,</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mo>-</mo><mn>3</mn><mi>x</mi></mrow></msup><mi>d</mi><mi>x</mi><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>×</mo><mrow><mo>(</mo><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>+</mo><mfrac><mn>2</mn><mn>3</mn></mfrac><mo>×</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow><mo>)</mo></mrow><mo>=</mo><mfrac><mn>14</mn><mn>27</mn></mfrac></mrow><annotation encoding="TeX">
+\int_{0}^{+\infty} (x^2 + x + 1) e^{-3x} d x = 
+\frac{1}{3} + \frac{1}{3} \times \left( 
+\frac{1}{3} + \frac{2}{3} \times \frac{1}{3}
+\right) = \frac{14}{27}
+</annotation></semantics></math>
+
+<h3>Example 2</h3>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>1</mn><mn>2</mn></msubsup><msup><mi>x</mi><mn>3</mn></msup><mo stretchy="false">(</mo><mn>2</mn><mo rspace="0em" lspace="0em">ln</mo><mi>x</mi><mo>+</mo><mn>7</mn><mo rspace="0em" lspace="0em">arctan</mo><mi>x</mi><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\int_1^2
+x^3 (2\ln x + 7\arctan x) d x
+</annotation></semantics></math>
+
+<p>We let <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>2</mn><mo rspace="0em" lspace="0em">ln</mo><mi>x</mi><mo>+</mo><mn>7</mn><mo rspace="0em" lspace="0em">arctan</mo><mi>x</mi></mrow><annotation encoding="TeX">f(x) = 2\ln x + 7\arctan x</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><msup><mi>x</mi><mn>3</mn></msup><mn>3</mn></mfrac></mrow><annotation encoding="TeX">g(x) = \frac{x^3}{3}</annotation></semantics></math>. Hence
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>′</mo><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>2</mn><mi>x</mi></mfrac><mo>+</mo><mfrac><mn>7</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="TeX">f'(x) = \frac{2}{x} + \frac{7}{1+x^2}</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo>′</mo><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>x</mi><mn>3</mn></msup></mrow><annotation encoding="TeX">g'(x) = x^3</annotation></semantics></math>. The integration
+by parts gives:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mrow><mo>[</mo><mrow><mfrac><msup><mi>x</mi><mn>3</mn></msup><mn>3</mn></mfrac><mrow><mo>(</mo><mrow><mn>2</mn><mo rspace="0em" lspace="0em">ln</mo><mi>x</mi><mo>+</mo><mn>7</mn><mo rspace="0em" lspace="0em">arctan</mo><mi>x</mi></mrow><mo>)</mo></mrow></mrow><mo>]</mo></mrow><mn>1</mn><mn>2</mn></msubsup><mo>-</mo><msubsup><mo>∫</mo><mn>1</mn><mn>2</mn></msubsup><mfrac><msup><mi>x</mi><mn>3</mn></msup><mn>3</mn></mfrac><mrow><mo>(</mo><mrow><mfrac><mn>2</mn><mi>x</mi></mfrac><mo>+</mo><mfrac><mn>7</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup></mrow></mfrac></mrow><mo>)</mo></mrow><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\left[\frac{x^3}{3} \left(2\ln x + 7\arctan x\right) \right]_1^2 - 
+\int_1^2
+\frac{x^3}{3} \left(\frac{2}{x} + \frac{7}{1+x^2}\right) d x
+</annotation></semantics></math>
+
+<p>The integral can be written</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>1</mn><mn>2</mn></msubsup><mfrac><mn>2</mn><mn>3</mn></mfrac><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mfrac><mn>7</mn><mn>3</mn></mfrac><mfrac><mrow><mi>x</mi><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>-</mo><mi>x</mi></mrow><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac><mi>d</mi><mi>x</mi><mo>=</mo><msubsup><mo>∫</mo><mn>2</mn><mn>2</mn></msubsup><mfrac><mn>2</mn><mn>3</mn></mfrac><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mfrac><mn>7</mn><mn>3</mn></mfrac><mi>x</mi><mo>-</mo><mfrac><mn>7</mn><mn>6</mn></mfrac><mfrac><mrow><mn>2</mn><mi>x</mi></mrow><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\int_1^2
+\frac{2}{3} x^2 + \frac{7}{3} \frac{x(x^2+1) - x}{x^2+1} dx =
+\int_2^2
+\frac{2}{3} x^2 + \frac{7}{3} x - \frac{7}{6} \frac{2x}{x^2+1} dx
+</annotation></semantics></math>
+
+<p>Finally</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>1</mn><mn>2</mn></msubsup><msup><mi>x</mi><mn>3</mn></msup><mo stretchy="false">(</mo><mn>2</mn><mo rspace="0em" lspace="0em">ln</mo><mi>x</mi><mo>+</mo><mn>7</mn><mo rspace="0em" lspace="0em">arctan</mo><mi>x</mi><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mfrac><msup><mi>x</mi><mn>3</mn></msup><mn>3</mn></mfrac><mrow><mo>(</mo><mrow><mn>2</mn><mo rspace="0em" lspace="0em">ln</mo><mi>x</mi><mo>+</mo><mn>7</mn><mo rspace="0em" lspace="0em">arctan</mo><mi>x</mi></mrow><mo>)</mo></mrow><mo>-</mo><mfrac><mn>2</mn><mn>9</mn></mfrac><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mfrac><mn>7</mn><mn>6</mn></mfrac><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mfrac><mn>7</mn><mn>6</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><mo>]</mo></mrow><mn>1</mn><mn>2</mn></msubsup><mo>=</mo><mfrac><mn>28</mn><mn>9</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>5</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>89</mn><mn>18</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>56</mn><mn>3</mn></mfrac><mo rspace="0em" lspace="0em">arctan</mo><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>-</mo><mfrac><mrow><mn>7</mn><mi>π</mi></mrow><mn>12</mn></mfrac><mo>-</mo><mfrac><mn>301</mn><mn>18</mn></mfrac></mrow><annotation encoding="TeX">
+\int_1^2
+x^3 (2\ln x + 7\arctan x) d x =
+\left[\frac{x^3}{3} \left(2\ln x + 7\arctan x\right)
+- \frac{2}{9} x^3 -\frac{7}{6} x^2 + \frac{7}{6} \ln (x^2 + 1)
+ \right]_1^2 =
+\frac{28}{9} \ln(5) + \frac{89}{18} \ln(2) + \frac{56}{3} \arctan(2) 
+- \frac{7 \pi}{12} - \frac{301}{18}
+</annotation></semantics></math>
+
+<h3>Example 3</h3>
+
+<p>Consider</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>=</mo><msubsup><mo>∫</mo><mn>0</mn><mfrac><mi>π</mi><mn>2</mn></mfrac></msubsup><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup><mi>d</mi><mi>θ</mi></mrow><annotation encoding="TeX">
+I =\int_{0}^{\frac{\pi}{2}}
+\sin(3 \theta) e^{2 \theta} d \theta
+</annotation></semantics></math>
+
+<p>We do an integration by parts with <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>=</mo><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">f(\theta) = \sin(3 \theta)</annotation></semantics></math> and
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo>′</mo><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup></mrow><annotation encoding="TeX">g'(\theta) =  e^{2 \theta}</annotation></semantics></math>:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><mfrac><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup><mn>2</mn></mfrac></mrow><mo>]</mo></mrow><mn>0</mn><mfrac><mi>π</mi><mn>2</mn></mfrac></msubsup><mo>-</mo><mfrac><mn>3</mn><mn>2</mn></mfrac><msubsup><mo>∫</mo><mn>0</mn><mfrac><mi>π</mi><mn>2</mn></mfrac></msubsup><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup><mi>d</mi><mi>θ</mi></mrow><annotation encoding="TeX">
+I = \left[\sin(3 \theta) \frac{e^{2 \theta}}{2}\right]_{0}^{\frac{\pi}{2}} -
+\frac{3}{2}
+\int_{0}^{\frac{\pi}{2}}
+\cos(3 \theta) e^{2 \theta} d \theta
+</annotation></semantics></math>
+
+
+<p>We repeat a similar integration by parts on the remaining integral:</p>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mfrac><mi>π</mi><mn>2</mn></mfrac></msubsup><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup><mi>d</mi><mi>θ</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><mfrac><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup><mn>2</mn></mfrac></mrow><mo>]</mo></mrow><mn>0</mn><mfrac><mi>π</mi><mn>2</mn></mfrac></msubsup><mo>+</mo><mfrac><mn>3</mn><mn>2</mn></mfrac><msubsup><mo>∫</mo><mn>0</mn><mfrac><mi>π</mi><mn>2</mn></mfrac></msubsup><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup><mi>d</mi><mi>θ</mi></mrow><annotation encoding="TeX">\int_{0}^{\frac{\pi}{2}}
+\cos(3 \theta) e^{2 \theta} d \theta =
+\left[\cos(3 \theta) \frac{e^{2 \theta}}{2}\right]_{0}^{\frac{\pi}{2}} +
+\frac{3}{2}
+\int_{0}^{\frac{\pi}{2}}
+\sin(3 \theta) e^{2 \theta} d \theta
+</annotation></semantics></math>
+
+<p>We note that we found the initial integral <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="TeX">I</annotation></semantics></math>. We get:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><mfrac><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup><mn>2</mn></mfrac><mo>-</mo><mfrac><mn>3</mn><mn>4</mn></mfrac><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup></mrow><mo>]</mo></mrow><mn>0</mn><mfrac><mi>π</mi><mn>2</mn></mfrac></msubsup><mo>-</mo><mfrac><mn>9</mn><mn>4</mn></mfrac><mi>I</mi></mrow><annotation encoding="TeX">
+I = \left[\sin(3 \theta) \frac{e^{2 \theta}}{2} -\frac{3}{4}
+\cos(3 \theta) e^{2 \theta}
+\right]_{0}^{\frac{\pi}{2}} - \frac{9}{4} I
+</annotation></semantics></math>
+
+<p>Finally, </p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>=</mo><msubsup><mo>∫</mo><mn>0</mn><mfrac><mi>π</mi><mn>2</mn></mfrac></msubsup><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup><mi>d</mi><mi>θ</mi><mo>=</mo><mfrac><mn>4</mn><mn>13</mn></mfrac><msubsup><mrow><mo>[</mo><mrow><mrow><mo>(</mo><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo><mo>-</mo><mfrac><mn>3</mn><mn>4</mn></mfrac><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mn>3</mn><mi>θ</mi><mo stretchy="false">)</mo></mrow><mo>)</mo></mrow><msup><mi>e</mi><mrow><mn>2</mn><mi>θ</mi></mrow></msup></mrow><mo>]</mo></mrow><mn>0</mn><mfrac><mi>π</mi><mn>2</mn></mfrac></msubsup><mo>=</mo><mfrac><mrow><mn>3</mn><mo>-</mo><mn>2</mn><msup><mi>e</mi><mi>π</mi></msup></mrow><mn>13</mn></mfrac></mrow><annotation encoding="TeX">
+I =\int_{0}^{\frac{\pi}{2}}
+\sin(3 \theta) e^{2 \theta} d \theta
+= \frac{4}{13} \left[\left(\frac{1}{2} \sin(3 \theta)  -\frac{3}{4}
+\cos(3 \theta)\right) e^{2 \theta}
+\right]_{0}^{\frac{\pi}{2}} = \frac{3 - 2 e^\pi}{13}
+</annotation></semantics></math>
+
+<h2>Integration by Partial Fraction Decomposition</h2>
+
+<h3>Idea</h3>
+
+<p>Given a rational function <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>P</mi><mi>Q</mi></mfrac><annotation encoding="TeX">\frac{P}{Q}</annotation></semantics></math>, write its partial fraction
+decomposition and integrate each term.</p>
+
+<h3>Example 1</h3>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow><mn>3</mn></msubsup><mfrac><mrow><mn>2</mn><msup><mi>x</mi><mn>4</mn></msup><mo>-</mo><mn>6</mn><msup><mi>x</mi><mn>3</mn></msup><mo>+</mo><mn>41</mn><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>44</mn><mi>x</mi><mo>+</mo><mn>12</mn></mrow><mrow><mn>6</mn><msup><mi>x</mi><mn>5</mn></msup><mo>-</mo><mn>18</mn><msup><mi>x</mi><mn>4</mn></msup><mo>+</mo><mn>18</mn><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mn>6</mn><msup><mi>x</mi><mn>2</mn></msup></mrow></mfrac><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\int_{x=2}^{3} \frac{2x^4-6x^3+41x^2-44x+12}{6x^5-18x^4+18x^3-6x^2} d x
+</annotation></semantics></math>
+
+<p>Clearly, we have <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6</mn><msup><mi>x</mi><mn>5</mn></msup><mo>-</mo><mn>18</mn><msup><mi>x</mi><mn>4</mn></msup><mo>+</mo><mn>18</mn><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mn>6</mn><msup><mi>x</mi><mn>2</mn></msup><mo>=</mo><mn>6</mn><msup><mi>x</mi><mn>2</mn></msup><mo stretchy="false">(</mo><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>3</mn><mi>x</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">6x^5-18x^4+18x^3-6x^2 = 
+6 x^2 (x^3-3x^2+3x-1)</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="TeX">1</annotation></semantics></math> is a trivial root of the second factor so we can
+factor it by <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">(x-1)</annotation></semantics></math> and obtain:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6</mn><msup><mi>x</mi><mn>5</mn></msup><mo>-</mo><mn>18</mn><msup><mi>x</mi><mn>4</mn></msup><mo>+</mo><mn>18</mn><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mn>6</mn><msup><mi>x</mi><mn>2</mn></msup><mo>=</mo><mn>6</mn><msup><mi>x</mi><mn>2</mn></msup><mo stretchy="false">(</mo><mi>x</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mn>6</mn><msup><mi>x</mi><mn>2</mn></msup><mo stretchy="false">(</mo><mi>x</mi><mo>-</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>3</mn></msup></mrow><annotation encoding="TeX">6x^5-18x^4+18x^3-6x^2 = 6 x^2 (x-1) (x^2-2x+1) = 6x^2 (x-1)^3</annotation></semantics></math>
+
+<p>Hence we search a decomposition of</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mn>2</mn><msup><mi>x</mi><mn>4</mn></msup><mo>-</mo><mn>6</mn><msup><mi>x</mi><mn>3</mn></msup><mo>+</mo><mn>41</mn><msup><mi>x</mi><mn>2</mn></msup><mo>-</mo><mn>44</mn><mi>x</mi><mo>+</mo><mn>12</mn></mrow><mrow><mn>6</mn><msup><mi>x</mi><mn>2</mn></msup><mo stretchy="false">(</mo><msup><mi>x</mi><mn>3</mn></msup><mo>-</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>3</mn><mi>x</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>=</mo><mfrac><mi>A</mi><mi>x</mi></mfrac><mo>+</mo><mfrac><mi>B</mi><msup><mi>x</mi><mn>2</mn></msup></mfrac><mo>+</mo><mfrac><mi>C</mi><mrow><mi>x</mi><mo>-</mo><mn>1</mn></mrow></mfrac><mo>+</mo><mfrac><mi>D</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>-</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mo>+</mo><mfrac><mi>E</mi><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>-</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>3</mn></msup></mrow></mfrac></mrow><annotation encoding="TeX">
+F(x) =
+\frac{2x^4-6x^3+41x^2-44x+12}{6 x^2 (x^3-3x^2+3x-1)} =
+\frac{A}{x} + \frac{B}{x^2} + 
+\frac{C}{x-1} + \frac{D}{(x-1)^2} + \frac{E}{(x-1)^3}
+</annotation></semantics></math>
+
+<p>for some constants <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>,</mo><mi>B</mi><mo>,</mo><mi>C</mi><mo>,</mo><mi>D</mi><mo>,</mo><mi>E</mi><mo>∊</mo><mi>ℝ</mi></mrow><annotation encoding="TeX">A, B, C, D, E \in \mathbb{R}</annotation></semantics></math>. We have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>x</mi><mo stretchy="false">→</mo><mn>1</mn></mrow></munder><mo stretchy="false">(</mo><mi>x</mi><mo>-</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>3</mn></msup><mi>F</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>E</mi><mo>=</mo><mfrac><mrow><mn>2</mn><mo>-</mo><mn>6</mn><mo>+</mo><mn>41</mn><mo>-</mo><mn>44</mn><mo>+</mo><mn>12</mn></mrow><mn>6</mn></mfrac><mo>=</mo><mfrac><mn>5</mn><mn>6</mn></mfrac></mrow><annotation encoding="TeX">
+\lim_{x \rightarrow 1} (x - 1)^3 F(x) = E = \frac{2 - 6 + 41 - 44 + 12}{6} =
+\frac{5}{6}
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>x</mi><mo stretchy="false">→</mo><mn>0</mn></mrow></munder><msup><mi>x</mi><mn>2</mn></msup><mi>F</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>B</mi><mo>=</mo><mfrac><mn>12</mn><mrow><mo>-</mo><mn>6</mn></mrow></mfrac><mo>=</mo><mo>-</mo><mn>2</mn></mrow><annotation encoding="TeX">
+\lim_{x \rightarrow 0} x^2 F(x) = B = \frac{12}{-6} = -2
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>x</mi><mo stretchy="false">→</mo><mn>0</mn></mrow></munder><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mi>F</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>′</mo><mo>=</mo><mi>A</mi><mo>=</mo><mfrac><mrow><mo>-</mo><mn>44</mn><mo>×</mo><mo>-</mo><mn>1</mn><mo>-</mo><mn>12</mn><mo>×</mo><mn>3</mn></mrow><mn>6</mn></mfrac><mo>=</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow><annotation encoding="TeX">
+\lim_{x \rightarrow 0} (x^2 F(x))' = A = 
+\frac{-44 \times -1 - 12 \times 3}{6} = \frac{4}{3}
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>x</mi><mo stretchy="false">→</mo><mo>+</mo><mn>∞</mn></mrow></munder><mi>x</mi><mi>F</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>A</mi><mo>+</mo><mi>C</mi><mo>=</mo><mfrac><mn>2</mn><mn>6</mn></mfrac><mo stretchy="false">→</mo><mi>C</mi><mo>=</mo><mfrac><mn>2</mn><mn>6</mn></mfrac><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac><mo>=</mo><mo>-</mo><mn>1</mn></mrow><annotation encoding="TeX">
+\lim_{x \rightarrow +\infty} x F(x) = A + C = \frac{2}{6} \rightarrow C = 
+\frac{2}{6} - \frac{4}{3} = -1
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mfrac><mi>A</mi><mn>2</mn></mfrac><mo>+</mo><mfrac><mi>B</mi><mn>4</mn></mfrac><mo>+</mo><mi>C</mi><mo>+</mo><mi>D</mi><mo>+</mo><mi>E</mi><mo>=</mo><mfrac><mrow><mn>2</mn><mo>×</mo><mn>16</mn><mo>-</mo><mn>6</mn><mo>×</mo><mn>8</mn><mo>+</mo><mn>41</mn><mo>×</mo><mn>4</mn><mo>-</mo><mn>44</mn><mo>×</mo><mn>2</mn><mo>+</mo><mn>12</mn></mrow><mrow><mn>6</mn><mo>×</mo><mn>4</mn></mrow></mfrac><mo>=</mo><mn>3</mn><mo stretchy="false">→</mo><mi>D</mi><mo>=</mo><mn>3</mn><mo>-</mo><mfrac><mn>2</mn><mn>3</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>+</mo><mn>1</mn><mo>-</mo><mfrac><mn>5</mn><mn>6</mn></mfrac><mo>=</mo><mn>3</mn></mrow><annotation encoding="TeX">
+F(2) = \frac{A}{2} + \frac{B}{4} + C + D + E = \frac{2\times16 - 6\times8+41\times4-44\times2+12}{6 \times 4} = 3 \rightarrow D = 3 - \frac{2}{3} + \frac{1}{2} + 1
+- \frac{5}{6} = 3</annotation></semantics></math>
+
+<p>Finally,</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow><mn>3</mn></msubsup><mi>F</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mfrac><mn>4</mn><mn>3</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">|</mo><mi>x</mi><mo stretchy="false">|</mo><mo>+</mo><mfrac><mn>2</mn><mi>x</mi></mfrac><mo>-</mo><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">|</mo><mi>x</mi><mo>-</mo><mn>1</mn><mo stretchy="false">|</mo><mo>-</mo><mfrac><mn>3</mn><mrow><mi>x</mi><mo>-</mo><mn>1</mn></mrow></mfrac><mo>-</mo><mfrac><mn>5</mn><mn>12</mn></mfrac><mfrac><mn>1</mn><mrow><mo stretchy="false">(</mo><mi>x</mi><mo>-</mo><mn>1</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac></mrow><mo>]</mo></mrow><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow><mn>3</mn></msubsup><mo>=</mo><mfrac><mn>4</mn><mn>3</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>3</mn><mo stretchy="false">)</mo><mo>-</mo><mfrac><mn>7</mn><mn>3</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>71</mn><mn>48</mn></mfrac></mrow><annotation encoding="TeX">
+\int_{x=2}^{3} F(x) d x =
+\left[ \frac{4}{3} \ln |x| + \frac{2}{x} - \ln |x - 1| - \frac{3}{x-1}
+- \frac{5}{12} \frac{1}{(x-1)^2}
+\right]_{x=2}^3 = \frac{4}{3} \ln(3) - \frac{7}{3} \ln(2) + \frac{71}{48}
+</annotation></semantics></math>
+
+<h3>Example 2</h3>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mn>1</mn></mrow><mn>5</mn></msubsup><mfrac><mrow><mn>2</mn><msup><mi>u</mi><mn>4</mn></msup><mo>-</mo><mn>5</mn><msup><mi>u</mi><mn>3</mn></msup><mo>+</mo><mn>24</mn><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>26</mn><mi>u</mi><mo>+</mo><mn>50</mn></mrow><mrow><msup><mi>u</mi><mn>5</mn></msup><mo>-</mo><mn>4</mn><msup><mi>u</mi><mn>4</mn></msup><mo>+</mo><mn>14</mn><msup><mi>u</mi><mn>3</mn></msup><mo>-</mo><mn>20</mn><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><mn>25</mn><mi>u</mi></mrow></mfrac><mi>d</mi><mi>u</mi></mrow><annotation encoding="TeX">
+\int_{u=1}^{5} \frac{2u^4-5u^3+24u^2-26u+50}{u^5-4u^4+14u^3-20u^2+25u} d u
+</annotation></semantics></math>
+
+<p>The denominator can be written 
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>u</mi><mn>5</mn></msup><mo>-</mo><mn>4</mn><msup><mi>u</mi><mn>4</mn></msup><mo>+</mo><mn>14</mn><msup><mi>u</mi><mn>3</mn></msup><mo>-</mo><mn>20</mn><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><mn>25</mn><mi>u</mi><mo>=</mo><mi>u</mi><mo stretchy="false">(</mo><msup><mi>u</mi><mn>4</mn></msup><mo>-</mo><mn>4</mn><msup><mi>u</mi><mn>3</mn></msup><mo>+</mo><mn>14</mn><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>20</mn><mi>u</mi><mo>+</mo><mn>25</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">u^5-4u^4+14u^3-20u^2+25u = u(u^4-4u^3+14u^2-20u+25)</annotation></semantics></math>. Evaluating the
+second factor at <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn><mo>,</mo><mo>±</mo><mn>1</mn><mo>,</mo><mo>±</mo><mn>2</mn></mrow><annotation encoding="TeX">0, \pm1, \pm2</annotation></semantics></math> we don't find any trivial roots. Hence we try
+to convert it to a depressed quartic by setting <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>=</mo><mi>v</mi><mo>-</mo><mfrac><mrow><mo>-</mo><mn>4</mn></mrow><mn>4</mn></mfrac><mo>=</mo><mi>v</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="TeX">u = v - \frac{-4}{4} = v + 1</annotation></semantics></math>.
+We find <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msup><mi>u</mi><mn>4</mn></msup><mo>-</mo><mn>4</mn><msup><mi>u</mi><mn>3</mn></msup><mo>+</mo><mn>14</mn><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>20</mn><mi>u</mi><mo>+</mo><mn>25</mn><mo stretchy="false">)</mo><mo>=</mo><msup><mi>v</mi><mn>4</mn></msup><mo>+</mo><mn>8</mn><msup><mi>v</mi><mn>2</mn></msup><mo>+</mo><mn>16</mn><mo>=</mo><mo stretchy="false">(</mo><msup><mi>v</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>=</mo><mo stretchy="false">(</mo><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><annotation encoding="TeX">(u^4-4u^3+14u^2-20u+25) = v^4 + 8v^2 + 16 = (v^2 + 4)^2 = (u^2-2u+5)^2</annotation></semantics></math>.
+The discriminant of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn></mrow><annotation encoding="TeX">u^2-2u+5</annotation></semantics></math> is <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn><mo stretchy="false">(</mo><mn>1</mn><mo>-</mo><mn>5</mn><mo stretchy="false">)</mo><mo>&lt;</mo><mn>0</mn></mrow><annotation encoding="TeX">4(1-5) &lt; 0</annotation></semantics></math> so we have the decomposition
+in irreducible factors:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>u</mi><mn>5</mn></msup><mo>-</mo><mn>4</mn><msup><mi>u</mi><mn>4</mn></msup><mo>+</mo><mn>14</mn><msup><mi>u</mi><mn>3</mn></msup><mo>-</mo><mn>20</mn><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><mn>25</mn><mi>u</mi><mo>=</mo><mi>u</mi><mo stretchy="false">(</mo><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><annotation encoding="TeX">
+u^5-4u^4+14u^3-20u^2+25u = u (u^2-2u+5)^2
+</annotation></semantics></math>
+
+<p>We now try to find <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>,</mo><mi>B</mi><mo>,</mo><mi>C</mi><mo>,</mo><mi>D</mi><mo>,</mo><mi>E</mi><mo>∊</mo><mi>ℝ</mi></mrow><annotation encoding="TeX">A, B, C, D, E \in \mathbb{R}</annotation></semantics></math> such that</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mn>2</mn><msup><mi>u</mi><mn>4</mn></msup><mo>-</mo><mn>5</mn><msup><mi>u</mi><mn>3</mn></msup><mo>+</mo><mn>24</mn><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>27</mn><mi>u</mi><mo>+</mo><mn>50</mn></mrow><mrow><mi>u</mi><mo stretchy="false">(</mo><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mo>=</mo><mfrac><mi>A</mi><mi>u</mi></mfrac><mo>+</mo><mfrac><mrow><mi>B</mi><mi>u</mi><mo>+</mo><mi>C</mi></mrow><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn></mrow></mfrac><mo>+</mo><mfrac><mrow><mi>D</mi><mi>u</mi><mo>+</mo><mi>E</mi></mrow><mrow><mo stretchy="false">(</mo><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="TeX">
+F(u) = 
+\frac{2u^4-5u^3+24u^2-27u+50}{u (u^2-2u+5)^2} =
+\frac{A}{u} + \frac{Bu+C}{u^2-2u+5} + \frac{Du+E}{(u^2-2u+5)^2}
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>u</mi><mo stretchy="false">→</mo><mn>0</mn></mrow></munder><mi>u</mi><mi>F</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>=</mo><mi>A</mi><mo>=</mo><mfrac><mn>50</mn><mrow><mn>3</mn><mo>×</mo><mn>25</mn></mrow></mfrac><mo>=</mo><mn>2</mn></mrow><annotation encoding="TeX">
+\lim_{u \rightarrow 0} uF(u) = A = \frac{50}{3 \times 25} = 2
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>u</mi><mo stretchy="false">→</mo><mo>+</mo><mn>∞</mn></mrow></munder><mi>u</mi><mi>F</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>=</mo><mi>A</mi><mo>+</mo><mi>B</mi><mo>=</mo><mn>2</mn><mo stretchy="false">→</mo><mi>B</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="TeX">
+\lim_{u \rightarrow +\infty} uF(u) = A + B = 2 \rightarrow B = 0
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>u</mi><mo stretchy="false">→</mo><mo>+</mo><mn>∞</mn></mrow></munder><msup><mi>u</mi><mn>2</mn></msup><mrow><mo>(</mo><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>-</mo><mfrac><mi>A</mi><mi>u</mi></mfrac></mrow><mo>)</mo></mrow><mo>=</mo><mi>C</mi><mo>=</mo><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>u</mi><mo stretchy="false">→</mo><mo>+</mo><mn>∞</mn></mrow></munder><msup><mi>u</mi><mn>2</mn></msup><mfrac><mrow><mn>2</mn><msup><mi>u</mi><mn>4</mn></msup><mo>-</mo><mn>5</mn><msup><mi>u</mi><mn>3</mn></msup><mo>-</mo><mn>2</mn><mo stretchy="false">(</mo><msup><mi>u</mi><mn>4</mn></msup><mo>-</mo><mn>4</mn><msup><mi>u</mi><mn>3</mn></msup><mo stretchy="false">)</mo></mrow><mrow><mi>u</mi><mo>×</mo><msup><mi>u</mi><mn>4</mn></msup></mrow></mfrac><mo>=</mo><mn>3</mn></mrow><annotation encoding="TeX">
+\lim_{u \rightarrow +\infty} u^2\left(F(u) - \frac{A}{u}\right) = C = 
+\lim_{u \rightarrow +\infty} u^2 \frac{2 u^4 - 5u^3 - 2(u^4-4u^3)}{u \times u^4} = 3
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>11</mn><mn>4</mn></mfrac><mo>=</mo><mn>2</mn><mo>+</mo><mfrac><mn>3</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mrow><mi>D</mi><mo>+</mo><mi>E</mi></mrow><mn>16</mn></mfrac><mo stretchy="false">→</mo><mi>D</mi><mo>+</mo><mi>E</mi><mo>=</mo><mn>44</mn><mo>-</mo><mn>32</mn><mo>-</mo><mn>12</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding="TeX">
+F(1) = \frac{11}{4} = 2 + \frac{3}{4} + \frac{D+E}{16} \rightarrow
+D+E = 44 - 32 - 12 = 0
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>42</mn><mn>25</mn></mfrac><mo>=</mo><mn>1</mn><mo>+</mo><mfrac><mn>3</mn><mn>5</mn></mfrac><mo>+</mo><mfrac><mrow><mn>2</mn><mi>D</mi><mo>+</mo><mi>E</mi></mrow><mn>25</mn></mfrac><mo stretchy="false">→</mo><mn>2</mn><mi>D</mi><mo>+</mo><mi>E</mi><mo>=</mo><mn>42</mn><mo>-</mo><mn>25</mn><mo>-</mo><mn>15</mn><mo>=</mo><mn>2</mn></mrow><annotation encoding="TeX">
+F(2) = \frac{42}{25} = 1 + \frac{3}{5} + \frac{2D+E}{25} \rightarrow
+2D + E = 42 - 25 - 15 = 2
+</annotation></semantics></math>
+
+<p>From the two last equalities, we immediately get <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="TeX">D = 2</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo>=</mo><mo>-</mo><mn>2</mn></mrow><annotation encoding="TeX">E = -2</annotation></semantics></math>. Finally,</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>2</mn><mi>u</mi></mfrac><mo>+</mo><mfrac><mn>3</mn><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn></mrow></mfrac><mo>+</mo><mfrac><mrow><mn>2</mn><mi>u</mi><mo>-</mo><mn>2</mn></mrow><mrow><mo stretchy="false">(</mo><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="TeX">
+F(u) = 
+\frac{2}{u} + \frac{3}{u^2-2u+5} + \frac{2u - 2}{(u^2-2u+5)^2}
+</annotation></semantics></math>
+
+<p>We have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mn>1</mn></mrow><mn>5</mn></msubsup><mfrac><mn>2</mn><mi>u</mi></mfrac><mi>d</mi><mi>u</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mn>2</mn><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">|</mo><mi>u</mi><mo stretchy="false">|</mo></mrow><mo>]</mo></mrow><mrow><mi>u</mi><mo>=</mo><mn>1</mn></mrow><mn>5</mn></msubsup><mo>=</mo><mn>2</mn><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>5</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">
+\int_{u=1}^{5} \frac{2}{u} d u= \left[ 
+2 \ln|u|
+\right]_{u=1}^5 = 2 \ln(5)
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mn>1</mn></mrow><mn>5</mn></msubsup><mfrac><mn>3</mn><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn></mrow></mfrac><mi>d</mi><mi>u</mi><mo>=</mo><mfrac><mn>3</mn><mn>4</mn></mfrac><msubsup><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mn>1</mn></mrow><mn>5</mn></msubsup><mfrac><mrow><mi>d</mi><mi>u</mi></mrow><mrow><mo stretchy="false">(</mo><mfrac><mrow><mi>u</mi><mo>-</mo><mn>1</mn></mrow><mn>2</mn></mfrac><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac><mo>=</mo><mfrac><mn>3</mn><mn>2</mn></mfrac><msubsup><mo>∫</mo><mrow><mi>v</mi><mo>=</mo><mn>0</mn></mrow><mn>2</mn></msubsup><mfrac><mrow><mi>d</mi><mi>v</mi></mrow><mrow><msup><mi>v</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac><mo>=</mo><mfrac><mn>3</mn><mn>2</mn></mfrac><mo rspace="0em" lspace="0em">arctan</mo><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">
+\int_{u=1}^{5} \frac{3}{u^2-2u+5} d u=
+\frac{3}{4} \int_{u=1}^{5} \frac{d u}{(\frac{u-1}{2})^2+1} =
+\frac{3}{2} \int_{v=0}^{2} \frac{d v}{v^2+1} = 
+\frac{3}{2} \arctan(2)
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mn>1</mn></mrow><mn>5</mn></msubsup><mfrac><mrow><mn>2</mn><mi>u</mi><mo>-</mo><mn>2</mn></mrow><mrow><mo stretchy="false">(</mo><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mi>d</mi><mi>u</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mo>-</mo><mfrac><mn>1</mn><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>-</mo><mn>2</mn><mi>u</mi><mo>+</mo><mn>5</mn></mrow></mfrac></mrow><mo>]</mo></mrow><mrow><mi>u</mi><mo>=</mo><mn>1</mn></mrow><mn>5</mn></msubsup><mo>=</mo><mfrac><mn>1</mn><mn>5</mn></mfrac></mrow><annotation encoding="TeX">
+\int_{u=1}^{5} \frac{2u - 2}{(u^2-2u+5)^2} d u = \left[ 
+- \frac{1}{u^2-2u+5}
+\right]_{u=1}^5 = \frac{1}{5}
+</annotation></semantics></math>
+
+<p>hence</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mn>1</mn></mrow><mn>5</mn></msubsup><mi>F</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mi>d</mi><mi>u</mi><mo>=</mo><mn>2</mn><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>5</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>3</mn><mn>2</mn></mfrac><mo rspace="0em" lspace="0em">arctan</mo><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>1</mn><mn>5</mn></mfrac></mrow><annotation encoding="TeX">
+\int_{u=1}^5 F(u) d u =  2 \ln(5) + \frac{3}{2} \arctan(2) + \frac{1}{5}
+</annotation></semantics></math>
+
+<h3>Example 3</h3>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mn>17</mn></msubsup><mfrac><mrow><msup><mi>t</mi><mn>6</mn></msup><mo>-</mo><mn>2</mn><msup><mi>t</mi><mn>5</mn></msup><mo>-</mo><mn>3</mn><msup><mi>t</mi><mn>4</mn></msup><mo>+</mo><mn>15</mn><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>4</mn><msup><mi>t</mi><mn>2</mn></msup><mo>-</mo><mn>17</mn></mrow><mrow><msup><mi>t</mi><mn>4</mn></msup><mo>+</mo><mn>2</mn><msup><mi>t</mi><mn>3</mn></msup><mo>-</mo><mi>t</mi><mo>-</mo><mn>2</mn></mrow></mfrac><mi>d</mi><mi>t</mi></mrow><annotation encoding="TeX">
+\int_{t=2}^{17} \frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} d t
+</annotation></semantics></math>
+
+<p>By polynomial long division we find that</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>X</mi><mn>6</mn></msup><mo>-</mo><mn>2</mn><msup><mi>x</mi><mn>5</mn></msup><mo>-</mo><mn>3</mn><msup><mi>X</mi><mn>4</mn></msup><mo>+</mo><mn>15</mn><msup><mi>X</mi><mn>3</mn></msup><mo>+</mo><mn>4</mn><msup><mi>X</mi><mn>2</mn></msup><mo>-</mo><mn>17</mn><mo>=</mo><mo stretchy="false">(</mo><msup><mi>X</mi><mn>2</mn></msup><mo>-</mo><mn>4</mn><mi>X</mi><mo>+</mo><mn>5</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><msup><mi>X</mi><mn>4</mn></msup><mo>+</mo><mn>2</mn><msup><mi>X</mi><mn>3</mn></msup><mo>-</mo><mi>X</mi><mo>-</mo><mn>2</mn><mo stretchy="false">)</mo><mo>+</mo><mn>6</mn><msup><mi>X</mi><mn>3</mn></msup><mo>+</mo><mn>2</mn><msup><mi>X</mi><mn>2</mn></msup><mo>-</mo><mn>3</mn><mi>X</mi><mo>-</mo><mn>7</mn></mrow><annotation encoding="TeX">
+X^6-2x^5-3X^4+15X^3+4X^2-17 = (X^2-4X+5)(X^4+2X^3-X-2)+6X^3+2X^2-3X-7
+</annotation></semantics></math>
+
+<p>and so </p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>t</mi><mn>6</mn></msup><mo>-</mo><mn>2</mn><msup><mi>t</mi><mn>5</mn></msup><mo>-</mo><mn>3</mn><msup><mi>t</mi><mn>4</mn></msup><mo>+</mo><mn>15</mn><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>4</mn><msup><mi>t</mi><mn>2</mn></msup><mo>-</mo><mn>17</mn></mrow><mrow><msup><mi>t</mi><mn>4</mn></msup><mo>+</mo><mn>2</mn><msup><mi>t</mi><mn>3</mn></msup><mo>-</mo><mi>t</mi><mo>-</mo><mn>2</mn></mrow></mfrac><mo>=</mo><msup><mi>t</mi><mn>2</mn></msup><mo>-</mo><mn>4</mn><mi>t</mi><mo>+</mo><mn>5</mn><mo>+</mo><mfrac><mrow><mn>6</mn><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>2</mn><msup><mi>t</mi><mn>2</mn></msup><mo>-</mo><mn>3</mn><mi>t</mi><mo>-</mo><mn>7</mn></mrow><mrow><msup><mi>t</mi><mn>4</mn></msup><mo>+</mo><mn>2</mn><msup><mi>t</mi><mn>3</mn></msup><mo>-</mo><mi>t</mi><mo>-</mo><mn>2</mn></mrow></mfrac></mrow><annotation encoding="TeX">
+\frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} = 
+t^2-4t+5+\frac{6t^3+2t^2-3t-7}{t^4+2t^3-t-2}
+</annotation></semantics></math>
+
+<p>The integral of the first term is:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mn>17</mn></msubsup><msup><mi>t</mi><mn>2</mn></msup><mo>-</mo><mn>4</mn><mi>t</mi><mo>+</mo><mn>5</mn><mi>d</mi><mi>t</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mfrac><msup><mi>t</mi><mn>3</mn></msup><mn>3</mn></mfrac><mo>-</mo><mn>2</mn><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mn>5</mn><mi>t</mi></mrow><mo>]</mo></mrow><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mn>17</mn></msubsup><mo>=</mo><mn>1140</mn></mrow><annotation encoding="TeX">
+\int_{t=2}^{17} t^2-4t+5 d t =
+{\left[\frac{t^3}{3} - 2t^2 + 5t\right]}_{t=2}^{17} = 1140
+</annotation></semantics></math>
+
+<p>First we search trivial roots for the denominator.
+If we evaluate <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>t</mi><mn>4</mn></msup><mo>+</mo><mn>2</mn><msup><mi>t</mi><mn>3</mn></msup><mo>-</mo><mi>t</mi><mo>-</mo><mn>2</mn></mrow><annotation encoding="TeX">t^4+2t^3-t-2</annotation></semantics></math> at <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>=</mo><mn>0</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mo>-</mo><mn>2</mn><mo>,</mo><mn>2</mn></mrow><annotation encoding="TeX">t=0,-1,1,-2,2</annotation></semantics></math> we find respectively
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>2</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>28</mn></mrow><annotation encoding="TeX">-2, -2, 0, 0, 28</annotation></semantics></math>. So we can factor <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>X</mi><mn>4</mn></msup><mo>+</mo><mn>2</mn><msup><mi>X</mi><mn>4</mn></msup><mo>-</mo><mi>X</mi><mo>-</mo><mn>2</mn></mrow><annotation encoding="TeX">X^4+2X^4-X-2</annotation></semantics></math> by <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>X</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>X</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">(X - 1)(X + 2)</annotation></semantics></math>. We get
+</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>X</mi><mn>4</mn></msup><mo>+</mo><mn>2</mn><msup><mi>X</mi><mn>3</mn></msup><mo>-</mo><mi>X</mi><mo>-</mo><mn>2</mn><mo>=</mo><mo stretchy="false">(</mo><mi>X</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>X</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><msup><mi>X</mi><mn>2</mn></msup><mo>+</mo><mi>X</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">
+X^4+2X^3-X-2 = (X - 1)(X + 2)(X^2+X+1)
+</annotation></semantics></math>
+
+<p>The polynomial <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>X</mi><mn>2</mn></msup><mo>+</mo><mi>X</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="TeX">X^2+X+1</annotation></semantics></math> is irreducible on <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ℝ</mi><annotation encoding="TeX">\mathbb{R}</annotation></semantics></math> because its
+discrimant is <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>-</mo><mn>4</mn><mo>=</mo><mo>-</mo><mn>3</mn><mo>&lt;</mo><mn>0</mn></mrow><annotation encoding="TeX">1 - 4 = -3 &lt; 0</annotation></semantics></math>. Hence we search a decomposition of</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mn>6</mn><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>2</mn><msup><mi>t</mi><mn>2</mn></msup><mo>-</mo><mn>3</mn><mi>t</mi><mo>-</mo><mn>7</mn></mrow><mrow><mo stretchy="false">(</mo><mi>t</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo><mo stretchy="false">(</mo><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>=</mo><mfrac><mi>A</mi><mrow><mi>t</mi><mo>-</mo><mn>1</mn></mrow></mfrac><mo>+</mo><mfrac><mi>B</mi><mrow><mi>t</mi><mo>+</mo><mn>2</mn></mrow></mfrac><mo>+</mo><mfrac><mrow><mi>C</mi><mi>t</mi><mo>+</mo><mi>D</mi></mrow><mrow><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mrow><annotation encoding="TeX">
+F(t) = \frac{6t^3+2t^2-3t-7}{(t - 1)(t + 2)(t^2+t+1)} =
+\frac{A}{t - 1} + \frac{B}{t + 2} + \frac{C t + D}{t^2+t+1}
+</annotation></semantics></math>
+
+<p>for some constants <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>,</mo><mi>B</mi><mo>,</mo><mi>C</mi><mo>,</mo><mi>D</mi><mo>∊</mo><mi>ℝ</mi></mrow><annotation encoding="TeX">A, B, C, D \in \mathbb{R}</annotation></semantics></math>. We have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>t</mi><mo stretchy="false">→</mo><mn>1</mn></mrow></munder><mo stretchy="false">(</mo><mi>t</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>A</mi><mo>=</mo><mfrac><mrow><mn>6</mn><mo>+</mo><mn>2</mn><mo>-</mo><mn>3</mn><mo>-</mo><mn>7</mn></mrow><mrow><mn>3</mn><mo>×</mo><mn>3</mn></mrow></mfrac><mo>=</mo><mo>-</mo><mfrac><mn>2</mn><mn>9</mn></mfrac></mrow><annotation encoding="TeX">
+\lim_{t \rightarrow 1} (t - 1)F(t) = A = \frac{6+2-3-7}{3 \times 3} = - \frac{2}{9}
+</annotation></semantics></math>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>t</mi><mo stretchy="false">→</mo><mo>-</mo><mn>2</mn></mrow></munder><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>B</mi><mo>=</mo><mfrac><mrow><mn>6</mn><mo>×</mo><mo>-</mo><mn>8</mn><mo>+</mo><mn>2</mn><mo>×</mo><mn>4</mn><mo>+</mo><mn>3</mn><mo>×</mo><mn>2</mn><mo>-</mo><mn>7</mn></mrow><mrow><mo>-</mo><mn>3</mn><mo>×</mo><mo stretchy="false">(</mo><mn>4</mn><mo>-</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>=</mo><mfrac><mn>41</mn><mn>9</mn></mfrac></mrow><annotation encoding="TeX">
+\lim_{t \rightarrow -2} (t + 2)F(t) = B = \frac{6\times-8+2\times4+3\times2-7}{-3 \times (4-2+1)} = \frac{41}{9}
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>t</mi><mo stretchy="false">→</mo><mo>+</mo><mn>∞</mn></mrow></munder><mi>t</mi><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>A</mi><mo>+</mo><mi>B</mi><mo>+</mo><mi>C</mi><mo>=</mo><mn>6</mn><mo stretchy="false">→</mo><mi>C</mi><mo>=</mo><mn>6</mn><mo>+</mo><mfrac><mn>2</mn><mn>9</mn></mfrac><mo>-</mo><mfrac><mn>41</mn><mn>9</mn></mfrac><mo>=</mo><mfrac><mn>5</mn><mn>3</mn></mfrac></mrow><annotation encoding="TeX">
+\lim_{t \rightarrow +\infty} t F(t) = A + B + C = 6 \rightarrow
+C = 6 + \frac{2}{9} - \frac{41}{9} = \frac{5}{3}
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mo>-</mo><mi>A</mi><mo>+</mo><mfrac><mi>B</mi><mn>2</mn></mfrac><mo>+</mo><mi>D</mi><mo>=</mo><mfrac><mrow><mo>-</mo><mn>7</mn></mrow><mrow><mo>-</mo><mn>1</mn><mo>×</mo><mn>2</mn><mo>×</mo><mn>1</mn></mrow></mfrac><mo stretchy="false">→</mo><mi>D</mi><mo>=</mo><mfrac><mn>7</mn><mn>2</mn></mfrac><mo>-</mo><mfrac><mn>2</mn><mn>9</mn></mfrac><mo>-</mo><mfrac><mn>41</mn><mn>18</mn></mfrac><mo>=</mo><mn>1</mn></mrow><annotation encoding="TeX">
+F(0) = -A + \frac{B}{2} + D = \frac{-7}{-1 \times 2 \times 1} \rightarrow
+D = \frac{7}{2} -\frac{2}{9} - \frac{41}{18} = 1
+</annotation></semantics></math>
+
+<p>So </p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mo>-</mo><mfrac><mn>2</mn><mrow><mn>9</mn><mo stretchy="false">(</mo><mi>t</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>+</mo><mfrac><mn>41</mn><mrow><mn>9</mn><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>+</mo><mfrac><mrow><mfrac><mn>5</mn><mn>3</mn></mfrac><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mrow><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mrow><annotation encoding="TeX">
+F(t) =
+-\frac{2}{9(t - 1)} + \frac{41}{9(t + 2)} + \frac{\frac{5}{3} t + 1}{t^2+t+1}
+</annotation></semantics></math>
+
+<p>The integral of the two first terms is easy to compute:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mn>17</mn></msubsup><mo>-</mo><mfrac><mn>2</mn><mrow><mn>9</mn><mo stretchy="false">(</mo><mi>t</mi><mo>-</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mfrac><mo>+</mo><mfrac><mn>41</mn><mrow><mn>9</mn><mo stretchy="false">(</mo><mi>t</mi><mo>+</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mfrac><mi>d</mi><mi>t</mi><mo>=</mo><mo>-</mo><mfrac><mn>2</mn><mn>9</mn></mfrac><msubsup><mrow><mo>[</mo><mrow><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">|</mo><mi>t</mi><mo>-</mo><mn>1</mn><mo stretchy="false">|</mo></mrow><mo>]</mo></mrow><mn>2</mn><mn>17</mn></msubsup><mo>+</mo><mfrac><mn>41</mn><mn>9</mn></mfrac><msubsup><mrow><mo>[</mo><mrow><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">|</mo><mi>t</mi><mo>+</mo><mn>2</mn><mo stretchy="false">|</mo></mrow><mo>]</mo></mrow><mn>2</mn><mn>17</mn></msubsup><mo>=</mo><mo>-</mo><mfrac><mn>2</mn><mn>9</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>16</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>41</mn><mn>9</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>19</mn><mo stretchy="false">)</mo><mo>-</mo><mfrac><mn>41</mn><mn>9</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>4</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">
+\int_{t=2}^{17} -\frac{2}{9(t - 1)} + \frac{41}{9(t + 2)} d t =
+-\frac{2}{9} \left[\ln|t-1|\right]_{2}^{17} +
+\frac{41}{9} \left[\ln|t+2|\right]_{2}^{17} =
+-\frac{2}{9} \ln(16) + \frac{41}{9} \ln(19) - \frac{41}{9} \ln(4)
+</annotation></semantics></math>
+
+<p>The last term can be split into two parts:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mfrac><mn>5</mn><mn>3</mn></mfrac><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mrow><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow></mfrac><mo>=</mo><mfrac><mn>5</mn><mn>6</mn></mfrac><mfrac><mrow><mn>2</mn><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mrow><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>6</mn></mfrac><mo>×</mo><mfrac><mn>4</mn><mn>3</mn></mfrac><mfrac><mn>1</mn><mrow><msup><mrow><mo>(</mo><mfrac><mrow><mi>t</mi><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow><msqrt><mfrac><mn>3</mn><mn>4</mn></mfrac></msqrt></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac></mrow><annotation encoding="TeX">
+\frac{\frac{5}{3} t + 1}{t^2+t+1} =
+\frac{5}{6} \frac{2t+1}{t^2+t+1} + \frac{1}{6} \times \frac{4}{3} \frac{1}{\left( \frac{t+\frac{1}{2}}{\sqrt{\frac{3}{4}}} \right)^2 + 1}
+</annotation></semantics></math>
+
+<p>We have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mn>17</mn></msubsup><mfrac><mn>5</mn><mn>6</mn></mfrac><mfrac><mrow><mn>2</mn><mi>t</mi></mrow><mrow><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow></mfrac><mi>d</mi><mi>t</mi><mo>=</mo><mfrac><mn>5</mn><mn>6</mn></mfrac><msubsup><mrow><mo>[</mo><mrow><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">|</mo><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false">|</mo></mrow><mo>]</mo></mrow><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mn>17</mn></msubsup><mo>=</mo><mfrac><mn>5</mn><mn>6</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>307</mn><mo stretchy="false">)</mo><mo>-</mo><mfrac><mn>5</mn><mn>6</mn></mfrac><mo rspace="0em" lspace="0em">log</mo><mo stretchy="false">(</mo><mn>7</mn><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">
+\int_{t=2}^{17}
+\frac{5}{6} \frac{2t}{t^2+t+1} d t =
+\frac{5}{6} \left[ \ln |t^2 + t + 1| \right]_{t=2}^{17}  =
+\frac{5}{6} \ln(307) - \frac{5}{6} \log(7)
+</annotation></semantics></math>
+
+<p>and</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mn>17</mn></msubsup><mfrac><mn>2</mn><mn>9</mn></mfrac><mfrac><mrow><mi>d</mi><mi>t</mi></mrow><mrow><msup><mrow><mo>(</mo><mfrac><mrow><mi>t</mi><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow><msqrt><mfrac><mn>3</mn><mn>4</mn></mfrac></msqrt></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac><mo>=</mo><mfrac><mn>2</mn><mn>9</mn></mfrac><msubsup><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mfrac><mn>5</mn><msqrt><mn>3</mn></msqrt></mfrac></mrow><mfrac><mn>35</mn><msqrt><mn>3</mn></msqrt></mfrac></msubsup><mfrac><mrow><msqrt><mfrac><mn>3</mn><mn>4</mn></mfrac></msqrt><mi>d</mi><mi>u</mi></mrow><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><mn>3</mn><msqrt><mn>3</mn></msqrt></mrow></mfrac><msubsup><mrow><mo>[</mo><mrow><mo rspace="0em" lspace="0em">arctan</mo><mi>u</mi></mrow><mo>]</mo></mrow><mrow><mi>u</mi><mo>=</mo><mfrac><mn>5</mn><msqrt><mn>3</mn></msqrt></mfrac></mrow><mfrac><mn>35</mn><msqrt><mn>3</mn></msqrt></mfrac></msubsup></mrow><annotation encoding="TeX">
+\int_{t=2}^{17}
+\frac{2}{9} \frac{d t}{\left( \frac{t+\frac{1}{2}}{\sqrt{\frac{3}{4}}} \right)^2 + 1} = \frac{2}{9}
+\int_{u=\frac{5}{\sqrt{3}}}^{\frac{35}{\sqrt{3}}} \frac{\sqrt{\frac{3}{4}} d u}{u^2 + 1} =
+\frac{1}{3 \sqrt{3}} \left[ \arctan u \right]_{u=\frac{5}{\sqrt{3}}}^{\frac{35}{\sqrt{3}}}
+</annotation></semantics></math>
+
+<p>Finally we get</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mi>t</mi><mo>=</mo><mn>2</mn></mrow><mn>17</mn></msubsup><mfrac><mrow><msup><mi>t</mi><mn>6</mn></msup><mo>-</mo><mn>2</mn><msup><mi>t</mi><mn>5</mn></msup><mo>-</mo><mn>3</mn><msup><mi>t</mi><mn>4</mn></msup><mo>+</mo><mn>15</mn><msup><mi>t</mi><mn>3</mn></msup><mo>+</mo><mn>4</mn><msup><mi>t</mi><mn>2</mn></msup><mo>-</mo><mn>17</mn></mrow><mrow><msup><mi>t</mi><mn>4</mn></msup><mo>+</mo><mn>2</mn><msup><mi>t</mi><mn>3</mn></msup><mo>-</mo><mi>t</mi><mo>-</mo><mn>2</mn></mrow></mfrac><mi>d</mi><mi>t</mi><mo>=</mo><mn>1140</mn><mo>-</mo><mfrac><mn>2</mn><mn>9</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>16</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>41</mn><mn>9</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>19</mn><mo stretchy="false">)</mo><mo>-</mo><mfrac><mn>41</mn><mn>9</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>4</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>5</mn><mn>6</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>307</mn><mo stretchy="false">)</mo><mo>-</mo><mfrac><mn>5</mn><mn>6</mn></mfrac><mo rspace="0em" lspace="0em">log</mo><mo stretchy="false">(</mo><mn>7</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>1</mn><mrow><mn>3</mn><msqrt><mn>3</mn></msqrt></mrow></mfrac><mo rspace="0em" lspace="0em">arctan</mo><mrow><mo>(</mo><mfrac><mn>35</mn><msqrt><mn>3</mn></msqrt></mfrac><mo>)</mo></mrow><mo>-</mo><mfrac><mn>1</mn><mrow><mn>3</mn><msqrt><mn>3</mn></msqrt></mrow></mfrac><mo rspace="0em" lspace="0em">arctan</mo><mrow><mo>(</mo><mfrac><mn>5</mn><msqrt><mn>3</mn></msqrt></mfrac><mo>)</mo></mrow></mrow><annotation encoding="TeX">
+\int_{t=2}^{17} \frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} d t =
+1140
+-\frac{2}{9} \ln(16) + \frac{41}{9} \ln(19) - \frac{41}{9} \ln(4) +
+\frac{5}{6} \ln(307) - \frac{5}{6} \log(7) +
+\frac{1}{3 \sqrt{3}} \arctan\left(\frac{35}{\sqrt{3}}\right) -
+\frac{1}{3 \sqrt{3}} \arctan\left(\frac{5}{\sqrt{3}}\right)
+</annotation></semantics></math>
+
+<p>Alternatively, we can write</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mfrac><mn>5</mn><mn>3</mn></mfrac><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mrow><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow></mfrac><mo>=</mo><mfrac><mi>E</mi><mrow><mi>t</mi><mo>-</mo><msup><mi>t</mi><mo>+</mo></msup></mrow></mfrac><mo>+</mo><mfrac><mi>F</mi><mrow><mi>t</mi><mo>-</mo><msup><mi>t</mi><mo>-</mo></msup></mrow></mfrac></mrow><annotation encoding="TeX">
+G(t) = \frac{\frac{5}{3} t + 1}{t^2+t+1} =
+\frac{E}{t - t^+} + \frac{F}{t - t^-}
+</annotation></semantics></math>
+
+<p>where <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>t</mi><mo>±</mo></msup><mo>=</mo><mfrac><mrow><mo>-</mo><mn>1</mn><mo>±</mo><mi>i</mi><msqrt><mn>3</mn></msqrt></mrow><mn>2</mn></mfrac></mrow><annotation encoding="TeX">t^\pm = \frac{-1\pm i \sqrt{3}}{2}</annotation></semantics></math> are the complex roots of
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="TeX">t^2+t+1</annotation></semantics></math>. We have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>t</mi><mo stretchy="false">→</mo><msup><mi>t</mi><mo>+</mo></msup></mrow></munder><mo stretchy="false">(</mo><mi>t</mi><mo>-</mo><msup><mi>t</mi><mo>+</mo></msup><mo stretchy="false">)</mo><mi>G</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>E</mi><mo>=</mo><mfrac><mrow><mn>5</mn><msqrt><mn>3</mn></msqrt><mo>+</mo><mi>i</mi></mrow><mrow><mn>6</mn><msqrt><mn>3</mn></msqrt></mrow></mfrac></mrow><annotation encoding="TeX">
+\lim_{t \rightarrow t^+} (t-t^+) G(t) =  E = \frac{5\sqrt{3}+i}{6 \sqrt{3}}
+</annotation></semantics></math>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>t</mi><mo stretchy="false">→</mo><msup><mi>t</mi><mo>-</mo></msup></mrow></munder><mo stretchy="false">(</mo><mi>t</mi><mo>-</mo><msup><mi>t</mi><mo>-</mo></msup><mo stretchy="false">)</mo><mi>G</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mi>F</mi><mo>=</mo><mfrac><mrow><mn>5</mn><msqrt><mn>3</mn></msqrt><mo>-</mo><mi>i</mi></mrow><mrow><mn>6</mn><msqrt><mn>3</mn></msqrt></mrow></mfrac></mrow><annotation encoding="TeX">
+\lim_{t \rightarrow t^-} (t-t^-) G(t) =  F = \frac{5\sqrt{3}-i}{6 \sqrt{3}}
+</annotation></semantics></math>
+
+<p>We have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>2</mn><mn>17</mn></msubsup><mi>G</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mi>d</mi><mi>t</mi><mo>=</mo><msubsup><mrow><mo>[</mo><mrow><mi>E</mi><mrow><mo>(</mo><mrow><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">|</mo><mi>t</mi><mo>-</mo><msup><mi>t</mi><mo>+</mo></msup><mo stretchy="false">|</mo><mo>+</mo><mi>i</mi><mo rspace="0em" lspace="0em">arctan</mo><mfrac><mrow><mi>t</mi><mo>-</mo><mi>ℜ</mi><mo stretchy="false">(</mo><msup><mi>t</mi><mo>+</mo></msup><mo stretchy="false">)</mo></mrow><mrow><mi>ℑ</mi><mo stretchy="false">(</mo><msup><mi>t</mi><mo>+</mo></msup><mo stretchy="false">)</mo></mrow></mfrac></mrow><mo>)</mo></mrow><mo>+</mo><mi>F</mi><mrow><mo>(</mo><mrow><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">|</mo><mi>t</mi><mo>-</mo><msup><mi>t</mi><mo>-</mo></msup><mo stretchy="false">|</mo><mo>+</mo><mi>i</mi><mo rspace="0em" lspace="0em">arctan</mo><mfrac><mrow><mi>t</mi><mo>-</mo><mi>ℜ</mi><mo stretchy="false">(</mo><msup><mi>t</mi><mo>-</mo></msup><mo stretchy="false">)</mo></mrow><mrow><mi>ℑ</mi><mo stretchy="false">(</mo><msup><mi>t</mi><mo>-</mo></msup><mo stretchy="false">)</mo></mrow></mfrac></mrow><mo>)</mo></mrow></mrow><mo>]</mo></mrow><mn>2</mn><mn>17</mn></msubsup></mrow><annotation encoding="TeX">
+\int_{2}^{17} G(t) d t = 
+\left[ 
+E
+\left( \ln |t - t^+| + i \arctan \frac{t - \Re(t^+)}{\Im(t^+)} \right)
++
+F
+\left(  \ln |t - t^-| + i \arctan \frac{t - \Re(t^-)}{\Im(t^-)} \right)
+ \right]_{2}^{17}
+</annotation></semantics></math>
+
+<p>After simplification, we get</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>2</mn><mn>17</mn></msubsup><mi>G</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mi>d</mi><mi>t</mi><mo>=</mo><mfrac><mn>5</mn><mn>6</mn></mfrac><mo rspace="0em" lspace="0em">ln</mo><mo stretchy="false">(</mo><mn>307</mn><mo stretchy="false">)</mo><mo>-</mo><mfrac><mn>5</mn><mn>6</mn></mfrac><mo rspace="0em" lspace="0em">log</mo><mo stretchy="false">(</mo><mn>7</mn><mo stretchy="false">)</mo><mo>+</mo><mfrac><mn>1</mn><mrow><mn>3</mn><msqrt><mn>3</mn></msqrt></mrow></mfrac><mo rspace="0em" lspace="0em">arctan</mo><mrow><mo>(</mo><mfrac><mn>35</mn><msqrt><mn>3</mn></msqrt></mfrac><mo>)</mo></mrow><mo>-</mo><mfrac><mn>1</mn><mrow><mn>3</mn><msqrt><mn>3</mn></msqrt></mrow></mfrac><mo rspace="0em" lspace="0em">arctan</mo><mrow><mo>(</mo><mfrac><mn>5</mn><msqrt><mn>3</mn></msqrt></mfrac><mo>)</mo></mrow></mrow><annotation encoding="TeX">
+\int_{2}^{17} G(t) d t = 
+\frac{5}{6} \ln(307) - \frac{5}{6} \log(7) +
+\frac{1}{3 \sqrt{3}} \arctan\left(\frac{35}{\sqrt{3}}\right) -
+\frac{1}{3 \sqrt{3}} \arctan\left(\frac{5}{\sqrt{3}}\right)
+</annotation></semantics></math>
+
+<p>as we already found above.</p>
+
+<h2>Contour Integration</h2>
+
+<h3>Idea</h3>
+
+<p>Consider contour integral <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∮</mo><mi>γ</mi></msub><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mi>d</mi><mi>z</mi></mrow><annotation encoding="TeX">\oint_\gamma f(z) d z</annotation></semantics></math> along paths in complex
+plane to deduce integral along the real line.</p>
+
+<h3>Example 1</h3>
+
+<p>Consider the integral</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mrow><mn>2</mn><mi>π</mi></mrow></msubsup><mfrac><mrow><mn>6</mn><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mn>2</mn><mi>θ</mi><mo stretchy="false">)</mo></mrow><mrow><mn>4</mn><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>-</mo><mn>5</mn></mrow></mfrac><mi>d</mi><mi>θ</mi></mrow><annotation encoding="TeX">
+\int_{0}^{2 \pi} \frac{6 \cos(2 \theta)}{4 \sin(\theta) - 5} d\theta
+</annotation></semantics></math>
+
+<p>Write <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>=</mo><msup><mi>e</mi><mrow><mi>i</mi><mi>θ</mi></mrow></msup></mrow><annotation encoding="TeX">z = e^{i \theta}</annotation></semantics></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>z</mi><mo>=</mo><mi>i</mi><mi>z</mi><mi>d</mi><mi>θ</mi></mrow><annotation encoding="TeX">d z = i z d \theta</annotation></semantics></math>. The integral becomes</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∮</mo><mi>γ</mi></msub><mfrac><mrow><mn>3</mn><mo stretchy="false">(</mo><msup><mi>z</mi><mn>2</mn></msup><mo>+</mo><msup><mi>z</mi><mrow><mo>-</mo><mn>2</mn></mrow></msup><mo stretchy="false">)</mo></mrow><mrow><mo>-</mo><mn>2</mn><mi>i</mi><mo stretchy="false">(</mo><mi>z</mi><mo>-</mo><msup><mi>z</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mo stretchy="false">)</mo><mo>-</mo><mn>5</mn></mrow></mfrac><mfrac><mrow><mi>d</mi><mi>z</mi></mrow><mrow><mi>i</mi><mi>z</mi></mrow></mfrac><mo>=</mo><msub><mo>∮</mo><mi>γ</mi></msub><mfrac><mrow><mn>3</mn><mo stretchy="false">(</mo><msup><mi>z</mi><mn>4</mn></msup><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><mrow><mn>2</mn><msup><mi>z</mi><mn>2</mn></msup><mo stretchy="false">(</mo><mi>z</mi><mo>-</mo><mn>2</mn><mi>i</mi><mo stretchy="false">)</mo><mrow><mo>(</mo><mrow><mi>z</mi><mo>-</mo><mfrac><mi>i</mi><mn>2</mn></mfrac></mrow><mo>)</mo></mrow></mrow></mfrac><mi>d</mi><mi>z</mi></mrow><annotation encoding="TeX">
+\oint_{\gamma} \frac{3 (z^2 + z^{-2})}{-2 i (z - z^{-1}) - 5} \frac{d z}{i z} =
+\oint_{\gamma}  \frac{3(z^4+1)}{2 z^2 (z - 2 i)\left(z - \frac{i}{2}\right)} d z
+</annotation></semantics></math>
+
+<p>where <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="TeX">\gamma</annotation></semantics></math> is the unit circle traversed counterclockwise.
+<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>:</mo><mi>z</mi><mo stretchy="false">↦</mo><mfrac><mrow><mn>3</mn><mo stretchy="false">(</mo><msup><mi>z</mi><mn>4</mn></msup><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><mrow><mn>2</mn><msup><mi>z</mi><mn>2</mn></msup><mo stretchy="false">(</mo><mi>z</mi><mo>-</mo><mn>2</mn><mi>i</mi><mo stretchy="false">)</mo><mrow><mo>(</mo><mrow><mi>z</mi><mo>-</mo><mfrac><mi>i</mi><mn>2</mn></mfrac></mrow><mo>)</mo></mrow></mrow></mfrac></mrow><annotation encoding="TeX">f : z \mapsto \frac{3(z^4+1)}{2 z^2 (z - 2 i)\left(z - \frac{i}{2}\right)}</annotation></semantics></math>
+has two
+singularities inside that circle: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="TeX">0</annotation></semantics></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>i</mi><mn>2</mn></mfrac><annotation encoding="TeX">\frac{i}{2}</annotation></semantics></math>.
+Hence the integral is the <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>π</mi><mi>i</mi></mrow><annotation encoding="TeX">2 \pi i</annotation></semantics></math> times the sum
+of the residues of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="TeX">f</annotation></semantics></math> at these points:</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathvariant="normal"><mrow><mi>R</mi><mi>e</mi><mi>s</mi></mrow></mstyle><mo stretchy="false">(</mo><mi>f</mi><mo>,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>z</mi><mo stretchy="false">→</mo><mn>0</mn></mrow></munder><mfrac><mrow><mi>d</mi><mrow><mo>(</mo><mrow><msup><mi>z</mi><mn>2</mn></msup><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><mo>)</mo></mrow></mrow><mrow><mi>d</mi><mi>z</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>15</mn><mi>i</mi></mrow><mn>4</mn></mfrac></mrow><annotation encoding="TeX">
+\mathrm{Res}(f, 0) = \lim_{z \rightarrow 0} \frac{d \left( z^2 f(z) \right)}{dz}
+= \frac{15 i}{4}
+</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathvariant="normal"><mrow><mi>R</mi><mi>e</mi><mi>s</mi></mrow></mstyle><mo stretchy="false">(</mo><mi>f</mi><mo>,</mo><mfrac><mi>i</mi><mn>2</mn></mfrac><mo stretchy="false">)</mo><mo>=</mo><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>z</mi><mo stretchy="false">→</mo><mn>0</mn></mrow></munder><mrow><mo>(</mo><mrow><mi>z</mi><mo>-</mo><mfrac><mi>i</mi><mn>2</mn></mfrac></mrow><mo>)</mo></mrow><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mo>-</mo><mfrac><mrow><mn>17</mn><mi>i</mi></mrow><mn>4</mn></mfrac></mrow><annotation encoding="TeX">
+\mathrm{Res}(f, \frac{i}{2}) = \lim_{z \rightarrow 0} \left( z - \frac{i}{2} \right)
+f(z) = -\frac{17 i}{4}
+</annotation></semantics></math>
+
+<p>Hence </p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mrow><mn>2</mn><mi>π</mi></mrow></msubsup><mfrac><mrow><mn>6</mn><mo rspace="0em" lspace="0em">cos</mo><mo stretchy="false">(</mo><mn>2</mn><mi>θ</mi><mo stretchy="false">)</mo></mrow><mrow><mn>4</mn><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>-</mo><mn>5</mn></mrow></mfrac><mi>d</mi><mi>θ</mi><mo>=</mo><msub><mo>∮</mo><mi>γ</mi></msub><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mi>d</mi><mi>z</mi><mo>=</mo><mn>2</mn><mi>π</mi><mi>i</mi><mrow><mo>(</mo><mrow><mfrac><mrow><mn>15</mn><mi>i</mi></mrow><mn>4</mn></mfrac><mo>-</mo><mfrac><mrow><mn>17</mn><mi>i</mi></mrow><mn>4</mn></mfrac></mrow><mo>)</mo></mrow><mo>=</mo><mi>π</mi></mrow><annotation encoding="TeX">
+\int_{0}^{2 \pi} \frac{6 \cos(2 \theta)}{4 \sin(\theta) - 5} d\theta = 
+\oint_{\gamma} f(z) d z =
+2 \pi i \left( \frac{15 i}{4} -\frac{17 i}{4} \right) = \pi
+</annotation></semantics></math>
+
+<h3>Example 2</h3>
+
+<p>We want to know the value of the integral</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mo>-</mo><mn>∞</mn></mrow><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mfrac><mrow><mn>16</mn><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>x</mi><mo>+</mo><mi>π</mi><mo stretchy="false">)</mo></mrow><mrow><mn>5</mn><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mi>d</mi><mi>x</mi></mrow><annotation encoding="TeX">
+\int_{-\infty}^{+\infty} \frac{16 \sin(2x+\pi)}{5(x^2+2x+5)^2} dx
+</annotation></semantics></math>
+
+<p>For that purpose, we introduce the function</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mn>16</mn><msup><mi>e</mi><mrow><mo>-</mo><mn>2</mn><mi>π</mi><mi>z</mi></mrow></msup></mrow><mrow><mn>5</mn><mo stretchy="false">(</mo><msup><mi>z</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>z</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="TeX">
+f(z) = \frac{16 e^{-2\pi z}}{5(z^2+2z+5)^2}
+</annotation></semantics></math>
+
+<p>We note that <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo stretchy="false">↦</mo><mi>ℑ</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">x \mapsto \Im(f(x))</annotation></semantics></math> is the integrand above. We also note that
+ the
+poles of <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="TeX">f</annotation></semantics></math> are <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>z</mi><mo>±</mo></msup><mo>=</mo><mo>-</mo><mn>1</mn><mo>±</mo><mn>2</mn><mi>i</mi></mrow><annotation encoding="TeX">z^\pm = -1 \pm 2 i</annotation></semantics></math>. By choosing the right contour, one can
+show that</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mo>-</mo><mn>∞</mn></mrow><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi><mo>=</mo><mo>-</mo><mn>2</mn><mi>i</mi><mi>π</mi><munder><mo>∑</mo><mover><mrow><mi>ℑ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mn>0</mn></mrow><mrow><mi>z</mi><mtext>residue</mtext></mrow></mover></munder><mstyle mathvariant="normal"><mrow><mi>R</mi><mi>e</mi><mi>s</mi></mrow></mstyle><mo stretchy="false">(</mo><mi>f</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><annotation encoding="TeX">
+\int_{-\infty}^{+\infty} f(x) dx =
+-2 i \pi \sum_{\stackrel{z \text{residue}}{\Im(z) &lt; 0}} \mathrm{Res}(f, z)
+</annotation></semantics></math>
+
+<p>We have</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathvariant="normal"><mrow><mi>R</mi><mi>e</mi><mi>s</mi></mrow></mstyle><mo stretchy="false">(</mo><mi>f</mi><mo>,</mo><msup><mi>z</mi><mo>-</mo></msup><mo stretchy="false">)</mo><mo>=</mo><munder><mo rspace="0em" lspace="0em">lim</mo><mrow><mi>z</mi><mo stretchy="false">→</mo><mi>z</mi><mtext>⁻</mtext></mrow></munder><mfrac><mrow><mi>d</mi><mrow><mo>(</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo>-</mo><msup><mi>z</mi><mo>-</mo></msup><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow><mo>)</mo></mrow></mrow><mrow><mi>d</mi><mi>z</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>i</mi><msup><mi>e</mi><mrow><mn>2</mn><mi>i</mi></mrow></msup></mrow><mrow><mn>2</mn><msup><mi>e</mi><mn>4</mn></msup></mrow></mfrac></mrow><annotation encoding="TeX">
+\mathrm{Res}(f, z^-) = \lim_{z \rightarrow z⁻}
+\frac{d \left( (z - z^-)^2 f(z) \right)}{dz} = \frac{i e^{2 i}}{2 e^4}
+</annotation></semantics></math>
+
+<p>Hence</p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mo>-</mo><mn>∞</mn></mrow><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mfrac><mrow><mn>16</mn><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>x</mi><mo>+</mo><mi>π</mi><mo stretchy="false">)</mo></mrow><mrow><mn>5</mn><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mi>d</mi><mi>x</mi><mo>=</mo><mi>ℑ</mi><mrow><mo>(</mo><mrow><msubsup><mo>∫</mo><mrow><mo>-</mo><mn>∞</mn></mrow><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mi>d</mi><mi>x</mi></mrow><mo>)</mo></mrow><mo>=</mo><mi>ℑ</mi><mrow><mo>(</mo><mrow><mo>-</mo><mn>2</mn><mi>i</mi><mi>π</mi><mfrac><mrow><mi>i</mi><msup><mi>e</mi><mrow><mn>2</mn><mi>i</mi></mrow></msup></mrow><mrow><mn>2</mn><msup><mi>e</mi><mn>4</mn></msup></mrow></mfrac></mrow><mo>)</mo></mrow><mo>=</mo><mi>ℑ</mi><mrow><mo>(</mo><mfrac><mrow><mi>π</mi><msup><mi>e</mi><mrow><mn>2</mn><mi>i</mi></mrow></msup></mrow><msup><mi>e</mi><mn>4</mn></msup></mfrac><mo>)</mo></mrow></mrow><annotation encoding="TeX">
+\int_{-\infty}^{+\infty} \frac{16 \sin(2x+\pi)}{5(x^2+2x+5)^2} dx
+= \Im\left(\int_{-\infty}^{+\infty} f(x) dx\right) =
+\Im\left(-2 i \pi \frac{i e^{2 i}}{2 e^4}\right) =
+\Im\left(\frac{\pi e^{2 i}}{e^4}\right)
+</annotation></semantics></math>
+
+<p>Finally </p>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mrow><mo>-</mo><mn>∞</mn></mrow><mrow><mo>+</mo><mn>∞</mn></mrow></msubsup><mfrac><mrow><mn>16</mn><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mi>x</mi><mo>+</mo><mi>π</mi><mo stretchy="false">)</mo></mrow><mrow><mn>5</mn><mo stretchy="false">(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>5</mn><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac><mi>d</mi><mi>x</mi><mo>=</mo><mfrac><mrow><mi>π</mi><mo rspace="0em" lspace="0em">sin</mo><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow><msup><mi>e</mi><mn>4</mn></msup></mfrac></mrow><annotation encoding="TeX">
+\int_{-\infty}^{+\infty} \frac{16 \sin(2x+\pi)}{5(x^2+2x+5)^2} dx =
+\frac{\pi \sin(2)}{e^4}
+</annotation></semantics></math>
+    
+
+  </body>
+</html>

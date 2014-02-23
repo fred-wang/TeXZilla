@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Handling Parsing Error</title>
+    <meta charset="utf-8"/>
+    <script type="text/javascript" src="../TeXZilla-min.js"></script>
+    <script type="text/javascript">
+      var oldinput = "";
+      function refresh()
+      {
+        var input = document.getElementById("input").value;
+        if (input == oldinput) {
+          return;
+        }
+        oldinput = input;
+        var output = document.getElementById("output");
+        while (output.firstChild)
+          output.removeChild(output.firstChild);
+        try {
+          output.style.color = "inherit";
+          var mathml = TeXZilla.toMathML(input, false, false, true);
+          output.appendChild(mathml);
+        } catch(e) {
+          output.style.color = "red";
+          output.textContent = input;
+        }
+      }
+    </script>
+  </head>
+  <body onload="window.setInterval(refresh, 500)">
+
+    <h1>Handling Parsing Error</h1>
+
+    <p>This page calls TeXZilla.toMathML every 500ms to show a preview.
+      It passes the parameter <code>aThrowExceptionOnError = true</code> in
+      order to detect when the parsing fails and in that case shows the
+      original TeX source.</p>
+
+    <textarea id="input" cols="80" rows="5">\frac{x}</textarea>
+
+    <div id="output"></div>
+
+  </body>
+</html>
