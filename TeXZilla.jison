@@ -143,13 +143,16 @@ parser.getTeXSource = function(aMathMLElement)
   return getTeXSourceInternal(aMathMLElement);
 }
 
-parser.toMathMLString = function(aTeX, aDisplay, aRTL)
+parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError)
 {
   /* Parse the TeX source and get the main MathML node. */
   var output;
   try {
     output = this.parse(aTeX);
   } catch(e) {
+    if (aThrowExceptionOnError) {
+       throw e;
+    }
     output = "<merror>" + escapeText(e.message) + "</merror>";
   }
 
@@ -171,10 +174,10 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL)
   return mathml;
 }
 
-parser.toMathML = function(aTeX, aDisplay, aRTL)
+parser.toMathML = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError)
 {
   /* Parse the TeX string into a <math> element. */
-  return this.parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL));
+  return this.parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError));
 }
 %}
 

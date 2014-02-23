@@ -24,7 +24,7 @@ or download the [pre-releases](https://github.com/fred-wang/TeXZilla/releases).
 
 Please read the [wiki](https://github.com/fred-wang/TeXZilla/wiki) to get more
 information on how to integrate TeXZilla in your Web page or project as well
-as a description of the TeXZilla syntax.
+as a description of the TeXZilla syntax. See also the examples/ directory.
 
 Build Instructions
 ------------------

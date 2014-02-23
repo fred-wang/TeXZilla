@@ -61,6 +61,7 @@ TeXZilla-min.js: TeXZilla.js
 # Minify the Javascript parser using Google's Closure Compiler.
 	$(JAVA) -jar $(CLOSURE_COMPILER) $< > tmp.js
 	cat MPL-header.js tmp.js > $@
+	rm tmp.js
 
 tests: unit-tests.js TeXZilla.js
 	$(SLIMERJS) $<
@@ -79,3 +80,7 @@ clean:
 distclean: clean
 # Remove all generated files.
 	rm -f unicode.xml TeXZilla-min.js
+
+release:
+# Generate a release branch.
+	./release.sh

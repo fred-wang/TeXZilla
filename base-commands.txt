@@ -50,14 +50,14 @@
 "\\cellopts" return "CELLOPTS";
 "\\check" { yytext = "\u02C7"; return "ACCENTNS"; }
 "\\choose" return "TEXCHOOSE";
-"\\closure" { yytext = "\u02C7"; return "ACCENT"; }
+"\\closure" { yytext = "\u00AF"; return "ACCENT"; }
 "\\colalign" { this.begin("TEXTARG"); return "COLALIGN"; }
 "\\collayout" { this.pushState("TEXTARG"); return "COLLAYOUT";}
 "\\collines" { this.pushState("TEXTARG"); return "COLLINES"; }
 "\\color" { this.pushState("TEXTARG"); return "COLOR"; }
 "\\colspan" { this.begin("TEXTARG"); return "COLSPAN"; }
 "\\ddddot" { yytext = "\u20DC"; return "ACCENT"; }
-"\\dddot" { yytext = "\u30DB"; return "ACCENT"; }
+"\\dddot" { yytext = "\u20DB"; return "ACCENT"; }
 "\\ddot" { yytext = "\u0308"; return "ACCENT"; }
 "\\displaystyle" return "DISPLAYSTYLE";
 "\\dot" { yytext = "\u02D9"; return "ACCENT"; }
@@ -116,7 +116,7 @@
 "\\operatorname" { this.begin("TEXTARG"); return "OPERATORNAME"; }
 "\\over" return "TEXOVER";
 "\\overbrace" return "OVERBRACE";
-"\\overline" { yytext = "\u02C7"; return "ACCENT"; }
+"\\overline" { yytext = "\u00AF"; return "ACCENT"; }
 "\\overset" return "OVERSET";
 "\\padding" { this.pushState("TEXTARG"); return "PADDING"; }
 "\\phantom" return "PHANTOM";
@@ -142,6 +142,7 @@
 "\\text" { this.begin("TEXTARG"); return "MTEXT"; }
 "\\textsize" return "TEXTSIZE";
 "\\textstyle" return "TEXTSTYLE";
+"\\tbinom" return "TBINOM";
 "\\tfrac" return "TFRAC";
 "\\thickspace" return "THICKSPACE";
 "\\thinspace" return "THINSPACE";
@@ -151,7 +152,7 @@
 "\\tooltip" { this.pushState("TEXTARG"); return "TOOLTIP"; }
 "\\underbrace" return "UNDERBRACE";
 "\\underline" return "UNDERLINE";
-"\\underoverset"  return UNDEROVERSET;
+"\\underoverset"  return "UNDEROVERSET";
 "\\underset" return "UNDERSET";
 "\\vec" { yytext = "\u21C0"; return "ACCENTNS"; }
 "\\widebar" { yytext = "\u00AF"; return "ACCENT"; }
