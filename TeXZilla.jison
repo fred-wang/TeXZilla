@@ -143,7 +143,7 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
     if (aThrowExceptionOnError) {
        throw e;
     }
-    output = "<merror>" + escapeText(e.message) + "</merror>";
+    output = "<merror><mtext>" + escapeText(e.message) + "</mtext></merror>";
   }
 
   /* Add the <math> root and attach the TeX annotation. */
