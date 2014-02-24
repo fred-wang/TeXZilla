@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-if (typeof require !== "undefined" && typeof exports !== "undefined") {
+if (require !== undefined && exports !== undefined) {
 
   exports.setDOMParser = function (aDOMParser) {
     TeXZilla.DOMParser = aDOMParser;
-  }
+  };
 
   exports.getTeXSource = function () {
     return TeXZilla.getTeXSource.apply(TeXZilla, arguments);
@@ -21,12 +21,15 @@ if (typeof require !== "undefined" && typeof exports !== "undefined") {
   };
 
   // Command line API
-  var args = require("system").args;
-  var webserver = require("webserver");
-  var server = null;
-  var tex, display, RTL, throwException;
+  var args = require("system").args,
+    webserver = require("webserver"),
+    server = null,
+    tex,
+    display,
+    RTL,
+    throwException;
 
-  function usage(aName) {
+  var usage = function (aName) {
     console.log("\nUsage:\n");
     console.log("slimerjs " + aName + " [help]");
     console.log("  Print this help message.\n");
@@ -38,7 +41,7 @@ if (typeof require !== "undefined" && typeof exports !== "undefined") {
     console.log("  See the TeXZilla wiki for details.\n");
     console.log("cat input | slimerjs " + aName + " streamfilter > output");
     console.log("  TODO\n");
-  }
+  };
 
   if (args.length >= 3 && args[1] === "parser") {
     // Parse the string and print the output.
@@ -48,7 +51,7 @@ if (typeof require !== "undefined" && typeof exports !== "undefined") {
     throwException = (args.length >= 6 ? args[5] === "true" : false);
     try {
       console.log(TeXZilla.toMathMLString(tex, display, RTL, throwException));
-    } catch(e) {
+    } catch (e) {
       // FIXME: This should probably call exit with status 1.
       // https://github.com/fred-wang/TeXZilla/issues/6
       console.log(e);
@@ -56,19 +59,20 @@ if (typeof require !== "undefined" && typeof exports !== "undefined") {
   } else if (args.length >= 2 && args[1] === "webserver") {
     // Run a Web server.
     try {
-      var port = (args.length >= 3 ? parseInt(args[2]) : 3141);
+      var port = (args.length >= 3 ? parseInt(args[2], 10) : 3141);
       server = webserver.create();
-      server.listen(port, function(request, response) {
+      server.listen(port, function (request, response) {
+        var query, vars, i, pair, key, value, json, data;
         response.statusCode = 200;
         if (request.method === "GET") {
           // Decode the query string.
-          var query = request.url.split("?")[1];
+          query = request.url.split("?")[1];
           if (query) {
-            var vars = query.split("&");
-            for (var i = 0; i < vars.length; i++) {
-              var pair = vars[i].split("=");
-              var key = decodeURIComponent(pair[0]).toLowerCase();
-              var value = decodeURIComponent(pair[1]);
+            vars = query.split("&");
+            for (i = 0; i < vars.length; i++) {
+              pair = vars[i].split("=");
+              key = decodeURIComponent(pair[0]).toLowerCase();
+              value = decodeURIComponent(pair[1]);
               if (key === "tex") {
                 tex = value;
               } else if (key === "display") {
@@ -81,21 +85,21 @@ if (typeof require !== "undefined" && typeof exports !== "undefined") {
             }
           }
         } else if (request.method === "POST") {
-          var json = JSON.parse(request.post)
+          json = JSON.parse(request.post);
           tex = json.tex;
           display = (json.display === "true");
           RTL = (json.rtl === "true");
           throwException = (json.exception === "true");
         }
- 	if (tex === undefined) {
+        if (tex === undefined) {
           response.close();
           return;
         }
-        var data = { tex: tex };
+        data = { tex: tex };
         try {
           data.mathml = TeXZilla.toMathMLString(tex, display, RTL, throwException);
           data.exception = null;
-        } catch(e) {
+        } catch (e) {
           data.exception = e.message;
         }
         response.write(JSON.stringify(data));
@@ -121,5 +125,5 @@ if (typeof require !== "undefined" && typeof exports !== "undefined") {
     } else if (phantom) {
       phantom.exit();
     }
-  } 
+  }
 }

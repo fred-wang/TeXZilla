@@ -3,33 +3,28 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 %{
-function escapeText(aString)
-{
+function escapeText(aString) {
   /* Escape reserved XML characters for use as text nodes. */
   return aString.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function escapeQuote(aString)
-{
+function escapeQuote(aString) {
   /* Escape the double quote characters for use as attribute. */
   return aString.replace(/"/g, "&#x22;");
 }
 
-function parseLength(aString)
-{
+function parseLength(aString) {
   /* See http://www.w3.org/TR/MathML3/appendixa.html#parsing_length */
   /* FIXME: should namedspaces be accepted too?
     https://github.com/fred-wang/TeXZilla/issues/8 */
-  var lengthRegexp = /\s*(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?\s*/;
-  var result = lengthRegexp.exec(aString);
+  var lengthRegexp = /\s*(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?\s*/, result = lengthRegexp.exec(aString);
   if (result) {
     result = { l: parseFloat(result[1]), u: result[2] };
   }
   return result;
 }
 
-function newTag(aTag, aContent, aAttributes)
-{
+function newTag(aTag, aContent, aAttributes) {
   /* Create a new tag with the specified content and attributes. */
   var tag = "<" + aTag;
   if (aAttributes) tag += " " + aAttributes
@@ -37,18 +32,16 @@ function newTag(aTag, aContent, aAttributes)
   return tag;
 }
 
-function newMo(aContent, aLeftSpace, aRightSpace)
-{
+function newMo(aContent, aLeftSpace, aRightSpace) {
   /* Create a new operator */
-  var tag =  "<mo";
+  var tag = "<mo";
   if (aLeftSpace) tag += " lspace=\"" + aLeftSpace + "\"";
   if (aRightSpace) tag += " rspace=\"" + aRightSpace + "\"";
   tag += ">" + escapeText(aContent) + "</mo>";
   return tag;
 }
 
-function newScript(aUnderOver, aBase, aScriptBot, aScriptTop)
-{
+function newScript(aUnderOver, aBase, aScriptBot, aScriptTop) {
   /* Create a new MathML script element. */
   if (aUnderOver) {
     if (!aScriptBot) {
@@ -71,8 +64,8 @@ function newScript(aUnderOver, aBase, aScriptBot, aScriptTop)
 /* FIXME: try to restore the operator grouping when compoundTermList does not
    contain any fences.
    https://github.com/fred-wang/TeXZilla/issues/9 */
-function newMrow(aList, aTag, aAttributes)
-{
+function newMrow(aList, aTag, aAttributes) {
+  var tag;
   if (!aTag) {
     if (aList.length == 1) {
       /* This list only has one element so we just return it. */
@@ -80,18 +73,18 @@ function newMrow(aList, aTag, aAttributes)
     }
     aTag = "mrow";
   }
-  var tag = "<" + aTag;
+  tag = "<" + aTag;
   if (aAttributes) tag += " " + aAttributes
   tag += ">" + aList.join("") + "</" + aTag + ">";
   return tag;
 }
 
-var MathMLNameSpace = "http://www.w3.org/1998/Math/MathML";
-var TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
+var MathMLNameSpace = "http://www.w3.org/1998/Math/MathML",
+    TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
                     "application/x-tex", "application/x-latex"];
 
-function getTeXSourceInternal(aMathMLElement)
-{
+function getTeXSourceInternal(aMathMLElement) {
+  var child;
   if (!aMathMLElement ||
       aMathMLElement.namespaceURI !== MathMLNameSpace) {
     return null;
@@ -100,7 +93,7 @@ function getTeXSourceInternal(aMathMLElement)
   if (aMathMLElement.tagName === "semantics") {
     // Note: we can't use aMathMLElement.children on WebKit/Blink because of
     // https://bugs.webkit.org/show_bug.cgi?id=109556.
-    for (var child = aMathMLElement.firstElementChild; child;
+    for (child = aMathMLElement.firstElementChild; child;
          child = child.nextElementSibling) {
       if (child.namespaceURI === MathMLNameSpace &&
           child.localName === "annotation" &&
@@ -124,8 +117,7 @@ try {
   parser.DOMParser = null;
 }
 
-parser.parseMathMLDocument = function (aString)
-{
+parser.parseMathMLDocument = function (aString) {
   /* Parse the string into a MathML document and return the <math> root. */
   if (this.DOMParser) {
     return this.DOMParser.
@@ -134,8 +126,7 @@ parser.parseMathMLDocument = function (aString)
   throw "TeXZilla.DOMParser has not been set!";
 }
 
-parser.getTeXSource = function(aMathMLElement)
-{
+parser.getTeXSource = function(aMathMLElement) {
   if (typeof aMathMLElement === "string") {
     aMathMLElement = this.parseMathMLDocument(aMathMLElement);
   }
@@ -143,13 +134,12 @@ parser.getTeXSource = function(aMathMLElement)
   return getTeXSourceInternal(aMathMLElement);
 }
 
-parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError)
-{
+parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
+  var output, mathml;
   /* Parse the TeX source and get the main MathML node. */
-  var output;
   try {
     output = this.parse(aTeX);
-  } catch(e) {
+  } catch (e) {
     if (aThrowExceptionOnError) {
        throw e;
     }
@@ -157,7 +147,7 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError)
   }
 
   /* Add the <math> root and attach the TeX annotation. */
-  var mathml = "<math xmlns=\"" + MathMLNameSpace + "\"";
+  mathml = "<math xmlns=\"" + MathMLNameSpace + "\"";
   if (aDisplay) {
     /* Set the display mode if it is specified. */
     mathml += " display=\"block\""
@@ -174,8 +164,7 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError)
   return mathml;
 }
 
-parser.toMathML = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError)
-{
+parser.toMathML = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
   /* Parse the TeX string into a <math> element. */
   return this.parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError));
 }
