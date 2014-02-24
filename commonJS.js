@@ -20,9 +20,11 @@ if (typeof require !== "undefined" && typeof exports !== "undefined") {
     return TeXZilla.toMathML.apply(TeXZilla, arguments);
   };
 
-  /* Command line API */
-  var system = require("system");
-  var args = system.args;
+  // Command line API
+  var args = require("system").args;
+  var webserver = require("webserver");
+  var server = null;
+  var tex, display, RTL, throwException;
 
   function usage(aName) {
     console.log("\nUsage:\n");
@@ -32,34 +34,92 @@ if (typeof require !== "undefined" && typeof exports !== "undefined") {
     console.log("  Print TeXZilla.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError)");
     console.log("  The interpretation of arguments and the default values are the same.\n");
     console.log("slimerjs " + aName + " webserver [port]");
-    console.log("  TODO\n");
-    console.log("cat input | slimerjs " + aName + " stream > output");
+    console.log("  Start a Web server on the specified port (default:3141)");
+    console.log("  See the TeXZilla wiki for details.\n");
+    console.log("cat input | slimerjs " + aName + " streamfilter > output");
     console.log("  TODO\n");
   }
 
   if (args.length >= 3 && args[1] === "parser") {
-    var tex = args[2];
-    var display = (args.length >= 4 ? args[3] === "true" : false);
-    var RTL = (args.length >= 5 ? args[4] === "true" : false);
-    var throwException = (args.length >= 6 ? args[5] === "true" : false);
+    // Parse the string and print the output.
+    tex = args[2];
+    display = (args.length >= 4 ? args[3] === "true" : false);
+    RTL = (args.length >= 5 ? args[4] === "true" : false);
+    throwException = (args.length >= 6 ? args[5] === "true" : false);
     try {
       console.log(TeXZilla.toMathMLString(tex, display, RTL, throwException));
     } catch(e) {
-      /* FIXME: This should probably call exit with status 1.
-         https://github.com/fred-wang/TeXZilla/issues/6 */
+      // FIXME: This should probably call exit with status 1.
+      // https://github.com/fred-wang/TeXZilla/issues/6
+      console.log(e);
+    }
+  } else if (args.length >= 2 && args[1] === "webserver") {
+    // Run a Web server.
+    try {
+      var port = (args.length >= 3 ? parseInt(args[2]) : 3141);
+      server = webserver.create();
+      server.listen(port, function(request, response) {
+        response.statusCode = 200;
+        if (request.method === "GET") {
+          // Decode the query string.
+          var query = request.url.split("?")[1];
+          if (query) {
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+              var pair = vars[i].split("=");
+              var key = decodeURIComponent(pair[0]).toLowerCase();
+              var value = decodeURIComponent(pair[1]);
+              if (key === "tex") {
+                tex = value;
+              } else if (key === "display") {
+                display = (value === "true");
+              } else if (key === "rtl") {
+                RTL = (value === "true");
+              } else if (key === "exception") {
+                throwException = (value === "true");
+              }
+            }
+          }
+        } else if (request.method === "POST") {
+          var json = JSON.parse(request.post)
+          tex = json.tex;
+          display = (json.display === "true");
+          RTL = (json.rtl === "true");
+          throwException = (json.exception === "true");
+        }
+ 	if (tex === undefined) {
+          response.close();
+          return;
+        }
+        var data = { tex: tex };
+        try {
+          data.mathml = TeXZilla.toMathMLString(tex, display, RTL, throwException);
+          data.exception = null;
+        } catch(e) {
+          data.exception = e.message;
+        }
+        response.write(JSON.stringify(data));
+        response.close();
+      });
+      console.log("Web server started on http://localhost:" + port);
+    } catch (e) {
+      // FIXME: This should probably call exit with status 1.
+      // https://github.com/fred-wang/TeXZilla/issues/6
       console.log(e);
     }
   } else {
-    /* FIXME: add a stream filter and web server
-       https://github.com/fred-wang/TeXZilla/issues/7 */
+    // FIXME: add a stream filter and web server
+    // https://github.com/fred-wang/TeXZilla/issues/7
     usage(args[0]);
   }
 
-  /* FIXME: We should use a standard commoneJS syntax for exit.
-     https://github.com/fred-wang/TeXZilla/issues/6 */
-  if (slimer) {
-    slimer.exit()
-  } else if (phantom) {
-    phantom.exit()
-  }
+  if (server === null) {
+    // FIXME: We should use a standard commoneJS syntax for exit.
+    // https://github.com/fred-wang/TeXZilla/issues/6
+    if (slimer) {
+      slimer.exit();
+    } else if (phantom) {
+      phantom.exit();
+    }
+  } 
 }
