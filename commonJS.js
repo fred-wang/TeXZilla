@@ -16,21 +16,6 @@ if (typeof require !== "undefined") {
       RTL,
       throwException;
 
-    var usage = function (aName) {
-      console.log("\nUsage:\n");
-      console.log("commonjs " + aName + " [help]");
-      console.log("  Print this help message.\n");
-      console.log("commonjs " + aName + " parser aTeX [aDisplay] [aRTL] [aThrowExceptionOnError]");
-      console.log("  Print TeXZilla.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError)");
-      console.log("  The interpretation of arguments and the default values are the same.\n");
-      console.log("commonjs " + aName + " webserver [port]");
-      console.log("  Start a Web server on the specified port (default:3141)");
-      console.log("  See the TeXZilla wiki for details.\n");
-      console.log("cat input | commonjs " + aName + " streamfilter > output");
-      console.log("  TODO\n");
-      console.log("  where commonjs is slimerjs, nodejs or phantomjs.");
-    };
-
     if (args.length >= 3 && args[1] === "parser") {
       // Parse the string and print the output.
       tex = args[2];
@@ -112,7 +97,18 @@ if (typeof require !== "undefined") {
     } else {
       // FIXME: add a stream filter.
       // https://github.com/fred-wang/TeXZilla/issues/7
-      usage(args[0]);
+      console.log("\nUsage:\n");
+      console.log("commonjs TeXZilla.js [help]");
+      console.log("  Print this help message.\n");
+      console.log("commonjs TeXZilla.js parser aTeX [aDisplay] [aRTL] [aThrowExceptionOnError]");
+      console.log("  Print TeXZilla.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError)");
+      console.log("  The interpretation of arguments and the default values are the same.\n");
+      console.log("commonjs TeXZilla.js webserver [port]");
+      console.log("  Start a Web server on the specified port (default:3141)");
+      console.log("  See the TeXZilla wiki for details.\n");
+      console.log("cat input | commonjs TeXZilla.js streamfilter > output");
+      console.log("  TODO\n");
+      console.log("  where commonjs is slimerjs, nodejs or phantomjs.");
     }
 
     if (server === null) {
