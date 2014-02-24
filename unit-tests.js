@@ -315,8 +315,4 @@ if (failures > 0) {
 
 // FIXME: we should use a standard commonJS for exit.
 // https://github.com/fred-wang/TeXZilla/issues/6
-if (slimer) {
-    slimer.exit();
-} else if (phantom) {
-    phantom.exit();
-}
+slimer.exit();
