@@ -49,15 +49,21 @@ TeXZilla.jisonlex: main.jisonlex commands.txt
 	echo "[\uDC00-\uDFFF] return \"LOW_SURROGATE\";" >> $@
 	echo ". return \"BMP_CHARACTER\";" >> $@
 
-TeXZilla.js: TeXZilla.jison TeXZilla.jisonlex commonJS.js
+TeXZilla-web.js: TeXZilla.jison TeXZilla.jisonlex
 # Generate the Javascript parser from the Jison grammars.
 	@echo "Generating the parser, this may take some time..."
 	$(JISON) --outfile $@ --module-type js TeXZilla.jison TeXZilla.jisonlex
 	$(SED) -i "s|\\\\b)/|)/|g" $@ # jison issue 204
-	cat MPL-header.js $@ commonJS.js > tmp.js
+	$(SED) -i "s|var TeXZillaWeb =|var TeXZilla =|" $@
+	cat MPL-header.js $@ > tmp.js
 	mv tmp.js $@
 
-TeXZilla-min.js: TeXZilla.js
+TeXZilla.js: TeXZilla-web.js commonJS.js
+# Append the commonJS.js interface to TeXZilla-web.js (without the MPL header).
+	cp TeXZilla-web.js TeXZilla.js
+	$(SED) "1,3d" commonJS.js >> TeXZilla.js
+
+TeXZilla-min.js: TeXZilla-web.js
 # Minify the Javascript parser using Google's Closure Compiler.
 	$(JAVA) -jar $(CLOSURE_COMPILER) $< > tmp.js
 	cat MPL-header.js tmp.js > $@
