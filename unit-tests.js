@@ -308,11 +308,15 @@ if (!success) {
 /* Print test results */
 if (failures > 0) {
     console.log(failures + " test(s) failed (" +
-                unexpectedfailures + " unexpected).")
+                unexpectedfailures + " unexpected).");
 } else {
-    console.log("All tests passed.")
+    console.log("All tests passed.");
 }
 
-// FIXME: use a standard commonJS exit() command?
+// FIXME: we should use a standard commonJS for exit.
 // https://github.com/fred-wang/TeXZilla/issues/6
-slimer.exit()
+if (slimer) {
+    slimer.exit();
+} else if (phantom) {
+    phantom.exit();
+}
