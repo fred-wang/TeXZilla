@@ -39,7 +39,7 @@ The following are required to generate `TeXZilla.js`:
 
 These dependencies are optional:
 
-- To run unit tests: [slimerJS](http://slimerjs.org/)
+- To run unit tests: [slimerJS](http://slimerjs.org/) or [phantomJS](http://phantomjs.org/)
 - To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/) and Java.
 
 To build TeXZilla, update config.cfg and try "make help".

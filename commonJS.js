@@ -2,25 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-if (require !== undefined && exports !== undefined) {
+if (typeof require !== "undefined") {
 
-  exports.setDOMParser = function (aDOMParser) {
-    TeXZilla.DOMParser = aDOMParser;
-  };
+  // FIXME: This tries to work with slimerjs, phantomjs and nodejs. Ideally,
+  // we should have a standard commonJS interface.
+  // https://github.com/fred-wang/TeXZilla/issues/6
 
-  exports.getTeXSource = function () {
-    return TeXZilla.getTeXSource.apply(TeXZilla, arguments);
-  };
-
-  exports.toMathMLString = function () {
-    return TeXZilla.toMathMLString.apply(TeXZilla, arguments);
-  };
-
-  exports.toMathML = function () {
-    return TeXZilla.toMathML.apply(TeXZilla, arguments);
-  };
-
-  exports.main = function commonjsMain(args) {
+  var main = function (args) {
     // Command line API
     var server = null,
       tex,
@@ -30,16 +18,17 @@ if (require !== undefined && exports !== undefined) {
 
     var usage = function (aName) {
       console.log("\nUsage:\n");
-      console.log("slimerjs " + aName + " [help]");
+      console.log("commonjs " + aName + " [help]");
       console.log("  Print this help message.\n");
-      console.log("slimerjs " + aName + " parser aTeX [aDisplay] [aRTL] [aThrowExceptionOnError]");
+      console.log("commonjs " + aName + " parser aTeX [aDisplay] [aRTL] [aThrowExceptionOnError]");
       console.log("  Print TeXZilla.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError)");
       console.log("  The interpretation of arguments and the default values are the same.\n");
-      console.log("slimerjs " + aName + " webserver [port]");
+      console.log("commonjs " + aName + " webserver [port]");
       console.log("  Start a Web server on the specified port (default:3141)");
       console.log("  See the TeXZilla wiki for details.\n");
-      console.log("cat input | slimerjs " + aName + " streamfilter > output");
+      console.log("cat input | commonjs " + aName + " streamfilter > output");
       console.log("  TODO\n");
+      console.log("  where commonjs is slimerjs, nodejs or phantomjs.");
     };
 
     if (args.length >= 3 && args[1] === "parser") {
@@ -51,15 +40,17 @@ if (require !== undefined && exports !== undefined) {
       try {
         console.log(TeXZilla.toMathMLString(tex, display, RTL, throwException));
       } catch (e) {
-        // FIXME: We should use a standard commoneJS syntax for exit.
-        // https://github.com/fred-wang/TeXZilla/issues/6
-        console.log(e);
-        slimer.exit(1);
+        if (typeof process != "undefined") {
+          process.exit(1);
+        } else if (typeof slimer != "undefined") {
+          slimer.exit(1);
+        } else if (typeof phantom != "undefined") {
+          phantom.exit(1);
+        }
       }
     } else if (args.length >= 2 && args[1] === "webserver") {
       // Run a Web server.
-      // FIXME: We should use a standard commonJS module to create a Web server.
-      // https://github.com/fred-wang/TeXZilla/issues/6
+      // FIXME: module "webserver" is not available in nodejs.
       try {
         var port = (args.length >= 3 ? parseInt(args[2], 10) : 3141);
         server = require("webserver").create();
@@ -109,9 +100,14 @@ if (require !== undefined && exports !== undefined) {
         });
         console.log("Web server started on http://localhost:" + port);
       } catch (e) {
-        // FIXME: This should probably call exit with status 1.
-        // https://github.com/fred-wang/TeXZilla/issues/6
         console.log(e);
+        if (typeof process != "undefined") {
+          process.exit(1);
+        } else if (typeof slimer != "undefined") {
+          slimer.exit(1);
+        } else if (typeof phantom != "undefined") {
+          phantom.exit(1);
+        }
       }
     } else {
       // FIXME: add a stream filter.
@@ -120,15 +116,44 @@ if (require !== undefined && exports !== undefined) {
     }
 
     if (server === null) {
-      // FIXME: We should use a standard commoneJS syntax for exit.
-      // https://github.com/fred-wang/TeXZilla/issues/6
-      slimer.exit();
+      if (typeof process != "undefined") {
+        process.exit();
+      } else if (typeof slimer != "undefined") {
+        slimer.exit();
+      } else if (typeof phantom != "undefined") {
+        phantom.exit();
+      }
     }
   };
 
-  if (module !== undefined && require.main === module) {
-    // FIXME: We should use a standard commonJS syntax for reading command
-    // line arguments. https://github.com/fred-wang/TeXZilla/issues/6
-    exports.main(require("system").args);
+  if (typeof exports !== "undefined") {
+    exports.setDOMParser = function (aDOMParser) {
+      TeXZilla.DOMParser = aDOMParser;
+    };
+
+    exports.getTeXSource = function () {
+      return TeXZilla.getTeXSource.apply(TeXZilla, arguments);
+    };
+
+    exports.toMathMLString = function () {
+      return TeXZilla.toMathMLString.apply(TeXZilla, arguments);
+    };
+
+    exports.toMathML = function () {
+      return TeXZilla.toMathML.apply(TeXZilla, arguments);
+    };
+
+    exports.main = main;
+  }
+
+  if (typeof exports === "undefined" ||
+      (typeof module !== "undefined" && require.main === module)) {
+    var args;
+    if (typeof process !== "undefined") {
+      args = process.argv.slice(1);
+    } else {
+      args = require("system").args;
+    }
+    main(args);
   }
 }
