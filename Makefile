@@ -59,9 +59,9 @@ TeXZilla-web.js: TeXZilla.jison TeXZilla.jisonlex
 	mv tmp.js $@
 
 TeXZilla.js: TeXZilla-web.js commonJS.js
-# Append the commonJS.js interface to TeXZilla-web.js (without the MPL header).
+# Append the commonJS.js interface to TeXZilla-web.js (without the header).
 	cp TeXZilla-web.js TeXZilla.js
-	$(SED) "1,3d" commonJS.js >> TeXZilla.js
+	$(SED) "1,6d" commonJS.js >> TeXZilla.js
 
 TeXZilla-min.js: TeXZilla-web.js
 # Minify the Javascript parser using Google's Closure Compiler.
