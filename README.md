@@ -11,7 +11,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Description
 -----------
 
-TeXZilla is a Javascript TeX-to-MathML converter compatible
+TeXZilla is a Javascript LaTeX-to-MathML converter compatible
 with Unicode. This is still a work in progress and things may change in the
 future. Please report any bug you find to the
 [issue tracker](https://github.com/fred-wang/TeXZilla/issues?state=open).

@@ -27,11 +27,10 @@ $MAKE minify
 
 # Remove all but the files to include in the release.
 rm .gitignore
-ls | egrep -v "README.md|TeXZilla.js|TeXZilla-min.js|examples|index.html" | xargs rm
+ls | egrep -v "README-release.txt|TeXZilla.js|TeXZilla-min.js|examples|index.html" | xargs rm
 
-# Remove the Build Instructions from the README file.
-$SED -n "/Build Instructions/q;p" README.md > README.tmp
-mv README.tmp README.md
+# Set the version in the README-release.txt
+$SED -i s/RELEASENUMBER/$RELEASENUMBER/ README-release.txt
 
 # Commit the changes.
 $GIT add --no-ignore-removal .
