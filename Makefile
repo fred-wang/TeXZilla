@@ -52,16 +52,16 @@ TeXZilla.jisonlex: main.jisonlex commands.txt
 TeXZilla-web.js: TeXZilla.jison TeXZilla.jisonlex
 # Generate the Javascript parser from the Jison grammars.
 	@echo "Generating the parser, this may take some time..."
-	$(JISON) --outfile $@ --module-type js TeXZilla.jison TeXZilla.jisonlex
+	$(JISON) --outfile $@ --module-type js --parser-type lalr TeXZilla.jison TeXZilla.jisonlex
 	$(SED) -i "s|\\\\b)/|)/|g" $@ # jison issue 204
 	$(SED) -i "s|var TeXZillaWeb =|var TeXZilla =|" $@
 	cat MPL-header.js $@ > tmp.js
 	mv tmp.js $@
 
 TeXZilla.js: TeXZilla-web.js commonJS.js
-# Append the commonJS.js interface to TeXZilla-web.js (without the MPL header).
+# Append the commonJS.js interface to TeXZilla-web.js (without the header).
 	cp TeXZilla-web.js TeXZilla.js
-	$(SED) "1,3d" commonJS.js >> TeXZilla.js
+	$(SED) "1,6d" commonJS.js >> TeXZilla.js
 
 TeXZilla-min.js: TeXZilla-web.js
 # Minify the Javascript parser using Google's Closure Compiler.
@@ -81,7 +81,7 @@ all: tests build
 clean:
 # Remove all generated files except unicode.xml and LaTeX-min.js
 	rm -f chars.txt char-commands.txt commands.txt \
-	TeXZilla.jisonlex TeXZilla.js
+	TeXZilla.jisonlex TeXZilla.js TeXZilla-web.js
 
 distclean: clean
 # Remove all generated files.
