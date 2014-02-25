@@ -81,7 +81,7 @@ all: tests build
 clean:
 # Remove all generated files except unicode.xml and LaTeX-min.js
 	rm -f chars.txt char-commands.txt commands.txt \
-	TeXZilla.jisonlex TeXZilla.js
+	TeXZilla.jisonlex TeXZilla.js TeXZilla-web.js
 
 distclean: clean
 # Remove all generated files.
