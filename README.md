@@ -11,7 +11,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Description
 -----------
 
-TeXZilla is a Javascript TeX-to-MathML converter compatible
+TeXZilla is a Javascript LaTeX-to-MathML converter compatible
 with Unicode. This is still a work in progress and things may change in the
 future. Please report any bug you find to the
 [issue tracker](https://github.com/fred-wang/TeXZilla/issues?state=open).
@@ -39,7 +39,7 @@ The following are required to generate `TeXZilla.js`:
 
 These dependencies are optional:
 
-- To run unit tests: [slimerJS](http://slimerjs.org/)
+- To run unit tests: [slimerJS](http://slimerjs.org/) or [phantomJS](http://phantomjs.org/)
 - To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/) and Java.
 
 To build TeXZilla, update config.cfg and try "make help".
