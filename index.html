@@ -136,14 +136,21 @@
       {
         var input = document.getElementById("input");
         var output = document.getElementById("output");
-        while (output.firstElementChild)
-          output.removeChild(output.firstElementChild);
+        while (output.firstChild)
+          output.removeChild(output.firstChild);
         if (aValue) input.value = aValue;
-        var math = TeXZilla.
-          toMathML(input.value,
-                   document.getElementById("mode").value === "display",
-                   document.getElementById("dir").value === "RTL");
-        output.appendChild(math);
+        if (!TeXZilla) throw "TeXZilla is not defined. Did you do 'make minify'?";
+        try {
+          output.style.color = "inherit";
+          var math = TeXZilla.
+            toMathML(input.value,
+                     document.getElementById("mode").value === "display",
+                     document.getElementById("dir").value === "RTL", true);
+          output.appendChild(math);
+        } catch(e) {
+          output.style.color = "red";
+          output.textContent = input.value;
+        }
       }
 
       function updateMathFont()
@@ -323,7 +330,7 @@ c_n & c_{n+1} & c_{n+2} & \dots & c_{2n}
     <option value="XITS">XITS (experimental)</option>
   </select> (see <a href="https://developer.mozilla.org/en-US/docs/Mozilla/MathML_Project/Fonts">Fonts for Mozilla's MathML engine</a>)
     </p>
-      <textarea id="input" cols="80" rows="5" onchange="update()" dir="ltr"></textarea>
+      <textarea id="input" cols="80" rows="5" onkeyup="update()" onchange="update()" dir="ltr"></textarea>
 
     <div id="output"></div>
 
