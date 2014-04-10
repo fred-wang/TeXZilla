@@ -330,7 +330,7 @@ c_n & c_{n+1} & c_{n+2} & \dots & c_{2n}
     <option value="XITS">XITS (experimental)</option>
   </select> (see <a href="https://developer.mozilla.org/en-US/docs/Mozilla/MathML_Project/Fonts">Fonts for Mozilla's MathML engine</a>)
     </p>
-      <textarea id="input" cols="80" rows="5" onkeyup="update()" onchange="update()" dir="ltr"></textarea>
+      <textarea id="input" cols="80" rows="5" oninput="update()" dir="ltr"></textarea>
 
     <div id="output"></div>
 
@@ -343,7 +343,7 @@ c_n & c_{n+1} & c_{n+2} & \dots & c_{2n}
         by asking TeXZilla to throw an exception when the parsing fails.</li>
       <li><a href="examples/convertClientSide.html">Convert the TeX source when the DOM is ready</a> using <a href="examples/TeXZilla-parse.js">TeXZilla-parse.js</a></li>
       <li>Using a custom
-        <a href="http://fred-wang.github.io/x-tex/demo/">&lt;x-tex&gt</a> tag
+        <a href="http://fred-wang.github.io/x-tex/demo/">&lt;x-tex&gt;</a> tag
         that automaticaly converts its TeX content into MathML.</li>
       <li><a href="examples/commonJS.js">Basic commonJS program</a> using TeXZilla.</li>
       <li><a href="examples/commonJS-DOMParser.js">Another commonJS program</a> using TeXZilla that requires a DOMParser instance to work.</li>

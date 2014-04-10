@@ -15,13 +15,34 @@ function escapeQuote(aString) {
 
 function parseLength(aString) {
   /* See http://www.w3.org/TR/MathML3/appendixa.html#parsing_length */
-  /* FIXME: should namedspaces be accepted too?
-    https://github.com/fred-wang/TeXZilla/issues/8 */
-  var lengthRegexp = /\s*(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?\s*/, result = lengthRegexp.exec(aString);
+  aString = aString.trim();
+  var lengthRegexp = /(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?/, result = lengthRegexp.exec(aString);
   if (result) {
-    result = { l: parseFloat(result[1]), u: result[2] };
+    result[1] = parseFloat(result[1]);
+    if (!result[2]) {
+      /* Unitless values are treated as a percent */
+      result[1] *= 100;
+      result[2] = "%";
+    }
+    return { l: result[1], u: result[2] };
   }
-  return result;
+  var index = [
+    "negativeveryverythinmathspace",
+    "negativeverythinmathspace",
+    "negativemediummathspace",
+    "negativethickmathspace",
+    "negativeverythickmathspace",
+    "negativeveryverythickmathspace",
+    "",
+    "veryverythinmathspace",
+    "verythinmathspace",
+    "thinmathspace",
+    "mediummathspace",
+    "thickmathspace",
+    "verythickmathspace",
+    "veryverythickmathspace"
+  ].indexOf(aString);
+  return { l: (index === -1 ? 0 : index - 6) / 18.0, u: "em" };
 }
 
 function newTag(aTag, aContent, aAttributes) {
