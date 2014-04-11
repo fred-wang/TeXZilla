@@ -2,10 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-%x TRYOPTARG TEXTOPTARG TEXTARG 
+%x DOCUMENT TRYOPTARG TEXTOPTARG TEXTARG
 %s OPTARG
 
 %%
+
+<DOCUMENT>. return "CHAR";
+<DOCUMENT><<EOF>> return "EOF";
+<DOCUMENT>"$$"|"\\["|"$"|"\\(" {
+  this.pushState("INITIAL");
+  return "STARTMATH" + (2 * (yytext[0] == "$") + yytext.length - 1);
+}
 
 <TRYOPTARG>\s*"[" { this.popState(); return "["; }
 <TRYOPTARG>. { this.unput(yytext); this.popState(); this.popState(); }
@@ -20,6 +27,10 @@
 <OPTARG>"]" { this.popState(); return "]"; }
 
 \s+ /* skip whitespace */
+"$$"|"\\]"|"$"|"\\)" {
+  this.popState();
+  return "ENDMATH" +  (2 * (yytext[0] == "$") + yytext.length - 1);
+}
 "{" return "{";
 "}" return "}";
 "^" return "^";

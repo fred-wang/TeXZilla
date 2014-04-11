@@ -189,6 +189,18 @@ parser.toMathML = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
   /* Parse the TeX string into a <math> element. */
   return this.parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError));
 }
+
+parser.parseString = function(aString) {
+  var oldSetInput = this.lexer.setInput;
+  this.lexer.setInput = function(aInput) {
+    oldSetInput.call(this, aInput);
+    this.conditionStack = ['DOCUMENT'];
+  }
+  var result = this.parse(aString);
+  this.lexer.setInput = oldSetInput;
+  return result;
+}
+
 %}
 
 /* Operator associations and precedence. */
@@ -797,5 +809,38 @@ math
   | EOF {
     $$ = "<mrow/>";
     return $$;
+  }
+  ;
+
+document
+  : document documentItem EOF {
+    $$ = $1 + $2;
+    return $$;
+  }
+  | documentItem EOF {
+    $$ = $1;
+    return $$
+  }
+  | EOF {
+    $$ = "";
+    return $$;
+  }
+  ;
+
+documentItem
+  : CHAR {
+    $$ = $1;
+  }
+  | STARTMATH0 styledExpression ENDMATH0 {
+    $$ = "<math>" + $2 + "</math>";
+  }
+  | STARTMATH1 styledExpression ENDMATH1 {
+    $$ = "<math display=\"block\">" + $2 + "</math>";
+  }
+  | STARTMATH2 styledExpression ENDMATH2 {
+    $$ = "<math>" + $2 + "</math>";
+  }
+  | STARTMATH3 styledExpression ENDMATH3 {
+    $$ = "<math display=\"block\">" + $2 + "</math>";
   }
   ;
