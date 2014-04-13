@@ -353,7 +353,7 @@ arrayoptList
 
 /* list of row options */
 rowoptList
-  : rowopt { $$ = $1 }
+  : rowopt { $$ = $1; }
   | rowoptList rowopt { $$ = $1 + " " + $2; }
   ;
 
@@ -739,7 +739,7 @@ subsupTerm
 /* list of subsup terms */
 subsupList
   : subsupTerm { $$ = $1; }
-  | subsupList subsupTerm { $$ = $1 + $2 }
+  | subsupList subsupTerm { $$ = $1 + $2; }
   ;
 
 /* text style */
@@ -785,7 +785,7 @@ tableRow
 /* list of table rows */
 tableRowList
   : tableRow { $$ = $1; }
-  | tableRowList ROWSEP tableRow { $$ = $1 + $3 }
+  | tableRowList ROWSEP tableRow { $$ = $1 + $3; }
   ;
 
 /* main math expression (list of styled expressions) */
