@@ -57,7 +57,7 @@ var tests = [
     ["\\itexnum{blah}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>blah</mn><annotation encoding="TeX">\\itexnum{blah}</annotation></semantics></math>'],
     /* whitespace collapse. Note: the leading/trailing space in the mtext
        output are no-break space. */
-    ["\\mtext{  x   y  }", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext> x y </mtext><annotation encoding="TeX">\\mtext{  x   y  }</annotation></semantics></math>'],
+    ["\\mtext{  x   y  }", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext> x y </mtext><annotation encoding="TeX">\\mtext{  x   y  }</annotation></semantics></math>'],
     /* escaped characters */
     ["\\mtext{2i\\}fzx\\\\}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext>2i}fzx\\</mtext><annotation encoding="TeX">\\mtext{2i\\}fzx\\\\}</annotation></semantics></math>'],
     /* escape > that could lead to invalid XML */
