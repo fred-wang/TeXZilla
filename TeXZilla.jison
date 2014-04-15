@@ -251,7 +251,7 @@ tokenContent
        replace trailing/leading whitespace by no-break space so that people can
        write e.g. \text{ if }. We also collapse internal whitespace here.
        See https://github.com/fred-wang/TeXZilla/issues/25. */
-    $$ = $1.replace(/^\s+|\s+$/g, "\u00A0").replace(/\s+/g, " ");
+    $$ = $1.replace(/\s+/g, " ").replace(/^ | $/g, "\u00A0");
   }
   ;
 
