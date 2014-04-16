@@ -20,8 +20,10 @@ For a quick overview, you can try a
 [live demo](http://fred-wang.github.io/TeXZilla/), install
 [a Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/texzilla/),
 try [a Firefox OS webapp](http://r-gaia-cs.github.io/TeXZilla-webapp/),
-check this page with [custom &lt;x-tex&gt; tag](http://fred-wang.github.io/x-tex/demo/)
-or download the [pre-releases](https://github.com/fred-wang/TeXZilla/releases).
+check this page with [custom &lt;x-tex&gt; tag](http://fred-wang.github.io/x-tex/demo/).
+
+You can download a [release archive](https://github.com/fred-wang/TeXZilla/releases) or
+install an [npm](https://www.npmjs.org/package/texzilla) package.
 
 Please read the [wiki](https://github.com/fred-wang/TeXZilla/wiki) to get more
 information on how to integrate TeXZilla in your Web page or project as well

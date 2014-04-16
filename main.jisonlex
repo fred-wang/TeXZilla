@@ -26,7 +26,7 @@
 "_" return "_";
 "." return ".";
 "&" return "COLSEP";
-"\\\\" return "ROWSEP"
+"\\\\" return "ROWSEP";
 <<EOF>> return "EOF";
 
 /* Numbers */

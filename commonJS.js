@@ -193,6 +193,10 @@ if (typeof require !== "undefined") {
       return TeXZilla.toMathML.apply(TeXZilla, arguments);
     };
 
+    exports.toImage = function () {
+      return TeXZilla.toImage.apply(TeXZilla, arguments);
+    };
+
     exports.main = main;
   }
 

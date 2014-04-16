@@ -15,13 +15,34 @@ function escapeQuote(aString) {
 
 function parseLength(aString) {
   /* See http://www.w3.org/TR/MathML3/appendixa.html#parsing_length */
-  /* FIXME: should namedspaces be accepted too?
-    https://github.com/fred-wang/TeXZilla/issues/8 */
-  var lengthRegexp = /\s*(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?\s*/, result = lengthRegexp.exec(aString);
+  aString = aString.trim();
+  var lengthRegexp = /(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?/, result = lengthRegexp.exec(aString);
   if (result) {
-    result = { l: parseFloat(result[1]), u: result[2] };
+    result[1] = parseFloat(result[1]);
+    if (!result[2]) {
+      /* Unitless values are treated as a percent */
+      result[1] *= 100;
+      result[2] = "%";
+    }
+    return { l: result[1], u: result[2] };
   }
-  return result;
+  var index = [
+    "negativeveryverythinmathspace",
+    "negativeverythinmathspace",
+    "negativemediummathspace",
+    "negativethickmathspace",
+    "negativeverythickmathspace",
+    "negativeveryverythickmathspace",
+    "",
+    "veryverythinmathspace",
+    "verythinmathspace",
+    "thinmathspace",
+    "mediummathspace",
+    "thickmathspace",
+    "verythickmathspace",
+    "veryverythickmathspace"
+  ].indexOf(aString);
+  return { l: (index === -1 ? 0 : index - 6) / 18.0, u: "em" };
 }
 
 function newTag(aTag, aContent, aAttributes) {
@@ -168,6 +189,65 @@ parser.toMathML = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
   /* Parse the TeX string into a <math> element. */
   return this.parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError));
 }
+
+function escapeHTML(aString)
+{
+    var rv = "", code1, code2;
+    for (var i = 0; i < aString.length; i++) {
+        var code1 = aString.charCodeAt(i);
+        if (code1 < 0x80) {
+          rv += aString.charAt(i);
+          continue;
+        }
+        if (0xD800 <= code1 && code1 <= 0xDBFF) {
+          i++;
+          code2 = aString.charCodeAt(i);
+          rv += "&#x" +
+             ((code1-0xD800)*0x400 + code2-0xDC00 + 0x10000).toString(16) + ";";
+          continue;
+        }
+        rv += "&#x" + code1.toString(16) + ";";
+    }
+    return rv;
+}
+
+parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
+  var div, box, svgWidth, svgHeight, math, svg, image;
+  if (aSize === undefined) {
+    aSize = 64;
+  }
+  if (aDocument === undefined) {
+    aDocument = window.document;
+  }
+  math = this.toMathML(aTeX, true, aRTL);
+  math.setAttribute("mathsize", aSize + "px");
+
+  div = document.createElement("div");
+  div.style.visibility = "hidden";
+  div.style.position = "absolute";
+  div.appendChild(math);
+  aDocument.body.appendChild(div);
+  box = math.getBoundingClientRect();
+  aDocument.body.removeChild(div);
+
+  if (aRoundToPowerOfTwo) {
+    svgWidth = Math.pow(2, Math.ceil(Math.log2(box.width)));
+    svgHeight = Math.pow(2, Math.ceil(Math.log2(box.height)));
+  } else {
+    svgWidth = Math.ceil(box.width);
+    svgHeight = Math.ceil(box.height);
+  }
+  svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + svgWidth + "px\" height=\""+ svgHeight + "px\"><g transform=\"translate(" + (svgWidth - box.width) / 2.0 + "," + (svgHeight - box.height) / 2.0 + ")\"><foreignObject width=\"" + box.width + "\" height=\"" + box.height + "\">" + escapeHTML(math.outerHTML) + "</foreignObject></g></svg>";
+
+  image = new Image();
+  image.src = "data:image/svg+xml;base64," + window.btoa(svg);
+
+  image.width = svgWidth;
+  image.height = svgHeight;
+  image.alt = escapeText(aTeX);
+  return image;
+}
+
 %}
 
 /* Operator associations and precedence. */
@@ -230,7 +310,7 @@ tokenContent
        replace trailing/leading whitespace by no-break space so that people can
        write e.g. \text{ if }. We also collapse internal whitespace here.
        See https://github.com/fred-wang/TeXZilla/issues/25. */
-    $$ = $1.replace(/^\s+|\s+$/g, "\u00A0").replace(/\s+/g, " ");
+    $$ = $1.replace(/\s+/g, " ").replace(/^ | $/g, "\u00A0");
   }
   ;
 
@@ -332,7 +412,7 @@ arrayoptList
 
 /* list of row options */
 rowoptList
-  : rowopt { $$ = $1 }
+  : rowopt { $$ = $1; }
   | rowoptList rowopt { $$ = $1 + " " + $2; }
   ;
 
@@ -664,13 +744,16 @@ compoundTerm
   | closedTerm "^" closedTerm "_" closedTerm {
     $$ = newScript(false, $1, $5, $3);
   }
+  | closedTerm OPP "_" closedTerm {
+    $$ = newScript(false, $1, $4, newMo($2));
+  }
   | closedTerm "_" closedTerm {
     $$ = newScript(false, $1, $3, null);
   }
   | closedTerm "^" closedTerm {
     $$ = newScript(false, $1, null, $3);
   }
-  | closedTerm OOP {
+  | closedTerm OPP {
     $$ = newScript(false, $1, null, newMo($2));
   }
   | closedTerm { $$ = $1; }
@@ -687,7 +770,6 @@ compoundTerm
     $$ = newScript(true, $1, null, $3);
   }
   | opm { $$ = $1; }
-  | OPP { $$ = newMo($1); }
   ;
 
 opm
@@ -718,7 +800,7 @@ subsupTerm
 /* list of subsup terms */
 subsupList
   : subsupTerm { $$ = $1; }
-  | subsupList subsupTerm { $$ = $1 + $2 }
+  | subsupList subsupTerm { $$ = $1 + $2; }
   ;
 
 /* text style */
@@ -764,7 +846,7 @@ tableRow
 /* list of table rows */
 tableRowList
   : tableRow { $$ = $1; }
-  | tableRowList ROWSEP tableRow { $$ = $1 + $3 }
+  | tableRowList ROWSEP tableRow { $$ = $1 + $3; }
   ;
 
 /* main math expression (list of styled expressions) */
