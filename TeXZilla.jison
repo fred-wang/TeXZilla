@@ -685,6 +685,9 @@ compoundTerm
   | closedTerm "^" closedTerm "_" closedTerm {
     $$ = newScript(false, $1, $5, $3);
   }
+  | closedTerm OPP "_" closedTerm {
+    $$ = newScript(false, $1, $4, newMo($2));
+  }
   | closedTerm "_" closedTerm {
     $$ = newScript(false, $1, $3, null);
   }
