@@ -202,9 +202,9 @@ var tests = [
   /* char commands */
   [". - + \\# , : ! = ~ ; ? # ` *", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>.</mo><mo>-</mo><mo>+</mo><mo>#</mo><mo>,</mo><mo>:</mo><mo>!</mo><mo>=</mo><mo stretchy="false">~</mo><mo>;</mo><mo>?</mo><mo>#</mo><mo>`</mo><mo>*</mo></mrow><annotation encoding="TeX">. - + \\# , : ! = ~ ; ? # ` *</annotation></semantics></math>'],
   /* primes */
-  ["\\prime ' '' ''' ''''", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>′</mo><mo>′</mo><mo>″</mo><mo>‴</mo><mo>⁗</mo></mrow><annotation encoding="TeX">\\prime \' \'\' \'\'\' \'\'\'\'</annotation></semantics></math>'],
+  ["f\\prime f' f'' f''' f''''", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>f</mi><mo>′</mo></msup><msup><mi>f</mi><mo>′</mo></msup><msup><mi>f</mi><mo>″</mo></msup><msup><mi>f</mi><mo>‴</mo></msup><msup><mi>f</mi><mo>⁗</mo></msup></mrow><annotation encoding="TeX">f\\prime f\' f\'\' f\'\'\' f\'\'\'\'</annotation></semantics></math>'],
   /* char commands */
-    ["\\omicron \\epsilon \\cdot", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℴ</mi><mi>ϵ</mi><mo>⋅</mo></mrow><annotation encoding="TeX">\\omicron \\epsilon \\cdot</annotation></semantics></math>'],
+  ["\\omicron \\epsilon \\cdot", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℴ</mi><mi>ϵ</mi><mo>⋅</mo></mrow><annotation encoding="TeX">\\omicron \\epsilon \\cdot</annotation></semantics></math>'],
 
   /* char commands */
   /* https://github.com/fred-wang/TeXZilla/issues/5 */

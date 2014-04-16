@@ -691,7 +691,7 @@ compoundTerm
   | closedTerm "^" closedTerm {
     $$ = newScript(false, $1, null, $3);
   }
-  | closedTerm OOP {
+  | closedTerm OPP {
     $$ = newScript(false, $1, null, newMo($2));
   }
   | closedTerm { $$ = $1; }
@@ -708,7 +708,6 @@ compoundTerm
     $$ = newScript(true, $1, null, $3);
   }
   | opm { $$ = $1; }
-  | OPP { $$ = newMo($1); }
   ;
 
 opm
