@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>TeXZilla.toImage</title>
+    <meta charset="utf-8"/>
+    <!-- This Source Code Form is subject to the terms of the Mozilla Public
+         License, v. 2.0. If a copy of the MPL was not distributed with this
+         file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+    <script type="text/javascript" src="../TeXZilla-min.js"></script>
+    <script type="text/javascript">
+      window.addEventListener("load", function() {
+        var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        var image =
+          TeXZilla.toImage("\\vec{F} = G \\frac{m_1 m_2}{r^2} \\mathbf{u}");
+        image.onload = function() {
+          context.drawImage(image,
+                            (canvas.width - image.width) / 2,
+                            (canvas.height - image.height) / 2);
+        }
+      });
+    </script>
+  </head>
+  <body>
+
+    <h1>TeXZilla.toImage</h1>
+
+    <p>This page contains a <code>&lt;canvas&gt;</code>. A mathematical
+      equation is inserted at the center using the following code:</p>
+
+<pre>
+  var image =
+    TeXZilla.toImage("\\vec{F} = G \\frac{m_1 m_2}{r^2} \\mathbf{u}");
+  image.onload = function() {
+    context.drawImage(image,
+                      (canvas.width - image.width) / 2,
+                      (canvas.height - image.height) / 2);
+</pre>
+
+    <canvas id="canvas" width="600" height="300"
+            style="border: 1px solid black;">
+    </canvas>
+
+  </body>
+</html>

@@ -189,6 +189,65 @@ parser.toMathML = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
   /* Parse the TeX string into a <math> element. */
   return this.parseMathMLDocument(this.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError));
 }
+
+function escapeHTML(aString)
+{
+    var rv = "", code1, code2;
+    for (var i = 0; i < aString.length; i++) {
+        var code1 = aString.charCodeAt(i);
+        if (code1 < 0x80) {
+          rv += aString.charAt(i);
+          continue;
+        }
+        if (0xD800 <= code1 && code1 <= 0xDBFF) {
+          i++;
+          code2 = aString.charCodeAt(i);
+          rv += "&#x" +
+             ((code1-0xD800)*0x400 + code2-0xDC00 + 0x10000).toString(16) + ";";
+          continue;
+        }
+        rv += "&#x" + code1.toString(16) + ";";
+    }
+    return rv;
+}
+
+parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
+  var div, box, svgWidth, svgHeight, math, svg, image;
+  if (aSize === undefined) {
+    aSize = 64;
+  }
+  if (aDocument === undefined) {
+    aDocument = window.document;
+  }
+  math = this.toMathML(aTeX, true, aRTL);
+  math.setAttribute("mathsize", aSize + "px");
+
+  div = document.createElement("div");
+  div.style.visibility = "hidden";
+  div.style.position = "absolute";
+  div.appendChild(math);
+  aDocument.body.appendChild(div);
+  box = math.getBoundingClientRect();
+  aDocument.body.removeChild(div);
+
+  if (aRoundToPowerOfTwo) {
+    svgWidth = Math.pow(2, Math.ceil(Math.log2(box.width)));
+    svgHeight = Math.pow(2, Math.ceil(Math.log2(box.height)));
+  } else {
+    svgWidth = Math.ceil(box.width);
+    svgHeight = Math.ceil(box.height);
+  }
+  svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + svgWidth + "px\" height=\""+ svgHeight + "px\"><g transform=\"translate(" + (svgWidth - box.width) / 2.0 + "," + (svgHeight - box.height) / 2.0 + ")\"><foreignObject width=\"" + box.width + "\" height=\"" + box.height + "\">" + escapeHTML(math.outerHTML) + "</foreignObject></g></svg>";
+
+  image = new Image();
+  image.src = "data:image/svg+xml;base64," + window.btoa(svg);
+
+  image.width = svgWidth;
+  image.height = svgHeight;
+  image.alt = escapeText(aTeX);
+  return image;
+}
+
 %}
 
 /* Operator associations and precedence. */
