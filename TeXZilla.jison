@@ -153,7 +153,7 @@ try {
 
 // Initialize some Node constants if they are not defined.
 if (typeof Node === "undefined") {
-  Node = { ELEMENT_NODE: 1, TEXT_NODE: 3 };
+  var Node = { ELEMENT_NODE: 1, TEXT_NODE: 3 };
 }
 
 parser.parseMathMLDocument = function (aString) {
@@ -283,9 +283,11 @@ parser.filterElement = function(aElement, aThrowExceptionOnError) {
         this.filterElement(node, aThrowExceptionOnError);
       break;
       case Node.TEXT_NODE:
+        this.yy.escapeXML = true;
         root = this.DOMParser.parseFromString("<root>" +
                TeXZilla.filterString(node.data, aThrowExceptionOnError) +
                "</root>", "application/xml").documentElement;
+        this.yy.escapeXML = false;
         while (child = root.firstChild) {
           aElement.insertBefore(root.removeChild(child), node);
         }
@@ -916,7 +918,7 @@ documentItemList
   ;
 
 documentItem
-  : CHAR {
+  : TEXT {
     $$ = $1;
   }
   | STARTMATH0 ENDMATH0 {

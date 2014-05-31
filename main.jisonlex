@@ -16,7 +16,14 @@
                        (yytext[1] == "$" || yytext[1] == "["));
 }
 <DOCUMENT><<EOF>> { this.popState(); return "EOF"; }
-<DOCUMENT>[^] return "CHAR";
+<DOCUMENT>"\\"[$\[\]] { yytext = yytext[1]; return "TEXT"; }
+<DOCUMENT>[<&>] {
+  if (yy.escapeXML) {
+    yytext = escapeText(yytext);
+  }
+  return "TEXT";
+}
+<DOCUMENT>[^] return "TEXT";
 
 <TRYOPTARG>\s*"[" { this.popState(); return "["; }
 <TRYOPTARG>. { this.unput(yytext); this.popState(); this.popState(); }
