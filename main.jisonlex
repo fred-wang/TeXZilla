@@ -3,16 +3,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 %x DOCUMENT TRYOPTARG TEXTOPTARG TEXTARG
-%s OPTARG
+%s MATH OPTARG
 
 %%
 
-<DOCUMENT>. return "CHAR";
-<DOCUMENT><<EOF>> return "EOF";
+<INITIAL>. { this.unput(yytext); this.pushState("DOCUMENT"); }
+
 <DOCUMENT>"$$"|"\\["|"$"|"\\(" {
-  this.pushState("INITIAL");
-  return "STARTMATH" + (2 * (yytext[0] == "$") + yytext.length - 1);
+  this.pushState("MATH");
+  yy.startMath = this.matched.length;
+  return "STARTMATH" + (2 * (yytext[0] == "$") +
+                       (yytext[1] == "$" || yytext[1] == "["));
 }
+<DOCUMENT><<EOF>> { this.popState(); return "EOF"; }
+<DOCUMENT>[^] return "CHAR";
 
 <TRYOPTARG>\s*"[" { this.popState(); return "["; }
 <TRYOPTARG>. { this.unput(yytext); this.popState(); this.popState(); }
@@ -29,7 +33,10 @@
 \s+ /* skip whitespace */
 "$$"|"\\]"|"$"|"\\)" {
   this.popState();
-  return "ENDMATH" +  (2 * (yytext[0] == "$") + yytext.length - 1);
+  yy.endMath = this.matched.length - this.match.length;
+  yy.tex = this.matched.substring(yy.startMath, yy.endMath);
+  return "ENDMATH" + (2 * (yytext[0] == "$") +
+                      (yytext[1] == "$" || yytext[1] == "]"));
 }
 "{" return "{";
 "}" return "}";
@@ -38,7 +45,6 @@
 "." return ".";
 "&" return "COLSEP";
 "\\\\" return "ROWSEP"
-<<EOF>> return "EOF";
 
 /* Numbers */
 [0-9]+(?:"."[0-9]+)?|[\u0660-\u0669]+(?:"\u066B"[\u0660-\u0669]+)?|(?:\uD835[\uDFCE-\uDFD7])+|(?:\uD835[\uDFCE-\uDFD7])+|(?:\uD835[\uDFD8-\uDFE1])+|(?:\uD835[\uDFE2-\uDFEB])+|(?:\uD835[\uDFEC-\uDFF5])+|(?:\uD835[\uDFF6-\uDFFF])+ return "NUM";
