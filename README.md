@@ -32,16 +32,19 @@ as a description of the TeXZilla syntax. See also the examples/ directory.
 Build Instructions
 ------------------
 
-The following are required to generate `TeXZilla.js`:
+The following dependencies are required:
 
 - [coreutils](https://www.gnu.org/software/coreutils/), [sed](https://www.gnu.org/software/sed/), [wget](https://www.gnu.org/software/wget/), [make](https://www.gnu.org/software/make/)
 - [xsltproc](http://xmlsoft.org/XSLT/xsltproc2.html)
 - [Python](http://www.python.org/)
 - [Jison](http://zaach.github.io/jison) and NodeJS.
-
-These dependencies are optional:
-
 - To run unit tests: [slimerJS](http://slimerjs.org/) or [phantomJS](http://phantomjs.org/)
-- To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/) and Java.
+- To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/)
 
-To build TeXZilla, update config.cfg and try "make help".
+To build TeXZilla, run the tests and generate the minified version:
+
+      ./configure
+      make all
+      make minify
+
+Type `make help` for more commands.
