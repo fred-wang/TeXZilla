@@ -3,6 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 %{
+var MathMLNameSpace = "http://www.w3.org/1998/Math/MathML",
+    TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
+                    "application/x-tex", "application/x-latex"];
+
 function escapeText(aString) {
   /* Escape reserved XML characters for use as text nodes. */
   return aString.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -100,9 +104,18 @@ function newMrow(aList, aTag, aAttributes) {
   return tag;
 }
 
-var MathMLNameSpace = "http://www.w3.org/1998/Math/MathML",
-    TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
-                    "application/x-tex", "application/x-latex"];
+function newMath(aList, aDisplay, aTeX)
+{
+  var tag = "<math xmlns=\"" + MathMLNameSpace + "\"";
+  if (aDisplay) {
+    tag += " display=\"block\""
+  }
+  tag += "><semantics>" + newMrow(aList);
+  tag += "<annotation encoding=\"TeX\">";
+  tag += escapeText(aTeX);
+  tag += "</annotation></semantics></math>";
+  return tag;
+}
 
 function getTeXSourceInternal(aMathMLElement) {
   var child;
@@ -138,13 +151,20 @@ try {
   parser.DOMParser = null;
 }
 
+// Initialize some Node constants if they are not defined.
+if (!Node) {
+  Node = { ELEMENT_NODE: 1, TEXT_NODE: 3 };
+}
+
 parser.parseMathMLDocument = function (aString) {
-  /* Parse the string into a MathML document and return the <math> root. */
-  if (this.DOMParser) {
-    return this.DOMParser.
-      parseFromString(aString, "application/xml").documentElement;
-  }
-  throw "TeXZilla.DOMParser has not been set!";
+  // Parse the string into a MathML document and return the <math> root.
+  return this.DOMParser.
+    parseFromString(aString, "application/xml").documentElement;
+}
+
+parser.setSafeMode = function(aEnable)
+{
+  this.yy.mSafeMode = aEnable;
 }
 
 parser.getTeXSource = function(aMathMLElement) {
@@ -159,30 +179,26 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
   var output, mathml;
   /* Parse the TeX source and get the main MathML node. */
   try {
-    output = this.parse(aTeX);
+    output = this.parse("\\(" + aTeX + "\\)");
   } catch (e) {
     if (aThrowExceptionOnError) {
        throw e;
     }
-    output = "<merror><mtext>" + escapeText(e.message) + "</mtext></merror>";
+    output = newMath(
+      ["<merror><mtext>" + escapeText(e.message) + "</mtext></merror>"], false,
+      aTeX);
   }
 
-  /* Add the <math> root and attach the TeX annotation. */
-  mathml = "<math xmlns=\"" + MathMLNameSpace + "\"";
-  if (aDisplay) {
-    /* Set the display mode if it is specified. */
-    mathml += " display=\"block\""
-  }
   if (aRTL) {
     /* Set the RTL mode if specified. */
-    mathml += " dir=\"rtl\""
+    output = output.replace(/^<math/, "<math dir=\"rtl\"");
   }
-  mathml += "><semantics>" + output;
-  mathml += "<annotation encoding=\"TeX\">";
-  mathml += escapeText(aTeX);
-  mathml += "</annotation></semantics></math>";
+  if (aDisplay) {
+    /* Set the display mode if it is specified. */
+    output = output.replace(/^<math/, "<math display=\"block\"");
+  }
 
-  return mathml;
+  return output;
 }
 
 parser.toMathML = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
@@ -248,13 +264,46 @@ parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
   return image;
 }
 
+parser.filterString = function(aString, aThrowExceptionOnError) {
+  try {
+    return this.parse(aString);
+  } catch (e) {
+    if (aThrowExceptionOnError) {
+       throw e;
+    }
+    return aString;
+  }
+}
+
+parser.filterElement = function(aElement, aThrowExceptionOnError) {
+  var root, child, node;
+  for (var node = aElement.firstChild; node; node = node.nextSibling) {
+    switch(node.nodeType) {
+      case Node.ELEMENT_NODE:
+        this.filterElement(node, aThrowExceptionOnError);
+      break;
+      case Node.TEXT_NODE:
+        root = this.DOMParser.parseFromString("<root>" +
+               TeXZilla.filterString(node.data, aThrowExceptionOnError) +
+               "</root>", "application/xml").documentElement;
+        while (child = root.firstChild) {
+          aElement.insertBefore(root.removeChild(child), node);
+        }
+        child = node.previousSibling;
+        aElement.removeChild(node); node = child;
+        break;
+      default:
+    }
+  }
+}
+
 %}
 
 /* Operator associations and precedence. */
 %left TEXOVER TEXATOP TEXCHOOSE
 %right "^" "_" "OPP"
 
-%start math
+%start document
 
 %%
 
@@ -632,22 +681,26 @@ closedTerm
   | MATHTT closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"monospace\""); }
   | MATHRM closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"normal\""); }
   | HREF attrArg closedTerm {
-    $$ = newTag("mrow", $3, "href=" + $2);
+    $$ = newTag("mrow", $3, yy.mSafeMode ? null : "href=" + $2);
   }
   | STATUSLINE textArg closedTerm {
-    $$ = newTag("maction",
+    $$ = yy.mSafeMode ? $3 :
+         newTag("maction",
                 $3 + newTag("mtext", $2), "actiontype=\"statusline\"");
   }
   | TOOLTIP textArg closedTerm {
-    $$ = newTag("maction",
+    $$ = yy.mSafeMode ? $3 :
+         newTag("maction",
                 $3 + newTag("mtext", $2), "actiontype=\"tooltip\"");
   }
   | TOGGLE closedTerm closedTerm {
     /* Backward compatibility with itex2MML */
-    $$ = newTag("maction", $2 + $3, "actiontype=\"toggle\" selection=\"2\"");
+    $$ = yy.mSafeMode ? $3 :
+         newTag("maction", $2 + $3, "actiontype=\"toggle\" selection=\"2\"");
   }
   | BTOGGLE closedTermList ETOGGLE {
-    $$ = newTag("maction", $2, "actiontype=\"toggle\"");
+    $$ = yy.mSafeMode ? newTag("mrow", $2) :
+         newTag("maction", $2, "actiontype=\"toggle\"");
   }
   | TENSOR closedTerm "{" subsupList "}" {
     $$ = newTag("mmultiscripts", $2 + $4);
@@ -849,14 +902,45 @@ tableRowList
   | tableRowList ROWSEP tableRow { $$ = $1 + $3; }
   ;
 
-/* main math expression (list of styled expressions) */
-math
-  : styledExpression EOF {
-    $$ = newMrow($1);
+/* a document with embedded math */
+document
+  : documentItemList EOF {
+    $$ = $1
     return $$;
   }
-  | EOF {
-    $$ = "<mrow/>";
-    return $$;
+  ;
+
+documentItemList
+  : documentItem { $$ = $1; }
+  | documentItemList documentItem { $$ = $1 + $2 }
+  ;
+
+documentItem
+  : CHAR {
+    $$ = $1;
+  }
+  | STARTMATH0 ENDMATH0 {
+    // \( \)
+    $$ = newMath(["<mrow/>"], false, yy.tex);
+  }
+  | STARTMATH0 styledExpression ENDMATH0 {
+    // \( ... \)
+    $$ = newMath($2, false, yy.tex);
+  }
+  | STARTMATH1 ENDMATH1 {
+    // \[ \]
+    $$ = newMath(["<mrow/>"], true, yy.tex);
+  }
+  | STARTMATH1 styledExpression ENDMATH1 {
+    // \[ ... \]
+    $$ = newMath($2, true, yy.tex);
+  }
+  | STARTMATH2 styledExpression ENDMATH2 {
+    // $ ... $
+    $$ = newMath($2, false, yy.tex);
+  }
+  | STARTMATH3 styledExpression ENDMATH3 {
+    // $$ ... $$
+    $$ = newMath($2, true, yy.tex);
   }
   ;

@@ -33,7 +33,8 @@ if (typeof require !== "undefined") {
     console.log("  Start a Web server on the specified port (default:3141)");
     console.log("  See the TeXZilla wiki for details.\n");
     console.log("cat input | commonjs TeXZilla.js streamfilter > output");
-    console.log("  TODO\n");
+    console.log("  Make TeXZilla behaves as a stream filter. The TeX fragments are");
+    console.log("  converted into MathML.\n");
     console.log("  where commonjs is slimerjs, nodejs or phantomjs.");
   };
 
@@ -143,7 +144,7 @@ if (typeof require !== "undefined") {
     console.log("Web server started on http://localhost:" + aPort);
   }
 
-  var main = function (aArgs) {
+  var main = function (aArgs, aStdinContent) {
     // Main command line function.
     var param = {};
     if (aArgs.length >= 3 && aArgs[1] === "parser") {
@@ -167,9 +168,23 @@ if (typeof require !== "undefined") {
         console.log(e);
         exitCommonJS(1);
       }
+    } else if (aArgs.length >= 2 && aArgs[1] === "streamfilter") {
+      if (typeof process !== "undefined") {
+        var stdinContent = "";
+        process.stdin.resume();
+        process.stdin.setEncoding("utf-8");
+        process.stdin.on("data", function(aData) { stdinContent += aData; });
+        process.stdin.on("end", function() {
+          console.log(TeXZilla.filterString(stdinContent, true));
+          exitCommonJS(0);
+        });
+      } else {
+        // FIXME: Slimerjs does not seem to support stdin.
+        console.log(TeXZilla.
+                    filterString(require("system").stdin.read(), true));
+        exitCommonJS(0);
+      }
     } else {
-      // FIXME: add a stream filter.
-      // https://github.com/fred-wang/TeXZilla/issues/7
       usage();
       exitCommonJS(0);
     }
@@ -181,6 +196,10 @@ if (typeof require !== "undefined") {
       TeXZilla.DOMParser = aDOMParser;
     };
 
+    exports.setSafeMode = function (aEnable) {
+      TeXZilla.setSafeMode(aEnable);
+    };
+
     exports.getTeXSource = function () {
       return TeXZilla.getTeXSource.apply(TeXZilla, arguments);
     };
@@ -190,6 +209,9 @@ if (typeof require !== "undefined") {
     };
 
     exports.toMathML = function () {
+      if (!TeXZilla.DOMParser) {
+        throw "TeXZilla.DOMParser has not been set!";
+      }
       return TeXZilla.toMathML.apply(TeXZilla, arguments);
     };
 
@@ -197,18 +219,28 @@ if (typeof require !== "undefined") {
       return TeXZilla.toImage.apply(TeXZilla, arguments);
     };
 
+    exports.filterString = function () {
+      return TeXZilla.filterString.apply(TeXZilla, arguments);
+    };
+
+    exports.filterElement = function () {
+      if (!TeXZilla.DOMParser) {
+        throw "TeXZilla.DOMParser has not been set!";
+      }
+      return TeXZilla.filterElement.apply(TeXZilla, arguments);
+    };
+
     exports.main = main;
   }
 
   if (typeof exports === "undefined" ||
       (typeof module !== "undefined" && require.main === module)) {
-    // Process the command line arguments and execute the main program.
-    var args;
+    // Process the command line arguments, the stdin content and execute the
+    // main program.
     if (typeof process !== "undefined") {
-      args = process.argv.slice(1);
+      main(process.argv.slice(1));
     } else {
-      args = require("system").args;
+      main(require("system").args);
     }
-    main(args);
   }
 }

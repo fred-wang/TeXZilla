@@ -1,7 +1,11 @@
+Makefile
 TeXZilla-web.js
 TeXZilla.jisonlex
 TeXZilla.js
+autom4te.cache
 char-commands.txt
 chars.txt
 commands.txt
+config.log
+config.status
 unicode.xml
