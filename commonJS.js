@@ -197,6 +197,10 @@ if (typeof require !== "undefined") {
       return TeXZilla.toImage.apply(TeXZilla, arguments);
     };
 
+    exports.filterString = function () {
+      return TeXZilla.filterString.apply(TeXZilla, arguments);
+    };
+
     exports.main = main;
   }
 
