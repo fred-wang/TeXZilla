@@ -262,8 +262,15 @@ parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
   return image;
 }
 
-parser.filterString = function(aString) {
-  return this.parse(aString);
+parser.filterString = function(aString, aThrowExceptionOnError) {
+  try {
+    return this.parse(aString);
+  } catch (e) {
+    if (aThrowExceptionOnError) {
+       throw e;
+    }
+    return aString;
+  }
 }
 
 %}

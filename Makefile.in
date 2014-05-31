@@ -69,6 +69,7 @@ TeXZilla-min.js: TeXZilla-web.js MPL-header.js
 
 tests: unit-tests.js TeXZilla.js
 	@COMMONJS@ $<
+	@BASH@ unit-tests.sh @COMMONJS@
 
 build: TeXZilla.js
 

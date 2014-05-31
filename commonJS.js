@@ -175,12 +175,13 @@ if (typeof require !== "undefined") {
         process.stdin.setEncoding("utf-8");
         process.stdin.on("data", function(aData) { stdinContent += aData; });
         process.stdin.on("end", function() {
-          console.log(TeXZilla.filterString(stdinContent));
+          console.log(TeXZilla.filterString(stdinContent, true));
           exitCommonJS(0);
         });
       } else {
         // FIXME: Slimerjs does not seem to support stdin.
-        console.log(TeXZilla.filterString(require("system").stdin.read()));
+        console.log(TeXZilla.
+                    filterString(require("system").stdin.read(), true));
         exitCommonJS(0);
       }
     } else {
