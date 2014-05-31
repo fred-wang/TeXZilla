@@ -195,6 +195,10 @@ if (typeof require !== "undefined") {
       TeXZilla.DOMParser = aDOMParser;
     };
 
+    exports.setSafeMode = function (aEnable) {
+      TeXZilla.setSafeMode(aEnable);
+    };
+
     exports.getTeXSource = function () {
       return TeXZilla.getTeXSource.apply(TeXZilla, arguments);
     };

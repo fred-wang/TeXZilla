@@ -160,6 +160,11 @@ parser.parseMathMLDocument = function (aString) {
   throw "TeXZilla.DOMParser has not been set!";
 }
 
+parser.setSafeMode = function(aEnable)
+{
+  this.yy.mSafeMode = aEnable;
+}
+
 parser.getTeXSource = function(aMathMLElement) {
   if (typeof aMathMLElement === "string") {
     aMathMLElement = this.parseMathMLDocument(aMathMLElement);
@@ -645,22 +650,26 @@ closedTerm
   | MATHTT closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"monospace\""); }
   | MATHRM closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"normal\""); }
   | HREF attrArg closedTerm {
-    $$ = newTag("mrow", $3, "href=" + $2);
+    $$ = newTag("mrow", $3, yy.mSafeMode ? null : "href=" + $2);
   }
   | STATUSLINE textArg closedTerm {
-    $$ = newTag("maction",
+    $$ = yy.mSafeMode ? $3 :
+         newTag("maction",
                 $3 + newTag("mtext", $2), "actiontype=\"statusline\"");
   }
   | TOOLTIP textArg closedTerm {
-    $$ = newTag("maction",
+    $$ = yy.mSafeMode ? $3 :
+         newTag("maction",
                 $3 + newTag("mtext", $2), "actiontype=\"tooltip\"");
   }
   | TOGGLE closedTerm closedTerm {
     /* Backward compatibility with itex2MML */
-    $$ = newTag("maction", $2 + $3, "actiontype=\"toggle\" selection=\"2\"");
+    $$ = yy.mSafeMode ? $3 :
+         newTag("maction", $2 + $3, "actiontype=\"toggle\" selection=\"2\"");
   }
   | BTOGGLE closedTermList ETOGGLE {
-    $$ = newTag("maction", $2, "actiontype=\"toggle\"");
+    $$ = yy.mSafeMode ? newTag("mrow", $2) :
+         newTag("maction", $2, "actiontype=\"toggle\"");
   }
   | TENSOR closedTerm "{" subsupList "}" {
     $$ = newTag("mmultiscripts", $2 + $4);
