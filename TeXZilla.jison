@@ -152,7 +152,7 @@ try {
 }
 
 // Initialize some Node constants if they are not defined.
-if (!Node) {
+if (typeof Node === "undefined") {
   Node = { ELEMENT_NODE: 1, TEXT_NODE: 3 };
 }
 
