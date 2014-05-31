@@ -209,6 +209,9 @@ if (typeof require !== "undefined") {
     };
 
     exports.toMathML = function () {
+      if (!TeXZilla.DOMParser) {
+        throw "TeXZilla.DOMParser has not been set!";
+      }
       return TeXZilla.toMathML.apply(TeXZilla, arguments);
     };
 
@@ -218,6 +221,13 @@ if (typeof require !== "undefined") {
 
     exports.filterString = function () {
       return TeXZilla.filterString.apply(TeXZilla, arguments);
+    };
+
+    exports.filterElement = function () {
+      if (!TeXZilla.DOMParser) {
+        throw "TeXZilla.DOMParser has not been set!";
+      }
+      return TeXZilla.filterElement.apply(TeXZilla, arguments);
     };
 
     exports.main = main;

@@ -151,13 +151,15 @@ try {
   parser.DOMParser = null;
 }
 
+// Initialize some Node constants if they are not defined.
+if (!Node) {
+  Node = { ELEMENT_NODE: 1, TEXT_NODE: 3 };
+}
+
 parser.parseMathMLDocument = function (aString) {
-  /* Parse the string into a MathML document and return the <math> root. */
-  if (this.DOMParser) {
-    return this.DOMParser.
-      parseFromString(aString, "application/xml").documentElement;
-  }
-  throw "TeXZilla.DOMParser has not been set!";
+  // Parse the string into a MathML document and return the <math> root.
+  return this.DOMParser.
+    parseFromString(aString, "application/xml").documentElement;
 }
 
 parser.setSafeMode = function(aEnable)
@@ -270,6 +272,28 @@ parser.filterString = function(aString, aThrowExceptionOnError) {
        throw e;
     }
     return aString;
+  }
+}
+
+parser.filterElement = function(aElement, aThrowExceptionOnError) {
+  var root, child, node;
+  for (var node = aElement.firstChild; node; node = node.nextSibling) {
+    switch(node.nodeType) {
+      case Node.ELEMENT_NODE:
+        this.filterElement(node, aThrowExceptionOnError);
+      break;
+      case Node.TEXT_NODE:
+        root = this.DOMParser.parseFromString("<root>" +
+               TeXZilla.filterString(node.data, aThrowExceptionOnError) +
+               "</root>", "application/xml").documentElement;
+        while (child = root.firstChild) {
+          aElement.insertBefore(root.removeChild(child), node);
+        }
+        child = node.previousSibling;
+        aElement.removeChild(node); node = child;
+        break;
+      default:
+    }
   }
 }
 
