@@ -4,6 +4,7 @@
 
 %{
 var MathMLNameSpace = "http://www.w3.org/1998/Math/MathML",
+    SVGNameSpace = "http://www.w3.org/2000/svg",
     TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
                     "application/x-tex", "application/x-latex"];
 
@@ -151,6 +152,15 @@ try {
   parser.DOMParser = null;
 }
 
+try {
+  // Try to create a XMLSerializer object if it exists (e.g. in a Web page,
+  // in a chrome script running in a window etc)
+  parser.XMLSerializer = new XMLSerializer();
+} catch (e) {
+  // Leave the XMLSerializer unset.
+  parser.XMLSerializer = null;
+}
+
 // Initialize some Node constants if they are not defined.
 if (typeof Node === "undefined") {
   var Node = { ELEMENT_NODE: 1, TEXT_NODE: 3 };
@@ -233,24 +243,31 @@ function escapeHTML(aString)
 }
 
 parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
-  var div, box, svgWidth, svgHeight, math, svg, image;
+  var math, el, box, svgWidth, svgHeight, svg, image;
+
+  // Set default values.
   if (aSize === undefined) {
     aSize = 64;
   }
   if (aDocument === undefined) {
     aDocument = window.document;
   }
+
+  // Create the MathML element.
   math = this.toMathML(aTeX, true, aRTL);
   math.setAttribute("mathsize", aSize + "px");
 
-  div = document.createElement("div");
-  div.style.visibility = "hidden";
-  div.style.position = "absolute";
-  div.appendChild(math);
-  aDocument.body.appendChild(div);
+  // Temporarily insert the MathML element in the document to measure it.
+  el = document.createElement("div");
+  el.style.visibility = "hidden";
+  el.style.position = "absolute";
+  el.appendChild(math);
+  aDocument.body.appendChild(el);
   box = math.getBoundingClientRect();
-  aDocument.body.removeChild(div);
+  aDocument.body.removeChild(el);
+  el.removeChild(math);
 
+  // Round up the computed sizes.
   if (aRoundToPowerOfTwo) {
     svgWidth = Math.pow(2, Math.ceil(Math.log2(box.width)));
     svgHeight = Math.pow(2, Math.ceil(Math.log2(box.height)));
@@ -258,14 +275,29 @@ parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
     svgWidth = Math.ceil(box.width);
     svgHeight = Math.ceil(box.height);
   }
-  svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + svgWidth + "px\" height=\""+ svgHeight + "px\"><g transform=\"translate(" + (svgWidth - box.width) / 2.0 + "," + (svgHeight - box.height) / 2.0 + ")\"><foreignObject width=\"" + box.width + "\" height=\"" + box.height + "\">" + escapeHTML(math.outerHTML) + "</foreignObject></g></svg>";
 
+  // Embed the MathML in an SVG element.
+  svg = document.createElementNS(SVGNameSpace, "svg");
+  svg.setAttribute("width", svgWidth + "px");
+  svg.setAttribute("height", svgHeight + "px");
+  el = document.createElementNS(SVGNameSpace, "g");
+  el.setAttribute("transform", "translate(" +
+    (svgWidth - box.width) / 2.0 + "," + (svgHeight - box.height) / 2.0 + ")");
+  svg.appendChild(el);
+  el = document.createElementNS(SVGNameSpace, "foreignObject");
+  el.setAttribute("width", box.width);
+  el.setAttribute("height", box.height);
+  el.appendChild(math);
+  svg.firstChild.appendChild(el);
+
+  // Create the image element.
   image = new Image();
-  image.src = "data:image/svg+xml;base64," + window.btoa(svg);
-
+  image.src = "data:image/svg+xml;base64," +
+    window.btoa(escapeHTML(this.XMLSerializer.serializeToString(svg)));
   image.width = svgWidth;
   image.height = svgHeight;
   image.alt = escapeText(aTeX);
+
   return image;
 }
 

@@ -196,6 +196,10 @@ if (typeof require !== "undefined") {
       TeXZilla.DOMParser = aDOMParser;
     };
 
+    exports.setXMLSerializer = function (aXMLSerializer) {
+      TeXZilla.XMLSerializer = aXMLSerializer;
+    };
+
     exports.setSafeMode = function (aEnable) {
       TeXZilla.setSafeMode(aEnable);
     };
