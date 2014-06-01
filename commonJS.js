@@ -29,12 +29,13 @@ if (typeof require !== "undefined") {
     console.log("commonjs TeXZilla.js parser aTeX [aDisplay] [aRTL] [aThrowExceptionOnError]");
     console.log("  Print TeXZilla.toMathMLString(aTeX, aDisplay, aRTL, aThrowExceptionOnError)");
     console.log("  The interpretation of arguments and the default values are the same.\n");
-    console.log("commonjs TeXZilla.js webserver [port]");
+    console.log("commonjs TeXZilla.js webserver [port] [safe] [itexId]");
     console.log("  Start a Web server on the specified port (default:3141)");
     console.log("  See the TeXZilla wiki for details.\n");
-    console.log("cat input | commonjs TeXZilla.js streamfilter > output");
+    console.log("cat input | commonjs TeXZilla.js streamfilter [safe] [itexId] > output");
     console.log("  Make TeXZilla behaves as a stream filter. The TeX fragments are");
-    console.log("  converted into MathML.\n");
+    console.log("  converted into MathML.");
+    console.log("  See the TeXZilla wiki for details.\n");
     console.log("  where commonjs is slimerjs, nodejs or phantomjs.");
   };
 
@@ -42,7 +43,8 @@ if (typeof require !== "undefined") {
     // Set the param value from the string value.
     if (aKey === "tex") {
       aParam[aKey] = aString;
-    } else if (aKey === "display" || aKey === "rtl" || aKey === "exception") {
+    } else if (aKey === "display" || aKey === "rtl" || aKey === "exception" ||
+               aKey === "safe" || aKey === "itexId") {
       aParam[aKey] = (aString === "true");
     }
   };
@@ -161,6 +163,10 @@ if (typeof require !== "undefined") {
         exitCommonJS(1);
       }
     } else if (aArgs.length >= 2 && aArgs[1] === "webserver") {
+      setParamValue(param, "safe", aArgs[2]);
+      TeXZilla.setSafeMode(param.safe);
+      setParamValue(param, "itexId", aArgs[3]);
+      TeXZilla.setItexIdentifierMode(param.itexId);
       // Run a Web server.
       try {
         startWebServer(aArgs.length >= 3 ? parseInt(aArgs[2], 10) : 3141);
@@ -169,6 +175,10 @@ if (typeof require !== "undefined") {
         exitCommonJS(1);
       }
     } else if (aArgs.length >= 2 && aArgs[1] === "streamfilter") {
+      setParamValue(param, "safe", aArgs[2]);
+      TeXZilla.setSafeMode(param.safe);
+      setParamValue(param, "itexId", aArgs[3]);
+      TeXZilla.setItexIdentifierMode(param.itexId);
       if (typeof process !== "undefined") {
         var stdinContent = "";
         process.stdin.resume();
