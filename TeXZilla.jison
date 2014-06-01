@@ -146,19 +146,37 @@ function getTeXSourceInternal(aMathMLElement) {
 try {
   // Try to create a DOM Parser object if it exists (e.g. in a Web page,
   // in a chrome script running in a window etc)
-  parser.DOMParser = new DOMParser();
+  parser.mDOMParser = new DOMParser();
 } catch (e) {
-  // Leave the DOMParser unset.
-  parser.DOMParser = null;
+  // Make the DOMParser throw an exception if used.
+  parser.mDOMParser = {
+    parseFromString: function() {
+      throw "DOMParser undefined. Did you call TeXZilla.setDOMParser?";
+    }
+  };
+}
+
+parser.setDOMParser = function(aDOMParser)
+{
+  this.mDOMParser = aDOMParser;
 }
 
 try {
   // Try to create a XMLSerializer object if it exists (e.g. in a Web page,
   // in a chrome script running in a window etc)
-  parser.XMLSerializer = new XMLSerializer();
+  parser.mXMLSerializer = new XMLSerializer();
 } catch (e) {
-  // Leave the XMLSerializer unset.
-  parser.XMLSerializer = null;
+  // Make the XMLSerializer throw an exception if used.
+  parser.mXMLSerializer = {
+    serializeToString: function() {
+      throw "XMLSerializer undefined. Did you call TeXZilla.setXMLSerializer?";
+    }
+  };
+}
+
+parser.setXMLSerializer = function(aXMLSerializer)
+{
+  this.mXMLSerializer = aXMLSerializer;
 }
 
 // Initialize some Node constants if they are not defined.
@@ -168,7 +186,7 @@ if (typeof Node === "undefined") {
 
 parser.parseMathMLDocument = function (aString) {
   // Parse the string into a MathML document and return the <math> root.
-  return this.DOMParser.
+  return this.mDOMParser.
     parseFromString(aString, "application/xml").documentElement;
 }
 
@@ -293,7 +311,7 @@ parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
   // Create the image element.
   image = new Image();
   image.src = "data:image/svg+xml;base64," +
-    window.btoa(escapeHTML(this.XMLSerializer.serializeToString(svg)));
+    window.btoa(escapeHTML(this.mXMLSerializer.serializeToString(svg)));
   image.width = svgWidth;
   image.height = svgHeight;
   image.alt = escapeText(aTeX);
@@ -321,7 +339,7 @@ parser.filterElement = function(aElement, aThrowExceptionOnError) {
       break;
       case Node.TEXT_NODE:
         this.yy.escapeXML = true;
-        root = this.DOMParser.parseFromString("<root>" +
+        root = this.mDOMParser.parseFromString("<root>" +
                TeXZilla.filterString(node.data, aThrowExceptionOnError) +
                "</root>", "application/xml").documentElement;
         this.yy.escapeXML = false;

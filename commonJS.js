@@ -193,11 +193,11 @@ if (typeof require !== "undefined") {
   if (typeof exports !== "undefined") {
     // Export the public API.
     exports.setDOMParser = function (aDOMParser) {
-      TeXZilla.DOMParser = aDOMParser;
+      TeXZilla.setDOMParser(aDOMParser);
     };
 
     exports.setXMLSerializer = function (aXMLSerializer) {
-      TeXZilla.XMLSerializer = aXMLSerializer;
+      TeXZilla.setXMLSerializer(aXMLSerializer);
     };
 
     exports.setSafeMode = function (aEnable) {
@@ -217,9 +217,6 @@ if (typeof require !== "undefined") {
     };
 
     exports.toMathML = function () {
-      if (!TeXZilla.DOMParser) {
-        throw "TeXZilla.DOMParser has not been set!";
-      }
       return TeXZilla.toMathML.apply(TeXZilla, arguments);
     };
 
@@ -232,9 +229,6 @@ if (typeof require !== "undefined") {
     };
 
     exports.filterElement = function () {
-      if (!TeXZilla.DOMParser) {
-        throw "TeXZilla.DOMParser has not been set!";
-      }
       return TeXZilla.filterElement.apply(TeXZilla, arguments);
     };
 
