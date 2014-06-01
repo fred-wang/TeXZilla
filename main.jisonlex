@@ -3,14 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 %x DOCUMENT TRYOPTARG TEXTOPTARG TEXTARG
-%s MATH OPTARG
+%s MATH0 MATH1 OPTARG
 
 %%
 
 <INITIAL>. { this.unput(yytext); this.pushState("DOCUMENT"); }
 
 <DOCUMENT>"$$"|"\\["|"$"|"\\(" {
-  this.pushState("MATH");
+  this.pushState("MATH" + (0+!!yy.mItexIdentifierMode));
   yy.startMath = this.matched.length;
   return "STARTMATH" + (2 * (yytext[0] == "$") +
                        (yytext[1] == "$" || yytext[1] == "["));
@@ -55,3 +55,6 @@
 
 /* Numbers */
 [0-9]+(?:"."[0-9]+)?|[\u0660-\u0669]+(?:"\u066B"[\u0660-\u0669]+)?|(?:\uD835[\uDFCE-\uDFD7])+|(?:\uD835[\uDFCE-\uDFD7])+|(?:\uD835[\uDFD8-\uDFE1])+|(?:\uD835[\uDFE2-\uDFEB])+|(?:\uD835[\uDFEC-\uDFF5])+|(?:\uD835[\uDFF6-\uDFFF])+ return "NUM";
+
+/* itex2MML identifier */
+<MATH1>[a-zA-Z]+ { return "A"; }

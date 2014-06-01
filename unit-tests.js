@@ -241,7 +241,22 @@ function escape(aString)
 
 var failures = 0, unexpectedfailures = 0, i = 0, output, input;
 
-for (i = 0; i < tests.length; i++) {
+function printTestResult(aSuccess, aExpectedFailure)
+{
+    i++;
+    if (aSuccess) {
+      console.log("Test " + i + "... PASS");
+    } else {
+      failures++;
+      if (!aExpectedFailure) {
+        unexpectedfailures++;
+      }
+      console.log("Test " + i + "... " +
+                  (aExpectedFailure ? "EXPECTED FAIL" : "FAIL"));
+    }
+}
+
+while (i < tests.length) {
     try {
         /* Test TeXZilla.toMathMLString against a reference output. */
         output = TeXZilla.toMathMLString(tests[i][0]);
@@ -258,13 +273,10 @@ for (i = 0; i < tests.length; i++) {
                    "  Actual: '" + escape(input) + "'\n" +
                    "  Expected: '" + escape(tests[i][0]) + "'");
         }
-        console.log("Test " + (i + 1) + "... PASS");
+        printTestResult(true);
     } catch(e) {
-        console.log("Test " + (i + 1) + "... " +
-                    (tests[i][2] ? "EXPECTED FAIL" : "FAIL"));
+        printTestResult(false, tests[i][2]);
         console.log(e);
-        failures++;
-        if (!tests[i][2]) unexpectedfailures++;
     }
 }
 
@@ -283,13 +295,7 @@ try {
     console.log(e)
 }
 success = (output.indexOf(error) != -1 && output.indexOf("<merror>") != -1);
-console.log("Test " + (i + 1) + "... " + (success ? "PASS" : "FAIL"));
-i++;
-
-if (!success) {
-    failures++;
-    unexpectedfailures++;
-}
+printTestResult(success);
 
 /* 2) with exception */
 success = false;
@@ -304,12 +310,28 @@ try {
         console.log(e);
     }
 }
-console.log("Test " + (i + 1) + "... " + (success ? "PASS" : "FAIL"));
-i++;
+printTestResult(success);
+
+/* Test itex identifier mode */
+TeXZilla.setItexIdentifierMode(true);
+output = TeXZilla.toMathMLString("xy");
+success = (output === '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>xy</mi><annotation encoding="TeX">xy</annotation></semantics></math>');
+printTestResult(success);
 if (!success) {
-    failures++;
-    unexpectedfailures++;
+  console.log("itex identifier mode ignored: " + escape(output));
 }
+TeXZilla.setItexIdentifierMode(false);
+
+/* Test safe mode */
+TeXZilla.setSafeMode(true);
+output =
+  TeXZilla.toMathMLString("\\href{javascript:alert(\"!\")}{\\mtext{evil}}");
+success = (output === '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>evil</mtext></mrow><annotation encoding="TeX">\\href{javascript:alert("!")}{\\mtext{evil}}</annotation></semantics></math>');
+printTestResult(success);
+if (!success) {
+  console.log("safe mode ignored: " + escape(output));
+}
+TeXZilla.setSafeMode(false);
 
 /* Print test results */
 if (failures > 0) {

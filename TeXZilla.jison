@@ -167,6 +167,11 @@ parser.setSafeMode = function(aEnable)
   this.yy.mSafeMode = aEnable;
 }
 
+parser.setItexIdentifierMode = function(aEnable)
+{
+  this.yy.mItexIdentifierMode = aEnable;
+}
+
 parser.getTeXSource = function(aMathMLElement) {
   if (typeof aMathMLElement === "string") {
     aMathMLElement = this.parseMathMLDocument(aMathMLElement);

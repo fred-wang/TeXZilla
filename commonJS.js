@@ -200,6 +200,10 @@ if (typeof require !== "undefined") {
       TeXZilla.setSafeMode(aEnable);
     };
 
+    exports.setItexIdentifierMode = function (aEnable) {
+      TeXZilla.setItexIdentifierMode(aEnable);
+    };
+
     exports.getTeXSource = function () {
       return TeXZilla.getTeXSource.apply(TeXZilla, arguments);
     };
