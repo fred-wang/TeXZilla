@@ -89,4 +89,4 @@ distclean: clean
 
 release:
 # Generate a release branch.
-	./release.sh
+	@BASH@ release.sh @GIT@ @SED@ @MAKE@ @EGREP@
