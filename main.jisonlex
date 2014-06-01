@@ -16,7 +16,7 @@
                        (yytext[1] == "$" || yytext[1] == "["));
 }
 <DOCUMENT><<EOF>> { this.popState(); return "EOF"; }
-<DOCUMENT>"\\"[$\[\]] { yytext = yytext[1]; return "TEXT"; }
+<DOCUMENT>"\\"[$\\] { yytext = yytext[1]; return "TEXT"; }
 <DOCUMENT>[<&>] {
   if (yy.escapeXML) {
     yytext = escapeText(yytext);
