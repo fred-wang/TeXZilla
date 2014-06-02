@@ -8,6 +8,7 @@ GIT=$1
 SED=$2
 MAKE=$3
 EGREP=$4
+NPM=$5
 
 echo "This may mess up your git repository. Are you sure you want to continue [Y,n]?"
 read ANSWER
@@ -40,6 +41,9 @@ $SED -i s/RELEASENUMBER/$RELEASENUMBER/ README-release.txt
 $GIT add --no-ignore-removal .
 $GIT commit -m "TeXZilla Release $RELEASENUMBER"
 $GIT tag -a v$RELEASENUMBER -m "TeXZilla Release $RELEASEMESSAGE"
+
+# Publish the npm release.
+$NPM publish . --tag v$RELEASENUMBER
 
 # Come back to the master branch.
 $GIT checkout master
