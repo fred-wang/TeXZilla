@@ -184,6 +184,13 @@ if (typeof Node === "undefined") {
   var Node = { ELEMENT_NODE: 1, TEXT_NODE: 3 };
 }
 
+// Polyfill for Math.log2.
+if (typeof Math.log2 === "undefined") {
+  Math.log2 = function(x) {
+    return Math.log(x) / Math.LN2;
+  }
+}
+
 parser.parseMathMLDocument = function (aString) {
   // Parse the string into a MathML document and return the <math> root.
   return this.mDOMParser.
