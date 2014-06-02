@@ -3,7 +3,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-TEXZILLA="$1 TeXZilla.js"
+COMMONJS=$1
+TEXZILLA="$COMMONJS TeXZilla.js"
 CURL=$2
 KILL=$3
 EXITCODE=0
@@ -17,17 +18,22 @@ testEqual () {
   fi;
 }
 
+# Test the common JS API
+$COMMONJS unit-tests.js
+
+# Test parser command line API
 testEqual "Testing parser..." "`$TEXZILLA parser 'x+y'`" '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><annotation encoding="TeX">x+y</annotation></semantics></math>'
 testEqual "Testing parser (aDisplay)..." "`$TEXZILLA parser 'x+y' true`" '<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><annotation encoding="TeX">x+y</annotation></semantics></math>'
 testEqual "Testing parser (aRTL)..." "`$TEXZILLA parser 'x+y' false true`" '<math dir="rtl" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><annotation encoding="TeX">x+y</annotation></semantics></math>'
 
-if [ "$TEXZILLA" != "slimerjs TeXZilla.js" ]; then
+# Test stream filter command line API
+if [ "$COMMONJS" != "slimerjs" ]; then
     # slimerjs does not support streamfilter yet
     # https://github.com/fred-wang/TeXZilla/issues/35
     testEqual "Testing streamfilter..." "`echo 'blah $x+y$ blah $$\\frac{1}{2}$$ blah' | $TEXZILLA streamfilter`" 'blah <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><annotation encoding="TeX">x+y</annotation></semantics></math> blah <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mfrac><mn>1</mn><mn>2</mn></mfrac><annotation encoding="TeX">\frac{1}{2}</annotation></semantics></math> blah'
 fi
 
-# Testing the Web server
+# Test web server command line API
 PORT=9999
 $TEXZILLA webserver $PORT & PID=$!
 
