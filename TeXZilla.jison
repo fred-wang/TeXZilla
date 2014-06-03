@@ -179,14 +179,10 @@ parser.setXMLSerializer = function(aXMLSerializer)
   this.mXMLSerializer = aXMLSerializer;
 }
 
-// Initialize some Node constants if they are not defined.
-if (typeof Node === "undefined") {
-  var Node = { ELEMENT_NODE: 1, TEXT_NODE: 3 };
-}
-
 // Polyfill for Math.log2.
-if (typeof Math.log2 === "undefined") {
-  Math.log2 = function(x) {
+// We use string notation so that it won't be modified by closure-compiler.
+if (typeof Math["log2"] === "undefined") {
+  Math["log2"] = function(x) {
     return Math.log(x) / Math.LN2;
   }
 }
@@ -294,8 +290,8 @@ parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
 
   // Round up the computed sizes.
   if (aRoundToPowerOfTwo) {
-    svgWidth = Math.pow(2, Math.ceil(Math.log2(box.width)));
-    svgHeight = Math.pow(2, Math.ceil(Math.log2(box.height)));
+    svgWidth = Math.pow(2, Math.ceil(Math["log2"](box.width)));
+    svgHeight = Math.pow(2, Math.ceil(Math["log2"](box.height)));
   } else {
     svgWidth = Math.ceil(box.width);
     svgHeight = Math.ceil(box.height);
@@ -341,10 +337,10 @@ parser.filterElement = function(aElement, aThrowExceptionOnError) {
   var root, child, node;
   for (var node = aElement.firstChild; node; node = node.nextSibling) {
     switch(node.nodeType) {
-      case Node.ELEMENT_NODE:
+      case 1: // Node.ELEMENT_NODE
         this.filterElement(node, aThrowExceptionOnError);
       break;
-      case Node.TEXT_NODE:
+      case 3: // Node.TEXT_NODE
         this.yy.escapeXML = true;
         root = this.mDOMParser.parseFromString("<root>" +
                TeXZilla.filterString(node.data, aThrowExceptionOnError) +

@@ -18,6 +18,13 @@ help:
 	@echo ""
 	@echo "make tests"
 	@echo "  Run the unit tests."
+	@echo
+	@echo "make tests-all"
+	@echo "  Run the unit tests with nodejs, phantomjs and slimerjs."
+	@echo
+	@echo "make release"
+	@echo "  Publish a new release of TeXZilla."
+	@echo
 	@echo ""
 
 unicode.xml:
@@ -61,11 +68,14 @@ TeXZilla.js: TeXZilla-web.js commonJS.js
 	cp TeXZilla-web.js TeXZilla.js
 	@SED@ "1,6d" commonJS.js >> TeXZilla.js
 
-TeXZilla-min.js: TeXZilla-web.js MPL-header.js
-# Minify the Javascript parser using Google's Closure Compiler.
-	@CLOSURE_COMPILER@ $< > tmp.js
-	cat MPL-header.js tmp.js > $@
-	rm tmp.js
+TeXZilla-min.js: TeXZilla-web.js web.js MPL-header.js
+	 # Minify the Javascript parser using Google's Closure Compiler.
+	cat TeXZilla-web.js web.js > t1.js;
+	@CLOSURE_COMPILER@ --charset UTF-8 \
+		--compilation_level ADVANCED_OPTIMIZATIONS --js t1.js > t2.js
+	 # Add the MPL header.
+	cat MPL-header.js t2.js > $@
+	rm t1.js t2.js
 
 tests:
 # Run the tests.
