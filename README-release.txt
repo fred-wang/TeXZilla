@@ -32,7 +32,7 @@ in your Web page,
     ...
     var MathMLElement = TeXZilla.toMathML("\\sqrt{\\frac{x}{2}+y}");
 
-or from the command line (replace commonjs by your favorite JS interpreter):
+or from the command line (replace commonjs with your favorite JS interpreter):
 
 commonjs TeXZilla.js parser "a^2+b^2=c^2" true
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>=</mo><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="TeX">a^2+b^2=c^2</annotation></semantics></math>
