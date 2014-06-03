@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(TeXZilla.jison)
 
 AC_CHECK_PROGS(BASH, bash)
 AC_CHECK_PROGS(CLOSURE_COMPILER, closure-compiler)
-AC_CHECK_PROGS(COMMONJS, phantomjs slimerjs)
+AC_CHECK_PROGS(COMMONJS, phantomjs slimerjs nodejs)
 AC_CHECK_PROGS(CURL, curl)
 AC_CHECK_PROGS(EGREP, egrep)
 AC_CHECK_PROGS(GIT, git)
