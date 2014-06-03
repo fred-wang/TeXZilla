@@ -27,7 +27,8 @@ $GIT checkout master
 $GIT branch $RELEASEBRANCH
 $GIT checkout $RELEASEBRANCH
 
-# Build TeXZilla.
+# Build TeXZilla.js and TeXZilla-min.js
+$MAKE build
 $MAKE minify
 
 # Remove all but the files to include in the release.
@@ -43,7 +44,9 @@ $GIT commit -m "TeXZilla Release $RELEASENUMBER"
 $GIT tag -a v$RELEASENUMBER -m "TeXZilla Release $RELEASEMESSAGE"
 
 # Publish the npm release.
-$NPM publish . --tag v$RELEASENUMBER
+# TODO
+# https://github.com/fred-wang/TeXZilla/issues/29
+# $NPM publish . --tag v$RELEASENUMBER
 
 # Come back to the master branch.
 $GIT checkout master
