@@ -14,30 +14,27 @@
 
       function createMath(aScene, aTeX, aSize, aX, aY, aZ)
       {
-        // This follows the suggestion of
-        //   https://github.com/mrdoob/three.js/issues/1305#issuecomment-3916734
-        // For some reason, we need to delay a bit the insertion of the math
-        // formula or it is tainted when the image is not cached yet.
-
         var image = TeXZilla.toImage(aTeX, false, true);
-        var texture = new THREE.Texture(image);
-        texture.needsUpdate = true;
-        var math =
-          new THREE.Mesh(
-          new THREE.PlaneGeometry(aSize, aSize * image.height / image.width),
-          new THREE.MeshBasicMaterial({
-            transparent: true,
-            depthTest: false,
-            depthWrite: false,
-            map: texture
-          })
-        );
-        math.position.x = aX;
-        math.position.y = aY;
-        math.position.z = aZ;
-        mathFormulas.push(math);
+        image.onload = function() {
+          var texture = new THREE.Texture(image);
+          texture.needsUpdate = true;
+          var math =
+            new THREE.Mesh(
+            new THREE.PlaneGeometry(aSize, aSize * image.height / image.width),
+            new THREE.MeshBasicMaterial({
+              transparent: true,
+              depthTest: false,
+              depthWrite: false,
+              map: texture
+            })
+          );
+          math.position.x = aX;
+          math.position.y = aY;
+          math.position.z = aZ;
+          mathFormulas.push(math);
 
-        setTimeout(function () { aScene.add(math); }, 500);
+          aScene.add(math);
+        }
       }
 
       function updateMath(aCamera)

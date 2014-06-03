@@ -77,11 +77,11 @@ TeXZilla-min.js: TeXZilla-web.js web.js MPL-header.js
 	cat MPL-header.js t2.js > $@
 	rm t1.js t2.js
 
-tests:
+tests: TeXZilla.js
 # Run the tests.
 	@BASH@ unit-tests.sh @COMMONJS@ @CURL@ @KILL@
 
-tests-all:
+tests-all: TeXZilla.js
 # Run the tests for various commonJS programs.
 	for commonJS in nodejs phantomjs slimerjs; do \
 		@BASH@ unit-tests.sh $$commonJS @CURL@ @KILL@; \

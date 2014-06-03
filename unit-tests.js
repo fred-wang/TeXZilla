@@ -419,13 +419,14 @@ if (!success) {
 
 if (hasDOMAPI) {
   /* Testing filterElement */
-  // We verify that <head> is not processed but that fragments in <body> are.
+  // We verify that <head>/attributes/comments are not processed but that
+  // fragments in <body> are.
   // We check basic escaping and delimiters.
   // We check that special XML characters &amp; &lt; &gt; do not cause problems.
-  var doc = (new DOMParser).parseFromString('<html xmlns="http://www.w3.org/1999/xhtml"><head>\\$</head><body><p>&amp; &lt; &gt; \\$ <span>blah $x$ <span>$$y$$ \\\\</span> blah</span> $z$ </p></body></html>', "application/xml");
+  var doc = (new DOMParser).parseFromString('<html xmlns="http://www.w3.org/1999/xhtml"><head>\\$</head><body><p class="\$"><!-- \$ --> &amp; &lt; &gt; \\$ <span>blah $x$ <span>$$y$$ \\\\</span> blah</span> $z$ </p></body></html>', "application/xml");
   TeXZilla.filterElement(doc.documentElement.lastElementChild);
   output = (new XMLSerializer).serializeToString(doc);
-  success = output.indexOf('<p>&amp; &lt; &gt; $ <span>blah <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="TeX">x</annotation></semantics></math> <span><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mi>y</mi><annotation encoding="TeX">y</annotation></semantics></math> \\</span> blah</span> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="TeX">z</annotation></semantics></math> </p>') >= 0 && output.indexOf('<head>\\$</head>') >= 0;
+  success = output.indexOf('<p class="\$"><!-- \$ --> &amp; &lt; &gt; $ <span>blah <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="TeX">x</annotation></semantics></math> <span><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mi>y</mi><annotation encoding="TeX">y</annotation></semantics></math> \\</span> blah</span> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="TeX">z</annotation></semantics></math> </p>') >= 0 && output.indexOf('<head>\\$</head>') >= 0;
   printTestResult(success);
   if (!success) {
     console.log("Bad filterElement output: " + output)
