@@ -18,13 +18,20 @@ help:
 	@echo ""
 	@echo "make tests"
 	@echo "  Run the unit tests."
+	@echo
+	@echo "make tests-all"
+	@echo "  Run the unit tests with nodejs, phantomjs and slimerjs."
+	@echo
+	@echo "make release"
+	@echo "  Publish a new release of TeXZilla."
+	@echo
 	@echo ""
 
 unicode.xml:
 # Download the unicode.xml file from the "XML Entity Definitions for Characters"
 	@WGET@ http://www.w3.org/2003/entities/2007xml/unicode.xml
 # Workaround for https://github.com/fred-wang/TeXZilla/issues/5
-	patch < unicode.patch
+	@PATCH@ < unicode.patch
 
 chars.txt: extractChars.xsl unicode.xml
 # Extract the relevant information on characters from unicode.xml
@@ -37,7 +44,7 @@ char-commands.txt: generateCharCommands.py chars.txt
 commands.txt: char-commands.txt base-commands.txt
 # Merge the two set of commands and sort them in reverse order according to the
 # quoted key, so that e.g. Jison will treat "\\mathbb{C}" before "\\mathbb".
-	cat $^ | egrep -v "^#" | \
+	cat $^ | @EGREP@ -v "^#" | \
 	sort --reverse --field-separator='"' --key=2,2 > $@
 
 TeXZilla.jisonlex: main.jisonlex commands.txt
@@ -61,15 +68,24 @@ TeXZilla.js: TeXZilla-web.js commonJS.js
 	cp TeXZilla-web.js TeXZilla.js
 	@SED@ "1,6d" commonJS.js >> TeXZilla.js
 
-TeXZilla-min.js: TeXZilla-web.js MPL-header.js
-# Minify the Javascript parser using Google's Closure Compiler.
-	@CLOSURE_COMPILER@ $< > tmp.js
-	cat MPL-header.js tmp.js > $@
-	rm tmp.js
+TeXZilla-min.js: TeXZilla-web.js web.js MPL-header.js
+	 # Minify the Javascript parser using Google's Closure Compiler.
+	cat TeXZilla-web.js web.js > t1.js;
+	@CLOSURE_COMPILER@ --charset UTF-8 \
+		--compilation_level ADVANCED_OPTIMIZATIONS --js t1.js > t2.js
+	 # Add the MPL header.
+	cat MPL-header.js t2.js > $@
+	rm t1.js t2.js
 
-tests: unit-tests.js TeXZilla.js
-	@COMMONJS@ $<
-	@BASH@ unit-tests.sh @COMMONJS@
+tests: TeXZilla.js
+# Run the tests.
+	@BASH@ unit-tests.sh @COMMONJS@ @CURL@ @KILL@
+
+tests-all: TeXZilla.js
+# Run the tests for various commonJS programs.
+	for commonJS in nodejs phantomjs slimerjs; do \
+		@BASH@ unit-tests.sh $$commonJS @CURL@ @KILL@; \
+	done
 
 build: TeXZilla.js
 
@@ -89,4 +105,4 @@ distclean: clean
 
 release:
 # Generate a release branch.
-	./release.sh
+	@BASH@ release.sh @GIT@ @SED@ @MAKE@ @EGREP@ @NPM@

@@ -3,6 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 var TeXZilla = require("./TeXZilla");
+var hasDOMAPI = (typeof window !== "undefined" &&
+                 typeof DOMParser !== "undefined" &&
+                 typeof XMLSerializer !== "undefined" &&
+                 typeof Image != "undefined");
+
 var tests = [
     /* Empty content */
     ["", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow/><annotation encoding="TeX"></annotation></semantics></math>'],
@@ -241,7 +246,22 @@ function escape(aString)
 
 var failures = 0, unexpectedfailures = 0, i = 0, output, input;
 
-for (i = 0; i < tests.length; i++) {
+function printTestResult(aSuccess, aExpectedFailure)
+{
+    i++;
+    if (aSuccess) {
+      console.log("Test " + i + "... PASS");
+    } else {
+      failures++;
+      if (!aExpectedFailure) {
+        unexpectedfailures++;
+      }
+      console.log("Test " + i + "... " +
+                  (aExpectedFailure ? "EXPECTED FAIL" : "FAIL"));
+    }
+}
+
+while (i < tests.length) {
     try {
         /* Test TeXZilla.toMathMLString against a reference output. */
         output = TeXZilla.toMathMLString(tests[i][0]);
@@ -250,21 +270,20 @@ for (i = 0; i < tests.length; i++) {
                    "  Actual: '" + escape(output) + "'\n" +
                    "  Expected: '" + escape(tests[i][1]) + "'");
         }
-        /* Do the same conversion with TeXZilla.toMathML and try to extract
-           the original input again with TeXZilla.getTeXSource */
-        input = TeXZilla.getTeXSource(TeXZilla.toMathML(tests[i][0]));
-        if (input !== tests[i][0]) {
-            throw ("TeXZilla.getTeXSource, unexpected result:\n" +
-                   "  Actual: '" + escape(input) + "'\n" +
-                   "  Expected: '" + escape(tests[i][0]) + "'");
+        if (hasDOMAPI) {
+          /* Do the same conversion with TeXZilla.toMathML and try to extract
+             the original input again with TeXZilla.getTeXSource */
+          input = TeXZilla.getTeXSource(TeXZilla.toMathML(tests[i][0]));
+          if (input !== tests[i][0]) {
+              throw ("TeXZilla.getTeXSource, unexpected result:\n" +
+                     "  Actual: '" + escape(input) + "'\n" +
+                     "  Expected: '" + escape(tests[i][0]) + "'");
+          }
         }
-        console.log("Test " + (i + 1) + "... PASS");
+        printTestResult(true);
     } catch(e) {
-        console.log("Test " + (i + 1) + "... " +
-                    (tests[i][2] ? "EXPECTED FAIL" : "FAIL"));
+        printTestResult(false, tests[i][2]);
         console.log(e);
-        failures++;
-        if (!tests[i][2]) unexpectedfailures++;
     }
 }
 
@@ -283,13 +302,7 @@ try {
     console.log(e)
 }
 success = (output.indexOf(error) != -1 && output.indexOf("<merror>") != -1);
-console.log("Test " + (i + 1) + "... " + (success ? "PASS" : "FAIL"));
-i++;
-
-if (!success) {
-    failures++;
-    unexpectedfailures++;
-}
+printTestResult(success);
 
 /* 2) with exception */
 success = false;
@@ -304,11 +317,147 @@ try {
         console.log(e);
     }
 }
-console.log("Test " + (i + 1) + "... " + (success ? "PASS" : "FAIL"));
-i++;
+printTestResult(success);
+
+/* Test itex identifier mode */
+TeXZilla.setItexIdentifierMode(true);
+output = TeXZilla.toMathMLString("xy");
+success = (output === '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>xy</mi><annotation encoding="TeX">xy</annotation></semantics></math>');
+printTestResult(success);
 if (!success) {
-    failures++;
-    unexpectedfailures++;
+  console.log("itex identifier mode ignored: " + escape(output));
+}
+TeXZilla.setItexIdentifierMode(false);
+
+/* Test safe mode */
+TeXZilla.setSafeMode(true);
+output =
+  TeXZilla.toMathMLString("\\href{javascript:alert(\"!\")}{\\mtext{evil}}");
+success = (output === '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>evil</mtext></mrow><annotation encoding="TeX">\\href{javascript:alert("!")}{\\mtext{evil}}</annotation></semantics></math>');
+printTestResult(success);
+if (!success) {
+  console.log("safe mode ignored: " + escape(output));
+}
+TeXZilla.setSafeMode(false);
+
+if (hasDOMAPI) {
+  /* Testing toImage */
+  /* 1) basic format */
+  var head = "data:image/svg+xml;base64,";
+  var img;
+  try {
+    img = TeXZilla.toImage("x", true, false, 77);
+    success = (img.toString().indexOf("[object HTMLImageElement]") !== -1 &&
+               img.src.indexOf(head) === 0)
+  } catch(e) {
+    console.log(e);
+    success = false;
+  }
+  printTestResult(success);
+
+  /* 2) Test the SVG source */
+  try {
+    /* phantomjs/slimerjs serializes differently, so we can't have a complete
+       reference string */
+    output = window.atob(img.src.substr(head.length));
+    success =
+          output.indexOf('<svg ') >= 0 &&
+          output.indexOf('dir="rtl"') >= 0 &&
+          output.indexOf('translate(0,0)') >= 0 &&
+          output.indexOf('mathsize="77px"') >= 0 &&
+          output.indexOf('<foreignObject ') >= 0 &&
+          output.indexOf('width="' + img.width + 'px"') >= 0 &&
+          output.indexOf('height="' + img.height + 'px"') >= 0 &&
+          output.indexOf('<semantics><mi>x</mi><annotation encoding="TeX">x</annotation></semantics>') >= 0 &&
+          output.indexOf('</g></svg>') >= 0;
+  } catch(e) {
+    console.log(e);
+    success = false;
+  }
+  printTestResult(success);
+  if (!success) {
+    console.log("Bad toImage output: " + output);
+  }
+
+  /* 3) Test the power of two param */
+  function isPowerOfTwo(x) {
+    while (x % 2 === 0) {
+      x /= 2;
+    }
+    return (x === 1);
+  }
+  try {
+    img = TeXZilla.toImage("\\frac{x}{y}", false, true);
+    success = isPowerOfTwo(img.width) && isPowerOfTwo(img.height);
+  } catch(e) {
+    console.log(e);
+    success = false;
+  }
+  printTestResult(success);
+  if (!success) {
+    console.log("Bad toImage dimension: " + img.width + ", " + img.height);
+  }
+}
+
+/* Testing filterString */
+
+/* 1) basic delimiters */
+output = TeXZilla.filterString("blah $a$ blah $$b$$ blah \\[c\\] blah \\(d\\) blah");
+success = (output === 'blah <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="TeX">a</annotation></semantics></math> blah <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mi>b</mi><annotation encoding="TeX">b</annotation></semantics></math> blah <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mi>c</mi><annotation encoding="TeX">c</annotation></semantics></math> blah <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="TeX">d</annotation></semantics></math> blah');
+printTestResult(success);
+if (!success) {
+  console.log("Bad filterString output: " + output)
+}
+
+/* 2) empty math, new line and escaped characters */
+output = TeXZilla.filterString("blah \\[\\] \\(\\) \n \\$ \\\\ blah");
+success = (output === 'blah <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow/><annotation encoding="TeX"></annotation></semantics></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow/><annotation encoding="TeX"></annotation></semantics></math> \n $ \\ blah')
+printTestResult(success);
+if (!success) {
+  console.log("Bad filterString output: " + output)
+}
+
+if (hasDOMAPI) {
+  /* Testing filterElement */
+  // We verify that <head>/attributes/comments are not processed but that
+  // fragments in <body> are.
+  // We check basic escaping and delimiters.
+  // We check that special XML characters &amp; &lt; &gt; do not cause problems.
+  var doc = (new DOMParser).parseFromString('<html xmlns="http://www.w3.org/1999/xhtml"><head>\\$</head><body><p class="\$"><!-- \$ --> &amp; &lt; &gt; \\$ <span>blah $x$ <span>$$y$$ \\\\</span> blah</span> $z$ </p></body></html>', "application/xml");
+  TeXZilla.filterElement(doc.documentElement.lastElementChild);
+  output = (new XMLSerializer).serializeToString(doc);
+  success = output.indexOf('<p class="\$"><!-- \$ --> &amp; &lt; &gt; $ <span>blah <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="TeX">x</annotation></semantics></math> <span><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mi>y</mi><annotation encoding="TeX">y</annotation></semantics></math> \\</span> blah</span> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="TeX">z</annotation></semantics></math> </p>') >= 0 && output.indexOf('<head>\\$</head>') >= 0;
+  printTestResult(success);
+  if (!success) {
+    console.log("Bad filterElement output: " + output)
+  }
+
+  /* Testing setDOMParser */
+  TeXZilla.setDOMParser({
+    parseFromString: function (aString, aType) {
+      return (new DOMParser).parseFromString('<html xmlns="http://www.w3.org/1999/xhtml"><body>' + aString + '</body></html>', aType);
+    }
+  })
+  output = (new XMLSerializer).serializeToString(TeXZilla.toMathML("x"));
+  success = (output === '<html xmlns="http://www.w3.org/1999/xhtml"><body><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="TeX">x</annotation></semantics></math></body></html>');
+  printTestResult(success);
+  if (!success) {
+    console.log("setDOMParser failure: " + output)
+  }
+  TeXZilla.setDOMParser(new DOMParser);
+
+  /* Testing setXMLSerializer */
+  TeXZilla.setXMLSerializer({
+    serializeToString: function () {
+      return "<svg/>";
+    }
+  })
+  output = window.atob(TeXZilla.toImage("x").src.substr(head.length));
+  success = (output === "<svg/>");
+  if (!success) {
+    console.log("setXMLSerializer failure: " + output)
+  }
+  TeXZilla.setDOMParser(new XMLSerializer);
 }
 
 /* Print test results */

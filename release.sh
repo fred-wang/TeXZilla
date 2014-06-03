@@ -3,9 +3,14 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-source ./config.cfg
 
-echo "This may mess up your GIT repository. Are you sure you want to continue [Y,n]?"
+GIT=$1
+SED=$2
+MAKE=$3
+EGREP=$4
+NPM=$5
+
+echo "This may mess up your git repository. Are you sure you want to continue [Y,n]?"
 read ANSWER
 if [ "$ANSWER" != "Y" ]
 then
@@ -27,7 +32,7 @@ $MAKE minify
 
 # Remove all but the files to include in the release.
 rm .gitignore
-ls | egrep -v "README-release.txt|TeXZilla.js|TeXZilla-min.js|examples|index.html" | xargs rm
+ls | $EGREP -v "README-release.txt|TeXZilla.js|TeXZilla-min.js|examples|index.html" | xargs rm
 
 # Set the version in the README-release.txt
 $SED -i s/RELEASENUMBER/$RELEASENUMBER/ README-release.txt
@@ -36,6 +41,9 @@ $SED -i s/RELEASENUMBER/$RELEASENUMBER/ README-release.txt
 $GIT add --no-ignore-removal .
 $GIT commit -m "TeXZilla Release $RELEASENUMBER"
 $GIT tag -a v$RELEASENUMBER -m "TeXZilla Release $RELEASEMESSAGE"
+
+# Publish the npm release.
+$NPM publish . --tag v$RELEASENUMBER
 
 # Come back to the master branch.
 $GIT checkout master

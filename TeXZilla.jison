@@ -4,6 +4,7 @@
 
 %{
 var MathMLNameSpace = "http://www.w3.org/1998/Math/MathML",
+    SVGNameSpace = "http://www.w3.org/2000/svg",
     TeXMimeTypes = ["TeX", "LaTeX", "text/x-tex", "text/x-latex",
                     "application/x-tex", "application/x-latex"];
 
@@ -145,26 +146,61 @@ function getTeXSourceInternal(aMathMLElement) {
 try {
   // Try to create a DOM Parser object if it exists (e.g. in a Web page,
   // in a chrome script running in a window etc)
-  parser.DOMParser = new DOMParser();
+  parser.mDOMParser = new DOMParser();
 } catch (e) {
-  // Leave the DOMParser unset.
-  parser.DOMParser = null;
+  // Make the DOMParser throw an exception if used.
+  parser.mDOMParser = {
+    parseFromString: function() {
+      throw "DOMParser undefined. Did you call TeXZilla.setDOMParser?";
+    }
+  };
 }
 
-// Initialize some Node constants if they are not defined.
-if (!Node) {
-  Node = { ELEMENT_NODE: 1, TEXT_NODE: 3 };
+parser.setDOMParser = function(aDOMParser)
+{
+  this.mDOMParser = aDOMParser;
+}
+
+try {
+  // Try to create a XMLSerializer object if it exists (e.g. in a Web page,
+  // in a chrome script running in a window etc)
+  parser.mXMLSerializer = new XMLSerializer();
+} catch (e) {
+  // Make the XMLSerializer throw an exception if used.
+  parser.mXMLSerializer = {
+    serializeToString: function() {
+      throw "XMLSerializer undefined. Did you call TeXZilla.setXMLSerializer?";
+    }
+  };
+}
+
+parser.setXMLSerializer = function(aXMLSerializer)
+{
+  this.mXMLSerializer = aXMLSerializer;
+}
+
+// Polyfill for Math.log2.
+// We use string notation so that it won't be modified by closure-compiler.
+if (typeof Math["log2"] === "undefined") {
+  Math["log2"] = function(x) {
+    return Math.log(x) / Math.LN2;
+  }
 }
 
 parser.parseMathMLDocument = function (aString) {
   // Parse the string into a MathML document and return the <math> root.
-  return this.DOMParser.
+  return this.mDOMParser.
     parseFromString(aString, "application/xml").documentElement;
 }
 
 parser.setSafeMode = function(aEnable)
 {
   this.yy.mSafeMode = aEnable;
+}
+
+parser.setItexIdentifierMode = function(aEnable)
+{
+  this.yy.mItexIdentifierMode = aEnable;
 }
 
 parser.getTeXSource = function(aMathMLElement) {
@@ -228,39 +264,61 @@ function escapeHTML(aString)
 }
 
 parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
-  var div, box, svgWidth, svgHeight, math, svg, image;
+  var math, el, box, svgWidth, svgHeight, svg, image;
+
+  // Set default values.
   if (aSize === undefined) {
     aSize = 64;
   }
   if (aDocument === undefined) {
     aDocument = window.document;
   }
+
+  // Create the MathML element.
   math = this.toMathML(aTeX, true, aRTL);
   math.setAttribute("mathsize", aSize + "px");
 
-  div = document.createElement("div");
-  div.style.visibility = "hidden";
-  div.style.position = "absolute";
-  div.appendChild(math);
-  aDocument.body.appendChild(div);
+  // Temporarily insert the MathML element in the document to measure it.
+  el = document.createElement("div");
+  el.style.visibility = "hidden";
+  el.style.position = "absolute";
+  el.appendChild(math);
+  aDocument.body.appendChild(el);
   box = math.getBoundingClientRect();
-  aDocument.body.removeChild(div);
+  aDocument.body.removeChild(el);
+  el.removeChild(math);
 
+  // Round up the computed sizes.
   if (aRoundToPowerOfTwo) {
-    svgWidth = Math.pow(2, Math.ceil(Math.log2(box.width)));
-    svgHeight = Math.pow(2, Math.ceil(Math.log2(box.height)));
+    svgWidth = Math.pow(2, Math.ceil(Math["log2"](box.width)));
+    svgHeight = Math.pow(2, Math.ceil(Math["log2"](box.height)));
   } else {
     svgWidth = Math.ceil(box.width);
     svgHeight = Math.ceil(box.height);
   }
-  svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + svgWidth + "px\" height=\""+ svgHeight + "px\"><g transform=\"translate(" + (svgWidth - box.width) / 2.0 + "," + (svgHeight - box.height) / 2.0 + ")\"><foreignObject width=\"" + box.width + "\" height=\"" + box.height + "\">" + escapeHTML(math.outerHTML) + "</foreignObject></g></svg>";
 
+  // Embed the MathML in an SVG element.
+  svg = document.createElementNS(SVGNameSpace, "svg");
+  svg.setAttribute("width", svgWidth + "px");
+  svg.setAttribute("height", svgHeight + "px");
+  el = document.createElementNS(SVGNameSpace, "g");
+  el.setAttribute("transform", "translate(" +
+    (svgWidth - box.width) / 2.0 + "," + (svgHeight - box.height) / 2.0 + ")");
+  svg.appendChild(el);
+  el = document.createElementNS(SVGNameSpace, "foreignObject");
+  el.setAttribute("width", box.width);
+  el.setAttribute("height", box.height);
+  el.appendChild(math);
+  svg.firstChild.appendChild(el);
+
+  // Create the image element.
   image = new Image();
-  image.src = "data:image/svg+xml;base64," + window.btoa(svg);
-
+  image.src = "data:image/svg+xml;base64," +
+    window.btoa(escapeHTML(this.mXMLSerializer.serializeToString(svg)));
   image.width = svgWidth;
   image.height = svgHeight;
   image.alt = escapeText(aTeX);
+
   return image;
 }
 
@@ -279,13 +337,15 @@ parser.filterElement = function(aElement, aThrowExceptionOnError) {
   var root, child, node;
   for (var node = aElement.firstChild; node; node = node.nextSibling) {
     switch(node.nodeType) {
-      case Node.ELEMENT_NODE:
+      case 1: // Node.ELEMENT_NODE
         this.filterElement(node, aThrowExceptionOnError);
       break;
-      case Node.TEXT_NODE:
-        root = this.DOMParser.parseFromString("<root>" +
+      case 3: // Node.TEXT_NODE
+        this.yy.escapeXML = true;
+        root = this.mDOMParser.parseFromString("<root>" +
                TeXZilla.filterString(node.data, aThrowExceptionOnError) +
                "</root>", "application/xml").documentElement;
+        this.yy.escapeXML = false;
         while (child = root.firstChild) {
           aElement.insertBefore(root.removeChild(child), node);
         }
@@ -916,7 +976,7 @@ documentItemList
   ;
 
 documentItem
-  : CHAR {
+  : TEXT {
     $$ = $1;
   }
   | STARTMATH0 ENDMATH0 {

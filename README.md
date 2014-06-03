@@ -34,12 +34,14 @@ Build Instructions
 
 The following dependencies are required:
 
-- [coreutils](https://www.gnu.org/software/coreutils/), [sed](https://www.gnu.org/software/sed/), [wget](https://www.gnu.org/software/wget/), [make](https://www.gnu.org/software/make/)
+- [coreutils](https://www.gnu.org/software/coreutils/), [sed](https://www.gnu.org/software/sed/), [patch](https://www.gnu.org/software/patch/), [wget](https://www.gnu.org/software/wget/), [make](https://www.gnu.org/software/make/)
 - [xsltproc](http://xmlsoft.org/XSLT/xsltproc2.html)
 - [Python](http://www.python.org/)
-- [Jison](http://zaach.github.io/jison) and NodeJS.
-- To run unit tests: [slimerJS](http://slimerjs.org/) or [phantomJS](http://phantomjs.org/)
-- To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/)
+- [Jison](http://zaach.github.io/jison).
+- To run unit tests: [slimerJS](http://slimerjs.org/) or [phantomJS](http://phantomjs.org/), [bash](https://www.gnu.org/software/bash/). [nodejs](http://nodejs.org/) can be used to run the DOM-less tests.
+- To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/).
+
+On Debian-based Linux distributions, try `sudo apt-get install coreutils sed patch wget make xsltproc python npm phantomjs bash closure-compiler` and install Jison with `npm install jison -g`.
 
 To build TeXZilla, run the tests and generate the minified version:
 
