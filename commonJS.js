@@ -5,6 +5,45 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+////////////////////////////////////////////////////////////////////////////////
+// Export the public API to commonJS programs.
+////////////////////////////////////////////////////////////////////////////////
+if (typeof require !== "undefined" && typeof exports !== "undefined") {
+  exports.setDOMParser = function (aDOMParser) {
+    TeXZilla.setDOMParser(aDOMParser);
+  };
+  exports.setXMLSerializer = function (aXMLSerializer) {
+    TeXZilla.setXMLSerializer(aXMLSerializer);
+  };
+  exports.setSafeMode = function (aEnable) {
+    TeXZilla.setSafeMode(aEnable);
+  };
+  exports.setItexIdentifierMode = function (aEnable) {
+    TeXZilla.setItexIdentifierMode(aEnable);
+  };
+  exports.getTeXSource = function () {
+    return TeXZilla.getTeXSource.apply(TeXZilla, arguments);
+  };
+  exports.toMathMLString = function () {
+    return TeXZilla.toMathMLString.apply(TeXZilla, arguments);
+  };
+  exports.toMathML = function () {
+    return TeXZilla.toMathML.apply(TeXZilla, arguments);
+  };
+  exports.toImage = function () {
+    return TeXZilla.toImage.apply(TeXZilla, arguments);
+  };
+  exports.filterString = function () {
+    return TeXZilla.filterString.apply(TeXZilla, arguments);
+  };
+  exports.filterElement = function () {
+    return TeXZilla.filterElement.apply(TeXZilla, arguments);
+  };
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Export the command-line API to commonJS programs.
+////////////////////////////////////////////////////////////////////////////////
 if (typeof require !== "undefined") {
 
   // FIXME: This tries to work with slimerjs, phantomjs and nodejs. Ideally,
@@ -199,51 +238,6 @@ if (typeof require !== "undefined") {
       exitCommonJS(0);
     }
   };
-
-  if (typeof exports !== "undefined") {
-    // Export the public API.
-    exports.setDOMParser = function (aDOMParser) {
-      TeXZilla.setDOMParser(aDOMParser);
-    };
-
-    exports.setXMLSerializer = function (aXMLSerializer) {
-      TeXZilla.setXMLSerializer(aXMLSerializer);
-    };
-
-    exports.setSafeMode = function (aEnable) {
-      TeXZilla.setSafeMode(aEnable);
-    };
-
-    exports.setItexIdentifierMode = function (aEnable) {
-      TeXZilla.setItexIdentifierMode(aEnable);
-    };
-
-    exports.getTeXSource = function () {
-      return TeXZilla.getTeXSource.apply(TeXZilla, arguments);
-    };
-
-    exports.toMathMLString = function () {
-      return TeXZilla.toMathMLString.apply(TeXZilla, arguments);
-    };
-
-    exports.toMathML = function () {
-      return TeXZilla.toMathML.apply(TeXZilla, arguments);
-    };
-
-    exports.toImage = function () {
-      return TeXZilla.toImage.apply(TeXZilla, arguments);
-    };
-
-    exports.filterString = function () {
-      return TeXZilla.filterString.apply(TeXZilla, arguments);
-    };
-
-    exports.filterElement = function () {
-      return TeXZilla.filterElement.apply(TeXZilla, arguments);
-    };
-
-    exports.main = main;
-  }
 
   if (typeof exports === "undefined" ||
       (typeof module !== "undefined" && require.main === module)) {
