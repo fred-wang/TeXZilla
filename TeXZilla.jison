@@ -775,61 +775,61 @@ closedTerm
     $$ = newTag("mmultiscripts", $4 + $6);
   }
   | BMATRIX tableRowList EMATRIX {
-    $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
   }
   | BGATHERED tableRowList EGATHERED {
-    $$ = newTag("mtable", $2, "rowspacing=\"1.0ex\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"true\" rowspacing=\"1.0ex\"");
   }
   | BPMATRIX tableRowList EPMATRIX {
-    $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | BBMATRIX tableRowList EBMATRIX {
-    $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
     $$ = newTag("mrow", newMo("[") + $$ + newMo("]"));
   }
   | BVMATRIX tableRowList EVMATRIX {
-    $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
     $$ = newTag("mrow", newMo("|") + $$ + newMo("|"));
   }
   | BBBMATRIX tableRowList EBBMATRIX {
-    $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
     $$ = newTag("mrow", newMo("{") + $$ + newMo("}"));
   }
   | BVVMATRIX tableRowList EVVMATRIX {
-    $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
     $$ = newTag("mrow", newMo("\u2016") + $$ + newMo("\u2016"));
   }
   | BSMALLMATRIX tableRowList ESMALLMATRIX {
-    $$ = newTag("mtable", $2, "rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
     $$ = newTag("mstyle", $$, "scriptlevel=\"2\"");
   }
   | BCASES tableRowList ECASES {
-    $$ = newTag("mtable", $2, "columnalign=\"left left\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"false\" columnalign=\"left left\"");
     $$ = newTag("mrow", newMo("{") + $$);
   }
   | BALIGNED tableRowList EALIGNED {
-    $$ = newTag("mtable", $2, "columnalign=\"right left right left right left right left right left\" columnspacing=\"0em\"");
+    $$ = newTag("mtable", $2, "displaystyle=\"true\" columnalign=\"right left right left right left right left right left\" columnspacing=\"0em\"");
   }
   | BARRAY arrayAlign columnAlign tableRowList EARRAY {
     $$ = newTag("mtable", $4,
-                "rowspacing=\"0.5ex\" " +
+                "displaystyle=\"false\" rowspacing=\"0.5ex\" " +
                 "align=\"" + $2 + "\" " +
                 "columnalign=\"" + $3 + "\"");
   }
   | BARRAY columnAlign tableRowList EARRAY {
     $$ = newTag("mtable", $3,
-                "rowspacing=\"0.5ex\" " +
+                "displaystyle=\"false\" rowspacing=\"0.5ex\" " +
                 "columnalign=\"" + $2 + "\"");
   }
   | SUBSTACK "{" tableRowList "}" {
-    $$ = newTag("mtable", $3, "columnalign=\"center\" rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $3, "displaystyle=\"false\" columnalign=\"center\" rowspacing=\"0.5ex\"");
   }
   | ARRAY "{" tableRowList "}" {
-    $$ = newTag("mtable", $3);
+    $$ = newTag("mtable", $3, "displaystyle=\"false\"");
   }
   | ARRAY "{" ARRAYOPTS "{" arrayoptList "}" tableRowList "}" {
-    $$ = newTag("mtable", $7, $5);
+    $$ = newTag("mtable", $7, "displaystyle=\"false\" " + $5);
   }
   ;
 
