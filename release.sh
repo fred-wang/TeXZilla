@@ -44,9 +44,8 @@ $GIT commit -m "TeXZilla Release $RELEASENUMBER"
 $GIT tag -a v$RELEASENUMBER -m "TeXZilla Release $RELEASEMESSAGE"
 
 # Publish the npm release.
-# TODO
 # https://github.com/fred-wang/TeXZilla/issues/29
-# $NPM publish . --tag v$RELEASENUMBER
+$NPM publish . --tag v$RELEASENUMBER
 
 # Come back to the master branch.
 $GIT checkout master
