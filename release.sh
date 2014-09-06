@@ -31,6 +31,9 @@ $GIT checkout $RELEASEBRANCH
 $MAKE build
 $MAKE minify
 
+# Publish the npm release.
+$NPM publish .
+
 # Remove all but the files to include in the release.
 rm .gitignore
 ls | $EGREP -v "README-release.txt|TeXZilla.js|TeXZilla-min.js|examples|index.html" | xargs rm
@@ -42,11 +45,6 @@ $SED -i s/RELEASENUMBER/$RELEASENUMBER/ README-release.txt
 $GIT add --no-ignore-removal .
 $GIT commit -m "TeXZilla Release $RELEASENUMBER"
 $GIT tag -a v$RELEASENUMBER -m "TeXZilla Release $RELEASEMESSAGE"
-
-# Publish the npm release.
-# TODO
-# https://github.com/fred-wang/TeXZilla/issues/29
-# $NPM publish . --tag v$RELEASENUMBER
 
 # Come back to the master branch.
 $GIT checkout master
