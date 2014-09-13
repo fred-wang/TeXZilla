@@ -7,7 +7,15 @@
 
   <xsl:template match="charlist">
 
+    <!-- We extract the list of characters from unicode.xml.
+         For the LaTeX commands, we use the 'AMS' set as a reference modulo
+         some modifications to match itex2MML's coverage.
+         See isLaTeXCharacterCommand and addLaTeXCommands in
+         generateCharCommands.py -->
     <xsl:apply-templates select="character"/>
+
+    <!-- Some of the char combinations from itex2MML are not in unicode.xml,
+         so we add them here. -->
 
     <xsl:text>U0003D-02237</xsl:text>
     <xsl:text> </xsl:text>
@@ -75,6 +83,7 @@
 
   </xsl:template>
   <xsl:template match="character">
+    <!-- First handle the characters from the MathML operator dictionary -->
     <xsl:if test="operator-dictionary">
       <xsl:value-of select="@id"/>
       <xsl:text> </xsl:text>
@@ -89,25 +98,22 @@
         <xsl:text>S</xsl:text>
       </xsl:if>
       <xsl:text> </xsl:text>
-      <xsl:value-of select="latex"/>
-      <xsl:text> </xsl:text>
-      <xsl:value-of select="varlatex"/>
-      <xsl:text> </xsl:text>
-      <xsl:value-of select="mathlatex"/>
-      <xsl:text> </xsl:text>
       <xsl:value-of select="AMS"/>
-      <xsl:text> </xsl:text>
-      <xsl:value-of select="IEEE"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
-    <xsl:if test="unicodedata/@mathclass and not(operator-dictionary) or
-                  boolean(@id = 'U000F0') or
-                  boolean(@id = 'U003C2') or
-                  boolean(@id = 'U0228A-0FE00') or
-                  boolean(@id = 'U02268-0FE00') or
-                  boolean(@id = 'U02269-0FE00') or
-                  boolean(@id = 'U0228B-0FE00') or
-                  boolean(@id = 'U02ACB-0FE00')">
+    <!-- Then handle the characters that have a mathclass as well as a few
+         extra characters. -->
+    <xsl:if test="not(operator-dictionary) and
+                  (unicodedata/@mathclass or
+                   boolean(@id = 'U00024') or
+                   boolean(@id = 'U000F0') or
+                   boolean(@id = 'U003C2') or
+                   boolean(@id = 'U0228A-0FE00') or
+                   boolean(@id = 'U02268-0FE00') or
+                   boolean(@id = 'U02269-0FE00') or
+                   boolean(@id = 'U0228B-0FE00') or
+                   boolean(@id = 'U02ACB-0FE00') or
+                   boolean(@id = 'U02ACC-0FE00'))">
       <xsl:value-of select="@id"/>
       <xsl:text> </xsl:text>
       <xsl:value-of select="unicodedata/@mathclass"/>
@@ -115,15 +121,7 @@
         <xsl:text>?</xsl:text>
       </xsl:if>
       <xsl:text> </xsl:text>
-      <xsl:value-of select="latex"/>
-      <xsl:text> </xsl:text>
-      <xsl:value-of select="varlatex"/>
-      <xsl:text> </xsl:text>
-      <xsl:value-of select="mathlatex"/>
-      <xsl:text> </xsl:text>
       <xsl:value-of select="AMS"/>
-      <xsl:text> </xsl:text>
-      <xsl:value-of select="IEEE"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
   </xsl:template>
