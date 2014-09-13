@@ -10,22 +10,273 @@ import argparse
 import re
 import sys
 
-def isValidLaTeXCommand(aCommand):
+def customMathClass(aCodePoint):
 
-    if (command.find("\\") == -1 or
-        command == "\\overbrace" or
+    # We define/redefine some mathclass that are absent from unicode.xml or
+    # that are different from what itex2MML does.
+
+    if len(aCodePoint) == 1:
+        if (aCodePoint[0] == 0x221E):
+            return "NUM"
+        elif (aCodePoint[0] in
+              [0x0024, 0x00F0, 0x03C2, 0x210F, 0x2127, 0x2205]):
+            return "A"
+        elif (aCodePoint[0] in [0x0023, 0x2020, 0x2021, 0x214B,
+                               0x2305, 0x2306, 0x2322, 0x2323, 0x23B0, 0x23B1,
+                               0x25CA, 0x25CB,
+                               0x2605, 0x2660, 0x2661, 0x2662, 0x2663]):
+            return "OP"
+        elif (aCodePoint[0] in [0x2032, 0x2033, 0x2034, 0x2035, 0x2057]):
+            return "OPP"
+
+    if len(aCodePoint) == 2:
+        if ((aCodePoint[0] == 0x003D and aCodePoint[1] == 0x2237) or
+            (aCodePoint[0] == 0x2268 and aCodePoint[1] == 0xFE00) or
+            (aCodePoint[0] == 0x2269 and aCodePoint[1] == 0xFE00) or
+            (aCodePoint[0] == 0x228A and aCodePoint[1] == 0xFE00) or
+            (aCodePoint[0] == 0x228B and aCodePoint[1] == 0xFE00) or
+            (aCodePoint[0] == 0x2ACB and aCodePoint[1] == 0xFE00) or
+            (aCodePoint[0] == 0x2ACC and aCodePoint[1] == 0xFE00)):
+            return "OP"
+
+    return None
+
+def isLaTeXCharacterCommand(aCommand):
+
+    # We exclude commands that do not generate a single character.
+    if (command == "\\overbrace" or
         command == "\\underbrace" or
-        command == "\doublebarwedge ?" or
-        command == "\\hat" or
-        command == "{_\\ast}" or
-        command == "{{/}\\!\\!{/}}" or
-        command.find("\\fontencoding") != -1 or
-        command.find("\\ElsevierGlyph") != -1 or
-        command.find("\\Pisymbol") != -1 or
-        command.find("\\mbox") != -1):
+        command == "\\hat"):
         return False
 
     return True
+
+def addLaTeXCommands(aCodePoint, aLaTeXCommands):
+
+    # We add some LaTeX commands defined in itex2MML
+
+    if len(aCodePoint) == 1:
+        if aCodePoint[0] == 0x0023:
+            aLaTeXCommands.append("\\#")
+        if aCodePoint[0] == 0x0024:
+            aLaTeXCommands.append("\\$")
+        if aCodePoint[0] == 0x0025:
+            aLaTeXCommands.append("\\%")
+        elif aCodePoint[0] == 0x0026:
+            aLaTeXCommands.append("\\&")
+        elif aCodePoint[0] == 0x003C:
+            aLaTeXCommands.append("\\lt")
+        elif aCodePoint[0] == 0x003E:
+            aLaTeXCommands.append("\\gt")
+        elif aCodePoint[0] == 0x007B:
+            aLaTeXCommands.append("\\{")
+        elif aCodePoint[0] == 0x007D:
+            aLaTeXCommands.append("\\}")
+        elif aCodePoint[0] == 0x00AC:
+            aLaTeXCommands.append("\\not")
+        elif aCodePoint[0] == 0x00F0:
+            aLaTeXCommands.append("\\eth")
+        elif aCodePoint[0] == 0x0237:
+            aLaTeXCommands.append("\\jmath")
+        elif aCodePoint[0] == 0x0391:
+            aLaTeXCommands.append("\\Alpha")
+        elif aCodePoint[0] == 0x0392:
+            aLaTeXCommands.append("\\Beta")
+        elif aCodePoint[0] == 0x0396:
+            aLaTeXCommands.append("\\Zeta")
+        elif aCodePoint[0] == 0x0397:
+            aLaTeXCommands.append("\\Eta")
+        elif aCodePoint[0] == 0x0399:
+            aLaTeXCommands.append("\\Iota")
+        elif aCodePoint[0] == 0x039A:
+            aLaTeXCommands.append("\\Kappa")
+        elif aCodePoint[0] == 0x039C:
+            aLaTeXCommands.append("\\Mu")
+        elif aCodePoint[0] == 0x039D:
+            aLaTeXCommands.append("\\Nu")
+        elif aCodePoint[0] == 0x03A1:
+            aLaTeXCommands.append("\\Rho")
+        elif aCodePoint[0] == 0x03A4:
+            aLaTeXCommands.append("\\Tau")
+        elif aCodePoint[0] == 0x03D1:
+            aLaTeXCommands.append("\\vartheta")
+        elif aCodePoint[0] == 0x03D2:
+            aLaTeXCommands.append("\\Upsi")
+        elif aCodePoint[0] == 0x2016:
+            aLaTeXCommands.append("\\|")
+        elif aCodePoint[0] == 0x2022:
+            aLaTeXCommands.append("\\bullet")
+        elif aCodePoint[0] == 0x2026:
+            aLaTeXCommands.append("\\ldots")
+        elif aCodePoint[0] == 0x2032:
+            aLaTeXCommands.append("'")
+        elif aCodePoint[0] == 0x2033:
+            aLaTeXCommands.append("''")
+        elif aCodePoint[0] == 0x2034:
+            aLaTeXCommands.append("'''")
+        elif aCodePoint[0] == 0x2057:
+            aLaTeXCommands.append("''''")
+        elif aCodePoint[0] == 0x210F:
+            aLaTeXCommands.append("\\hbar")
+        elif aCodePoint[0] == 0x2127:
+            aLaTeXCommands.append("\\mho")
+        elif aCodePoint[0] == 0x2134:
+            aLaTeXCommands.append("\\omicron")
+        elif aCodePoint[0] == 0x214B:
+            aLaTeXCommands.append("\\invamp")
+            aLaTeXCommands.append("\\parr")
+        elif aCodePoint[0] == 0x2192:
+            aLaTeXCommands.append("\\to")
+        elif aCodePoint[0] == 0x21A6:
+            aLaTeXCommands.append("\\map")
+        elif aCodePoint[0] == 0x2205:
+            aLaTeXCommands.append("\\empty")
+            aLaTeXCommands.append("\\emptyset")
+        elif aCodePoint[0] == 0x2207:
+            aLaTeXCommands.append("\\Del")
+        elif aCodePoint[0] == 0x220C:
+            aLaTeXCommands.append("\\notni")
+        elif aCodePoint[0] == 0x220F:
+            aLaTeXCommands.append("\\product")
+        elif aCodePoint[0] == 0x2210:
+            aLaTeXCommands.append("\\coproduct")
+        elif aCodePoint[0] == 0x2216:
+            aLaTeXCommands.append("\\smallsetminus")
+        elif aCodePoint[0] == 0x221D:
+            aLaTeXCommands.append("\\varpropto")
+        elif aCodePoint[0] == 0x221E:
+            aLaTeXCommands.append("\\infinity")
+        elif aCodePoint[0] == 0x2223:
+            aLaTeXCommands.append("\\shortmid")
+        elif aCodePoint[0] == 0x2224:
+            aLaTeXCommands.append("\\nshortmid")
+        elif aCodePoint[0] == 0x2225:
+            aLaTeXCommands.append("\\shortparallel")
+        elif aCodePoint[0] == 0x2226:
+            aLaTeXCommands.append("\\nshortparallel")
+        elif aCodePoint[0] == 0x2229:
+            aLaTeXCommands.append("\\intersection")
+        elif aCodePoint[0] == 0x222A:
+            aLaTeXCommands.append("\\union")
+        elif aCodePoint[0] == 0x222B:
+            aLaTeXCommands.append("\\integral")
+        elif aCodePoint[0] == 0x222C:
+            aLaTeXCommands.append("\\doubleintegral")
+        elif aCodePoint[0] == 0x222D:
+            aLaTeXCommands.append("\\tripleintegral")
+        elif aCodePoint[0] == 0x222E:
+            aLaTeXCommands.append("\\conint")
+            aLaTeXCommands.append("\\contourintegral")
+        elif aCodePoint[0] == 0x2237:
+            aLaTeXCommands.append("\\dblcolon")
+        elif aCodePoint[0] == 0x223C:
+            aLaTeXCommands.append("\\thicksim")
+        elif aCodePoint[0] == 0x2248:
+            aLaTeXCommands.append("\\thickapprox")
+        elif aCodePoint[0] == 0x2251:
+            aLaTeXCommands.append("\\doteqdot")
+        elif aCodePoint[0] == 0x2254:
+            aLaTeXCommands.append("\\coloneqq")
+        elif aCodePoint[0] == 0x2255:
+            aLaTeXCommands.append("\\eqqcolon")
+        elif aCodePoint[0] == 0x2260:
+            aLaTeXCommands.append("\\neq")
+        elif aCodePoint[0] == 0x2264:
+            aLaTeXCommands.append("\\leq")
+        elif aCodePoint[0] == 0x2265:
+            aLaTeXCommands.append("\\geq")
+        elif aCodePoint[0] == 0x2288:
+            aLaTeXCommands.append("\\nsubseteqq")
+        elif aCodePoint[0] == 0x229D:
+            aLaTeXCommands.append("\\odash")
+        elif aCodePoint[0] == 0x229E:
+            aLaTeXCommands.append("\\plusb")
+        elif aCodePoint[0] == 0x229F:
+            aLaTeXCommands.append("\\minusb")
+        elif aCodePoint[0] == 0x22A0:
+            aLaTeXCommands.append("\\timesb")
+        elif aCodePoint[0] == 0x22A5:
+            aLaTeXCommands.append("\\bottom")
+            aLaTeXCommands.append("\\bot")
+        elif aCodePoint[0] == 0x22AB:
+            aLaTeXCommands.append("\\VDash")
+        elif aCodePoint[0] == 0x22B2:
+            aLaTeXCommands.append("\\lhd")
+        elif aCodePoint[0] == 0x22B3:
+            aLaTeXCommands.append("\\rhd")
+        elif aCodePoint[0] == 0x22B4:
+            aLaTeXCommands.append("\\unlhd")
+        elif aCodePoint[0] == 0x22B5:
+            aLaTeXCommands.append("\\unrhd")
+        elif aCodePoint[0] == 0x22C0:
+            aLaTeXCommands.append("\\Wedge")
+        elif aCodePoint[0] == 0x22C1:
+            aLaTeXCommands.append("\\Vee")
+        elif aCodePoint[0] == 0x22C2:
+            aLaTeXCommands.append("\\Intersection")
+        elif aCodePoint[0] == 0x22C3:
+            aLaTeXCommands.append("\\Union")
+        elif aCodePoint[0] == 0x22C4:
+            aLaTeXCommands.append("\\Diamond")
+        elif aCodePoint[0] == 0x22D8:
+            aLaTeXCommands.append("\\lll")
+        elif aCodePoint[0] == 0x22F0:
+            aLaTeXCommands.append("\\udots")
+        elif aCodePoint[0] == 0x2306:
+            aLaTeXCommands.append("\\doublebarwedge")
+        elif aCodePoint[0] == 0x2322:
+            aLaTeXCommands.append("\\smallfrown")
+        elif aCodePoint[0] == 0x2323:
+            aLaTeXCommands.append("\\smallsmile")
+        elif aCodePoint[0] == 0x25A1:
+            aLaTeXCommands.append("\\Box")
+        elif aCodePoint[0] == 0x25AA:
+            aLaTeXCommands.append("\\qed")
+        elif aCodePoint[0] == 0x25B5:
+            aLaTeXCommands.append("\\triangle")
+        elif aCodePoint[0] == 0x27E8:
+            aLaTeXCommands.append("\\lang")
+            aLaTeXCommands.append("\\langle")
+        elif aCodePoint[0] == 0x27E9:
+            aLaTeXCommands.append("\\rang")
+            aLaTeXCommands.append("\\rangle")
+        elif aCodePoint[0] == 0x27EA:
+            aLaTeXCommands.append("\\llangle")
+        elif aCodePoint[0] == 0x27EB:
+            aLaTeXCommands.append("\\rrangle")
+        elif aCodePoint[0] == 0x2A0C:
+            aLaTeXCommands.append("\\quadrupleintegral")
+        elif aCodePoint[0] == 0x2A2D:
+            aLaTeXCommands.append("\\Oplus")
+        elif aCodePoint[0] == 0x2A34:
+            aLaTeXCommands.append("\\Otimes")
+        elif aCodePoint[0] == 0x2A74:
+            aLaTeXCommands.append("\\Coloneqq")
+        elif aCodePoint[0] == 0x2AEB:
+            aLaTeXCommands.append("\\Perp")
+            aLaTeXCommands.append("\\Vbar")
+        elif aCodePoint[0] == 0x2AFC:
+            aLaTeXCommands.append("\\biginterleave")
+        elif aCodePoint[0] == 0x2AFD:
+            aLaTeXCommands.append("\\sslash")
+
+    if len(aCodePoint) == 2:
+        if aCodePoint[0] == 0x003D and aCodePoint[1] == 0x2237:
+            aLaTeXCommands.append("\\Eqcolon")
+        elif aCodePoint[0] == 0x2268 and aCodePoint[1] == 0xFE00:
+            aLaTeXCommands.append("\\lvertneqq")
+        elif aCodePoint[0] == 0x2269 and aCodePoint[1] == 0xFE00:
+            aLaTeXCommands.append("\\gvertneqq")
+        elif aCodePoint[0] == 0x228A and aCodePoint[1] == 0xFE00:
+            aLaTeXCommands.append("\\varsubsetneq")
+        elif aCodePoint[0] == 0x2A7D and aCodePoint[1] == 0x0338:
+            aLaTeXCommands.append("\\nleqq")
+        elif aCodePoint[0] == 0x2A7E and aCodePoint[1] == 0x0338:
+            aLaTeXCommands.append("\\ngeqq")
+        elif aCodePoint[0] == 0x2ACB and aCodePoint[1] == 0xFE00:
+            aLaTeXCommands.append("\\varsubsetneqq")
+        elif aCodePoint[0] == 0x2ACC and aCodePoint[1] == 0xFE00:
+            aLaTeXCommands.append("\\varsupsetneqq")
 
 class surrogatePair:
     def __init__(self, aHigh, aLow):
@@ -118,7 +369,7 @@ class UnicodeRange:
 
         # Remove useless brackets around isolate values [\uXXXX].
         s = re.sub("\\[(\\\\u[0-9A-F]{4})\\]", "\\1", s)
-              
+
         return s
 
 if __name__ == "__main__":
@@ -143,197 +394,17 @@ if __name__ == "__main__":
             codePoint[i] = int(codePoint[i], 16)
             jsString += getJS(getSurrogatePair(codePoint[i]));
 
-        # Extract the mathclass.
-        mathclass = info[1]
-        if len(codePoint) == 1:
-            if (codePoint[0] == 0x221E):
-                # infinity
-                mathclass = "NUM"
-            elif (codePoint[0] == 0x0024 or codePoint[0] == 0x2205 or
-                  codePoint[0] == 0x00F0 or codePoint[0] == 0x210F or
-                  codePoint[0] == 0x03C2):
-                # $, emptyset
-                mathclass = "A"
-            elif (codePoint[0] in [0x2322, 0x2323, 0x214B, 0x2661, 0x2662,
-                                   0x2306, 0x2305, 0x2020, 0x2021, 0x2605,
-                                   0x25CA, 0x25CB, 0x2663, 0x2660,
-                                   0x23B0, 0x23B1, 0x0023]):
-                mathclass = "OP"
-            elif (codePoint[0] in [0x2032, 0x2033, 0x2034, 0x2035, 0x2057]):
-                mathclass = "OPP"
+        # Extract the mathclass, or use our custom one.
+        mathclass = customMathClass(codePoint)
+        if (mathclass is None):
+            mathclass = info[1]
 
-        if len(codePoint) == 2:
-            if ((codePoint[0] == 0x228A and codePoint[1] == 0xFE00) or
-                (codePoint[0] == 0x2268 and codePoint[1] == 0xFE00) or
-                (codePoint[0] == 0x2269 and codePoint[1] == 0xFE00) or
-                (codePoint[0] == 0x228B and codePoint[1] == 0xFE00) or
-                (codePoint[0] == 0x2ACB and codePoint[1] == 0xFE00)):
-                mathclass = "OP"
-
-        # Extract the TeX commands for this character.
+        # Extract the TeX commands for this character and add more definitions.
         LaTeXCommands = []
         for command in set(info[2:]): # use "set" to remove duplicate entries.
-            if (isValidLaTeXCommand(command)):
+            if (isLaTeXCharacterCommand(command)):
                 LaTeXCommands.append(command)
-
-        if len(codePoint) == 1:
-            # Add the escaped version of braces.
-            if codePoint[0] == 0x7B:
-                LaTeXCommands.append("\\{")
-            elif codePoint[0] == 0x7D:
-                LaTeXCommands.append("\\}")
-            elif codePoint[0] == 0x221E:
-                LaTeXCommands.append("\\infinity") # itex2MML
-            elif codePoint[0] == 0x2032:
-                LaTeXCommands.append("'")
-            elif codePoint[0] == 0x2033:
-                LaTeXCommands.append("''")
-            elif codePoint[0] == 0x2034:
-                LaTeXCommands.append("'''")
-            elif codePoint[0] == 0x2057:
-                LaTeXCommands.append("''''")
-            elif codePoint[0] == 0x2192:
-                LaTeXCommands.append("\\to")
-            elif codePoint[0] == 0x21A6:
-                LaTeXCommands.append("\\map")
-            elif codePoint[0] == 0x22A5:
-                LaTeXCommands.append("\\bottom")
-            elif codePoint[0] == 0x2223:
-                LaTeXCommands.append("\\shortmid")
-            elif codePoint[0] == 0x222B:
-                LaTeXCommands.append("\\integral")
-            elif codePoint[0] == 0x222C:
-                LaTeXCommands.append("\\doubleintegral")
-            elif codePoint[0] == 0x222D:
-                LaTeXCommands.append("\\tripleintegral")
-            elif codePoint[0] == 0x2A0C:
-                LaTeXCommands.append("\\quadrupleintegral")
-            elif codePoint[0] == 0x222E:
-                LaTeXCommands.append("\\conint")
-                LaTeXCommands.append("\\contourintegral")
-            elif codePoint[0] == 0x229D:
-                LaTeXCommands.append("\\odash")
-            elif codePoint[0] == 0x2322:
-                LaTeXCommands.append("\\smallfrown")
-            elif codePoint[0] == 0x2323:
-                LaTeXCommands.append("\\smallsmile")
-            elif codePoint[0] == 0x229E:
-                LaTeXCommands.append("\\plusb")
-            elif codePoint[0] == 0x22A0:
-                LaTeXCommands.append("\\timesb")
-            elif codePoint[0] == 0x229F:
-                LaTeXCommands.append("\\minusb")
-            elif codePoint[0] == 0x2A34:
-                LaTeXCommands.append("\\Otimes")
-            elif codePoint[0] == 0x2A2D:
-                LaTeXCommands.append("\\Oplus")
-            elif codePoint[0] == 0x2AFC:
-                LaTeXCommands.append("\\biginterleave")
-            elif codePoint[0] == 0x22C0:
-                LaTeXCommands.append("\\Wedge")
-            elif codePoint[0] == 0x22C1:
-                LaTeXCommands.append("\\Vee")
-            elif codePoint[0] == 0x214B:
-                LaTeXCommands.append("\\invamp")
-                LaTeXCommands.append("\\parr")
-            elif codePoint[0] == 0x2260:
-                LaTeXCommands.append("\\neq")
-            elif codePoint[0] == 0x220F:
-                LaTeXCommands.append("\\product")
-            elif codePoint[0] == 0x2210:
-                LaTeXCommands.append("\\coproduct")
-            elif codePoint[0] == 0x2AEB:
-                LaTeXCommands.append("\\Perp")
-                LaTeXCommands.append("\\Vbar")
-            elif codePoint[0] == 0x25A1:
-                LaTeXCommands.append("\\Box")
-            elif codePoint[0] == 0x2205:
-                LaTeXCommands.append("\\empty")
-                LaTeXCommands.append("\\emptyset")
-            elif codePoint[0] == 0x22B2:
-                LaTeXCommands.append("\\lhd")
-            elif codePoint[0] == 0x22B3:
-                LaTeXCommands.append("\\rhd")
-            elif codePoint[0] == 0x22D8:
-                LaTeXCommands.append("\\lll")
-            elif codePoint[0] == 0x22B4:
-                LaTeXCommands.append("\\unlhd")
-            elif codePoint[0] == 0x22B5:
-                LaTeXCommands.append("\\unrhd")
-            elif codePoint[0] == 0x2207:
-                LaTeXCommands.append("\\Del")
-            elif codePoint[0] == 0x25AA:
-                LaTeXCommands.append("\\qed")
-            elif codePoint[0] == 0x00F0:
-                LaTeXCommands.append("\\eth")
-            elif codePoint[0] == 0x0237:
-                LaTeXCommands.append("\\jmath")
-            elif codePoint[0] == 0x003C:
-                LaTeXCommands.append("\\lt")
-            elif codePoint[0] == 0x003E:
-                LaTeXCommands.append("\\gt")
-            elif codePoint[0] == 0x2306:
-                LaTeXCommands.append("\\doublebarwedge")
-            elif codePoint[0] == 0x2224:
-                LaTeXCommands.append("\\nshortmid")
-            elif codePoint[0] == 0x2225:
-                LaTeXCommands.append("\\shortparallel")
-            elif codePoint[0] == 0x2226:
-                LaTeXCommands.append("\\nshortparallel")
-            elif codePoint[0] == 0x220C:
-                LaTeXCommands.append("\\notni")
-            elif codePoint[0] == 0x2248:
-                LaTeXCommands.append("\\thickapprox")
-            elif codePoint[0] == 0x223C:
-                LaTeXCommands.append("\\thicksim")
-            elif codePoint[0] == 0x25B5:
-                LaTeXCommands.append("\\triangle")
-            elif codePoint[0] == 0x22C4:
-                LaTeXCommands.append("\\Diamond")
-            elif codePoint[0] == 0x2216:
-                LaTeXCommands.append("\\smallsetminus")
-            elif codePoint[0] == 0x2016:
-                LaTeXCommands.append("\\|")
-            elif codePoint[0] == 0x2AFD:
-                LaTeXCommands.append("\\sslash")
-            elif codePoint[0] == 0x27E8:
-                LaTeXCommands.append("\\lang")
-            elif codePoint[0] == 0x27E9:
-                LaTeXCommands.append("\\rang")
-            elif codePoint[0] == 0x27EA:
-                LaTeXCommands.append("\\llangle")
-            elif codePoint[0] == 0x27EB:
-                LaTeXCommands.append("\\rrangle")
-            elif codePoint[0] == 0x2254:
-                LaTeXCommands.append("\\coloneqq")
-            elif codePoint[0] == 0x2255:
-                LaTeXCommands.append("\\eqqcolon")
-            elif codePoint[0] == 0x2A74:
-                LaTeXCommands.append("\\Coloneqq")
-            elif codePoint[0] == 0x2237:
-                LaTeXCommands.append("\\dblcolon")
-            elif codePoint[0] == 0x22F0:
-                LaTeXCommands.append("\\udots")
-            elif codePoint[0] == 0x222A:
-                LaTeXCommands.append("\\union")
-            elif codePoint[0] == 0x22C3:
-                LaTeXCommands.append("\\Union")
-            elif codePoint[0] == 0x2229:
-                LaTeXCommands.append("\\intersection")
-            elif codePoint[0] == 0x22C2:
-                LaTeXCommands.append("\\Intersection")
-            elif codePoint[0] == 0x2134:
-                LaTeXCommands.append("\\omicron")
-
-        if len(codePoint) == 2:
-            if codePoint[0] == 0x228A and codePoint[1] == 0xFE00:
-                LaTeXCommands.append("\\varsubsetneq")
-            elif codePoint[0] == 0x2ACB and codePoint[1] == 0xFE00:
-                LaTeXCommands.append("\\varsubsetneqq")
-            elif codePoint[0] == 0x2268 and codePoint[1] == 0xFE00:
-                LaTeXCommands.append("\\lvertneqq")
-            elif codePoint[0] == 0x2269 and codePoint[1] == 0xFE00:
-                LaTeXCommands.append("\\gvertneqq")
+        addLaTeXCommands(codePoint, LaTeXCommands)
 
         # Escape the backslahes.
         for i in range(0,len(LaTeXCommands)):
