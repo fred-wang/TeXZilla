@@ -603,7 +603,7 @@ closedTerm
   }
   | NUM { $$ = newTag("mn", $1); }
   | TEXT { $$ = newTag("mtext", $1); }
-  | A { $$ = newTag("mi", $1); }
+  | A { $$ = newTag("mi", escapeText($1)); }
   | F { $$ = newMo($1, "0em", "0em"); }
   | MI tokenContent { $$ = newTag("mi", $2); }
   | MN tokenContent { $$ = newTag("mn", $2); }
