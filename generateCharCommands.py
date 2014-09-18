@@ -19,12 +19,13 @@ def customMathClass(aCodePoint):
         if (aCodePoint[0] == 0x221E):
             return "NUM"
         elif (aCodePoint[0] in
-              [0x0024, 0x00F0, 0x03C2, 0x210F, 0x2127, 0x2205]):
+              [0x0024, 0x0025, 0x0026, 0x00F0, 0x03C2, 0x210F, 0x2127, 0x2205]):
             return "A"
         elif (aCodePoint[0] in [0x0023, 0x2020, 0x2021, 0x214B,
-                               0x2305, 0x2306, 0x2322, 0x2323, 0x23B0, 0x23B1,
-                               0x25CA, 0x25CB,
-                               0x2605, 0x2660, 0x2661, 0x2662, 0x2663]):
+                                0x2305, 0x2306, 0x2322, 0x2323, 0x23B0, 0x23B1,
+                                0x25CA, 0x25CB,
+                                0x2605, 0x2660, 0x2661, 0x2662, 0x2663,
+                                0x27F2, 0x27F3]):
             return "OP"
         elif (aCodePoint[0] in [0x2032, 0x2033, 0x2034, 0x2035, 0x2057]):
             return "OPP"
@@ -127,8 +128,42 @@ def addLaTeXCommands(aCodePoint, aLaTeXCommands):
             aLaTeXCommands.append("\\parr")
         elif aCodePoint[0] == 0x2192:
             aLaTeXCommands.append("\\to")
+        elif aCodePoint[0] == 0x2191:
+            aLaTeXCommands.append("\\uparr")
+        elif aCodePoint[0] == 0x2193:
+            aLaTeXCommands.append("\\darr")
+        elif aCodePoint[0] == 0x2195:
+            aLaTeXCommands.append("\\downuparrow")
+            aLaTeXCommands.append("\\duparr")
+            aLaTeXCommands.append("\\updarr")
+        elif aCodePoint[0] == 0x2196:
+            aLaTeXCommands.append("\\nwarr")
+        elif aCodePoint[0] == 0x2197:
+            aLaTeXCommands.append("\\nearr")
+        elif aCodePoint[0] == 0x2198:
+            aLaTeXCommands.append("\\searr")
+        elif aCodePoint[0] == 0x2199:
+            aLaTeXCommands.append("\\swarr")
+        elif aCodePoint[0] == 0x21AA:
+            aLaTeXCommands.append("\\embedsin")
         elif aCodePoint[0] == 0x21A6:
             aLaTeXCommands.append("\\map")
+        elif aCodePoint[0] == 0x21D0:
+            aLaTeXCommands.append("\\impliedby")
+        elif aCodePoint[0] == 0x21D2:
+            aLaTeXCommands.append("\\implies")
+        elif aCodePoint[0] == 0x21D6:
+            aLaTeXCommands.append("\\nwArrow")
+            aLaTeXCommands.append("\\nwArr")
+        elif aCodePoint[0] == 0x21D7:
+            aLaTeXCommands.append("\\neArrow")
+            aLaTeXCommands.append("\\neArr")
+        elif aCodePoint[0] == 0x21D8:
+            aLaTeXCommands.append("\\seArrow")
+            aLaTeXCommands.append("\\seArr")
+        elif aCodePoint[0] == 0x21D9:
+            aLaTeXCommands.append("\\swArrow")
+            aLaTeXCommands.append("\\swArr")
         elif aCodePoint[0] == 0x2205:
             aLaTeXCommands.append("\\empty")
             aLaTeXCommands.append("\\emptyset")
@@ -244,6 +279,18 @@ def addLaTeXCommands(aCodePoint, aLaTeXCommands):
             aLaTeXCommands.append("\\llangle")
         elif aCodePoint[0] == 0x27EB:
             aLaTeXCommands.append("\\rrangle")
+        elif aCodePoint[0] == 0x27F2:
+            aLaTeXCommands.append("\\righttoleftarrow")
+        elif aCodePoint[0] == 0x27F3:
+            aLaTeXCommands.append("\\lefttorightarrow")
+        elif aCodePoint[0] == 0x27FA:
+            aLaTeXCommands.append("\\iff")
+        elif aCodePoint[0] == 0x290E:
+            aLaTeXCommands.append("\\dashleftarrow")
+        elif aCodePoint[0] == 0x290F:
+            aLaTeXCommands.append("\\dashrightarrow")
+        elif aCodePoint[0] == 0x293B:
+            aLaTeXCommands.append("\\curvearrowbotright")
         elif aCodePoint[0] == 0x2A0C:
             aLaTeXCommands.append("\\quadrupleintegral")
         elif aCodePoint[0] == 0x2A2D:
