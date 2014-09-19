@@ -319,8 +319,6 @@ while (i < tests.length) {
 }
 
 /* Test error handling */
-// FIXME: Improve testing when we have better error messages?
-// https://github.com/fred-wang/TeXZilla/issues/16
 var badsource= "\\frac";
 var error = "Parse error on line 1";
 var success;

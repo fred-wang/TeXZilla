@@ -60,6 +60,12 @@ TeXZilla-web.js: TeXZilla.jison TeXZilla.jisonlex MPL-header.js
 	@JISON@ --outfile $@ --module-type js --parser-type lalr TeXZilla.jison TeXZilla.jisonlex
 	@SED@ -i "s|\\\\b)/|)/|g" $@ # jison issue 204
 	@SED@ -i "s|var TeXZillaWeb =|var TeXZilla =|" $@
+# Always use the custom parseError function. This also removes the use of
+# getPrototypeOf, which causes problems on some engines.
+	@SED@ -i "s|typeof this.yy.parseError === 'function'|true|" $@
+	@SED@ -i "s|this.parseError = this.yy.parseError|this.parseError = parseError|" $@
+	@SED@ -i "s|this.parseError = Object.getPrototypeOf(this).parseError;||" $@
+# Add the header
 	cat MPL-header.js $@ > tmp.js
 	mv tmp.js $@
 

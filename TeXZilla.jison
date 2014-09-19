@@ -357,6 +357,12 @@ parser.filterElement = function(aElement, aThrowExceptionOnError) {
   }
 }
 
+function parseError(aString, aHash) {
+    // We delete the last line, which contains token names that are obscure
+    // to the users. See issue #16
+    throw new Error(aString.replace(/\nExpecting [^\n]*$/, "\n"));
+}
+
 %}
 
 /* Operator associations and precedence. */
