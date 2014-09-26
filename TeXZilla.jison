@@ -179,14 +179,6 @@ parser.setXMLSerializer = function(aXMLSerializer)
   this.mXMLSerializer = aXMLSerializer;
 }
 
-// Polyfill for Math.log2.
-// We use string notation so that it won't be modified by closure-compiler.
-if (typeof Math["log2"] === "undefined") {
-  Math["log2"] = function(x) {
-    return Math.log(x) / Math.LN2;
-  }
-}
-
 parser.parseMathMLDocument = function (aString) {
   // Parse the string into a MathML document and return the <math> root.
   return this.mDOMParser.
@@ -290,8 +282,10 @@ parser.toImage = function(aTeX, aRTL, aRoundToPowerOfTwo, aSize, aDocument) {
 
   // Round up the computed sizes.
   if (aRoundToPowerOfTwo) {
-    svgWidth = Math.pow(2, Math.ceil(Math["log2"](box.width)));
-    svgHeight = Math.pow(2, Math.ceil(Math["log2"](box.height)));
+    // Harmony's Math.log2() is not supported by all rendering engines and is
+    // removed by closure-compiler, so we use Math.log() / Math.LN2 instead.
+    svgWidth = Math.pow(2, Math.ceil(Math.log(box.width) / Math.LN2));
+    svgHeight = Math.pow(2, Math.ceil(Math.log(box.height) / Math.LN2));
   } else {
     svgWidth = Math.ceil(box.width);
     svgHeight = Math.ceil(box.height);
@@ -355,6 +349,12 @@ parser.filterElement = function(aElement, aThrowExceptionOnError) {
       default:
     }
   }
+}
+
+function parseError(aString, aHash) {
+    // We delete the last line, which contains token names that are obscure
+    // to the users. See issue #16
+    throw new Error(aString.replace(/\nExpecting [^\n]*$/, "\n"));
 }
 
 %}

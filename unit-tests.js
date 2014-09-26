@@ -89,6 +89,8 @@ var tests = [
     /* | HIGH_SURROGATE LOWSURROGATE */
     /* | BMP_CHARACTER */
     ["𝀸", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext></mtext><mtext>𝀸</mtext></mrow><annotation encoding="TeX">𝀸</annotation></semantics></math>'],
+    /* itex2MML compatibility note:
+       \&[EntityName]; and \&[EntityNumber]; are not supported */
     /* \operatorname, \mathop, \mathbin, \mathrel */
     ["\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="thinmathspace">x</mo><mo lspace="thinmathspace" rspace="thinmathspace">x</mo><mo lspace="mediummathspace" rspace="mediummathspace">x</mo><mo lspace="thickmathspace" rspace="thickmathspace">x</mo></mrow><annotation encoding="TeX">\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}</annotation></semantics></math>'],
     /* \frac */
@@ -111,6 +113,8 @@ var tests = [
     ["\\xrightarrow[a]{b} \\xleftarrow[a]{b} \\xleftrightarrow[a]{b} \\xLeftarrow[a]{b} \\xRightarrow[a]{b} \\xLeftrightarrow[a]{b} \\xleftrightharpoons[a]{b} \\xrightleftharpoons[a]{b} \\xhookleftarrow[a]{b} \\xhookrightarrow[a]{b} \\xmapsto[a]{b}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munderover><mo>→</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>←</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>↔</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>⇐</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>⇒</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>⇔</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>⇋</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>⇌</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>↩</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>↪</mo><mi>a</mi><mi>b</mi></munderover><munderover><mo>↦</mo><mi>a</mi><mi>b</mi></munderover></mrow><annotation encoding="TeX">\\xrightarrow[a]{b} \\xleftarrow[a]{b} \\xleftrightarrow[a]{b} \\xLeftarrow[a]{b} \\xRightarrow[a]{b} \\xLeftrightarrow[a]{b} \\xleftrightharpoons[a]{b} \\xrightleftharpoons[a]{b} \\xhookleftarrow[a]{b} \\xhookrightarrow[a]{b} \\xmapsto[a]{b}</annotation></semantics></math>'],
     /* \math*lap */
     ["\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mpadded width="0em"><mi>x</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-100%width"><mi>y</mi></mpadded><mo>,</mo><mpadded width="0em" lspace="-50%width"><mi>y</mi></mpadded></mrow><annotation encoding="TeX">\\mathrlap{x}, \\mathllap{y}, \\mathclap{y}</annotation></semantics></math>'],
+    /* itex2MML compatibility note:
+       \rlap, \llap, \ulap and \dlap are not supported. */
     /* \phantom */
     ["\\phantom{x}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mphantom><mi>x</mi></mphantom><annotation encoding="TeX">\\phantom{x}</annotation></semantics></math>'],
     /* \tfrac */
@@ -157,6 +161,9 @@ var tests = [
     ["\\tooltip{a}b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><maction actiontype="tooltip"><mi>b</mi><mtext>a</mtext></maction><annotation encoding="TeX">\\tooltip{a}b</annotation></semantics></math>'],
     ["\\toggle a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><maction actiontype="toggle" selection="2"><mi>a</mi><mi>b</mi></maction><annotation encoding="TeX">\\toggle a b</annotation></semantics></math>'],
     ["\\begintoggle a b c \\endtoggle", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><maction actiontype="toggle"><mi>a</mi><mi>b</mi><mi>c</mi></maction><annotation encoding="TeX">\\begintoggle a b c \\endtoggle</annotation></semantics></math>'],
+    /* itex2MML compatibility note:
+       \fghilight, \fghighlight, \bghilight, and \bghighlight are not
+       supported */
     /* tensor */
     ["\\tensor x_b^c_d^e_^f", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mmultiscripts><mi>x</mi><mi>b</mi><mi>c</mi><mi>d</mi><mi>e</mi><none/><mi>f</mi></mmultiscripts><annotation encoding="TeX">\\tensor x_b^c_d^e_^f</annotation></semantics></math>'],
     ["\\tensor x{_b^c_d^e_^f}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mmultiscripts><mi>x</mi><mi>b</mi><mi>c</mi><mi>d</mi><mi>e</mi><none/><mi>f</mi></mmultiscripts><annotation encoding="TeX">\\tensor x{_b^c_d^e_^f}</annotation></semantics></math>'],
@@ -196,6 +203,7 @@ var tests = [
   /* array */
   ["\\array{ a & b \\\\ c & d }", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable displaystyle="false"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><annotation encoding="TeX">\\array{ a &amp; b \\\\ c &amp; d }</annotation></semantics></math>'],
     ["\\array{ \\arrayopts{\\colalign{left right right}\\rowalign{top bottom bottom}\\align{center}\\padding{1em}\\equalrows{true}\\equalcols{true}\\rowlines{dashed}\\collines{dashed}\\frame{solid}} a & b & c}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable displaystyle="false" columnalign="left right right" rowalign="top bottom bottom" align="center" rowspacing="1em" columnspacing="1em" equalrows="true" equalcolumns="true" rowlines="dashed" columnlines="dashed" frame="solid"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr></mtable><annotation encoding="TeX">\\array{ \\arrayopts{\\colalign{left right right}\\rowalign{top bottom bottom}\\align{center}\\padding{1em}\\equalrows{true}\\equalcols{true}\\rowlines{dashed}\\collines{dashed}\\frame{solid}} a &amp; b &amp; c}</annotation></semantics></math>'],
+    ["\\array{ \\arrayopts{\\collayout{left right right}\\rowalign{top bottom bottom}\\align{center}\\padding{1em}\\equalrows{true}\\equalcols{true}\\rowlines{dashed}\\collines{dashed}\\frame{solid}} a & b & c}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable displaystyle="false" columnalign="left right right" rowalign="top bottom bottom" align="center" rowspacing="1em" columnspacing="1em" equalrows="true" equalcolumns="true" rowlines="dashed" columnlines="dashed" frame="solid"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr></mtable><annotation encoding="TeX">\\array{ \\arrayopts{\\collayout{left right right}\\rowalign{top bottom bottom}\\align{center}\\padding{1em}\\equalrows{true}\\equalcols{true}\\rowlines{dashed}\\collines{dashed}\\frame{solid}} a &amp; b &amp; c}</annotation></semantics></math>'],
     /* gathered */
     ["\\begin{gathered} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{gathered}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable displaystyle="true" rowspacing="1.0ex"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr><mtr><mtd><mi>d</mi></mtd><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr><mtr><mtd><mi>g</mi></mtd><mtd><mi>h</mi></mtd><mtd><mi>i</mi></mtd></mtr></mtable><annotation encoding="TeX">\\begin{gathered} a &amp; b &amp; c \\\\ d &amp; e &amp; f \\\\ g &amp; h &amp; i \\end{gathered}</annotation></semantics></math>'],
     /* smallmatrix */
@@ -204,6 +212,13 @@ var tests = [
     ["\\begin{cases} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{cases}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>{</mo><mtable displaystyle="false" columnalign="left left"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr><mtr><mtd><mi>d</mi></mtd><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr><mtr><mtd><mi>g</mi></mtd><mtd><mi>h</mi></mtd><mtd><mi>i</mi></mtd></mtr></mtable></mrow><annotation encoding="TeX">\\begin{cases} a &amp; b &amp; c \\\\ d &amp; e &amp; f \\\\ g &amp; h &amp; i \\end{cases}</annotation></semantics></math>'],
     /* aligned */
     ["\\begin{aligned} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{aligned}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable displaystyle="true" columnalign="right left right left right left right left right left" columnspacing="0em"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr><mtr><mtd><mi>d</mi></mtd><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr><mtr><mtd><mi>g</mi></mtd><mtd><mi>h</mi></mtd><mtd><mi>i</mi></mtd></mtr></mtable><annotation encoding="TeX">\\begin{aligned} a &amp; b &amp; c \\\\ d &amp; e &amp; f \\\\ g &amp; h &amp; i \\end{aligned}</annotation></semantics></math>'],
+    /* split */
+    ["\\begin{split} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{split}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable displaystyle="true" columnalign="right left right left right left right left right left" columnspacing="0em"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr><mtr><mtd><mi>d</mi></mtd><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr><mtr><mtd><mi>g</mi></mtd><mtd><mi>h</mi></mtd><mtd><mi>i</mi></mtd></mtr></mtable><annotation encoding="TeX">\\begin{split} a &amp; b &amp; c \\\\ d &amp; e &amp; f \\\\ g &amp; h &amp; i \\end{split}</annotation></semantics></math>'],
+    /* itex2MML compatibility note:
+       \begin{svg} ... \end{svg} and \includegraphics are not supported
+       "&amp;" can not be used as a colsep */
+    /* colors */
+    ["{\\color{aqua} x} {\\color{#ff00ff} y} {\\bgcolor{aqua} x} {\\bgcolor{#ff00ff} y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle mathcolor="aqua"><mi>x</mi></mstyle><mstyle mathcolor="#ff00ff"><mi>y</mi></mstyle><mstyle mathbackground="aqua"><mi>x</mi></mstyle><mstyle mathbackground="#ff00ff"><mi>y</mi></mstyle></mrow><annotation encoding="TeX">{\\color{aqua} x} {\\color{#ff00ff} y} {\\bgcolor{aqua} x} {\\bgcolor{#ff00ff} y}</annotation></semantics></math>'],
 
     /**** Various char commands ****/
     /* Greek letters */
@@ -304,8 +319,6 @@ while (i < tests.length) {
 }
 
 /* Test error handling */
-// FIXME: Improve testing when we have better error messages?
-// https://github.com/fred-wang/TeXZilla/issues/16
 var badsource= "\\frac";
 var error = "Parse error on line 1";
 var success;
