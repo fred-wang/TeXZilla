@@ -39,7 +39,7 @@ public class TeXZillaParser {
         if (jsEngine == null) {
             jsEngine = scriptEngineManager.getEngineByName("rhino");
             if (jsEngine == null) {
-                System.out.println("Nashorn or Rhino not find!");
+                System.out.println("Nashorn or Rhino not found!");
                 System.exit(1);
             }
         }
