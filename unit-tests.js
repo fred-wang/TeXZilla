@@ -60,6 +60,8 @@ var tests = [
     ["01234.56789", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>01234.56789</mn><annotation encoding="TeX">01234.56789</annotation></semantics></math>'],
     /* Arabic number */
     ["١٢٣٤٫٥٦٧", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>١٢٣٤٫٥٦٧</mn><annotation encoding="TeX">١٢٣٤٫٥٦٧</annotation></semantics></math>'],
+    /* bold, double-struck, sans-serif sans-serif bold, monospace numbers */
+    ["𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗 𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡 𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫 𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵 𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗</mn><mn>𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡</mn><mn>𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫</mn><mn>𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵</mn><mn>𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿</mn></mrow><annotation encoding="TeX">𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗 𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡 𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫 𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵 𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿</annotation></semantics></math>'],
     /* itexnum */
     ["\\itexnum{blah}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>blah</mn><annotation encoding="TeX">\\itexnum{blah}</annotation></semantics></math>'],
     /* whitespace collapse. Note: the leading/trailing space in the mtext
