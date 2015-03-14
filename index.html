@@ -9,82 +9,9 @@
     <script type="text/javascript" src="TeXZilla-min.js"></script>
     <style type="text/css">
       /* Asana */
-      .Asana ::-moz-math-stretchy {
+      .Asana math {
         font-family: Asana Math;
       }
-    
-      .Asana math, .Asana [mathvariant] {
-        font-family: Asana Math;
-        }
-    
-      .Asana [mathvariant="sans-serif"],
-      .Asana [mathvariant="bold-sans-serif"],
-      .Asana [mathvariant="sans-serif-italic"],
-      .Asana [mathvariant="sans-serif-bold-italic"] {
-        font-family: sans-serif;
-      }
-    
-      .Asana [mathvariant="monospace"] {
-        font-family: monospace;
-      }
-    
-      /* MathJax */
-    
-      .MathJax ::-moz-math-stretchy {
-        font-family: MathJax_Main;
-      }
-    
-      .MathJax math, .MathJax [mathvariant] {
-        font-family: MathJax_Main;
-      }
-    
-      .MathJax [mathvariant="sans-serif"],
-      .MathJax [mathvariant="bold-sans-serif"],
-      .MathJax [mathvariant="sans-serif-italic"]
-      .MathJax [mathvariant="sans-serif-bold-italic"] {
-        font-family: MathJax_SansSerif;
-      }
-    
-      .MathJax [mathvariant="monospace"] {
-        font-family: MathJax_Typewriter;
-      }
-    
-      .MathJax [mathvariant="fraktur"],
-      .MathJax [mathvariant="bold-fraktur"] {
-        font-family: MathJax_Fraktur;
-      }
-    
-      .MathJax [mathvariant="script"],
-      .MathJax [mathvariant="bold-script"] {
-        font-family: MathJax_Script;
-      }
-    
-      .MathJax [mathvariant="double-struck"] {
-        font-family: MathJax_AMS;
-      }
-    
-      /* STIX */
-    
-      .STIX ::-moz-math-stretchy {
-        font-family: STIXNonUnicode, STIXSizeOneSym, STIXSize1, STIXGeneral;
-      }
-    
-      .STIX math, .STIX [mathvariant] {
-        font-family: STIXGeneral;
-      }
-    
-      .STIX [mathvariant="sans-serif"],
-      .STIX [mathvariant="bold-sans-serif"],
-      .STIX [mathvariant="sans-serif-italic"],
-      .STIX [mathvariant="sans-serif-bold-italic"] {
-        font-family: sans-serif;
-      }
-    
-      .STIX [mathvariant="monospace"] {
-        font-family: monospace;
-      }
-    
-      /**** Experimental Open Type MATH fonts ****/
     
       /* Cambria */
       .Cambria math {
@@ -317,17 +244,15 @@ c_n & c_{n+1} & c_{n+2} & \dots & c_{2n}
   <select id="MathFont" onchange="updateMathFont()">
     <option value="Default" selected="selected">Default fonts</option>
     <option value="Asana">Asana</option>
-    <option value="MathJax">MathJax</option>
-    <option value="STIX">STIX General</option>
-    <option value="Cambria">Cambria (experimental)</option>
-    <option value="TeXGyreBonum">TeX Gyre Bonum (experimental)</option>
-    <option value="TeXGyrePagella">TeX Gyre Pagella (experimental)</option>
-    <option value="TeXGyreTermes">TeX Gyre Termes (experimental)</option>
-    <option value="LatinModern">Latin Modern (experimental)</option>
-    <option value="Lucida">Lucida (experimental)</option>
-    <option value="NeoEuler">Neo Euler (experimental)</option>
-    <option value="STIXWord">STIX Word (experimental)</option>
-    <option value="XITS">XITS (experimental)</option>
+    <option value="Cambria">Cambria</option>
+    <option value="TeXGyreBonum">TeX Gyre Bonum</option>
+    <option value="TeXGyrePagella">TeX Gyre Pagella</option>
+    <option value="TeXGyreTermes">TeX Gyre Termes</option>
+    <option value="LatinModern">Latin Modern</option>
+    <option value="Lucida">Lucida</option>
+    <option value="NeoEuler">Neo Euler</option>
+    <option value="STIXWord">STIX Word</option>
+    <option value="XITS">XITS</option>
   </select> (see <a href="https://developer.mozilla.org/en-US/docs/Mozilla/MathML_Project/Fonts">Fonts for Mozilla's MathML engine</a>)
     </p>
       <textarea id="input" cols="80" rows="5" oninput="update()" dir="ltr"></textarea>
@@ -349,6 +274,7 @@ c_n & c_{n+1} & c_{n+2} & \dots & c_{2n}
       <li><a href="examples/commonJS.js">Basic commonJS program</a> using TeXZilla.</li>
       <li><a href="examples/commonJS-DOMParser.js">Another commonJS program</a> using TeXZilla that requires a DOMParser instance to work.</li>
       <li><a href="examples/TeXZillaParser.java">Basic Java program</a> that runs TeXZilla with the Rhino/Nashorn Javascript engines.</li>
+      <li><a href="examples/TeXZillaParser.py">Basic Python program</a> that runs TeXZilla with the SpiderMonkey Javascript engine.</li>
       <li><a href="examples/toImage.html">Create an SVG image</a>
         of the MathML formula for use in a &lt;canvas&gt; 2D context.</li>
       <li><a href="examples/toImageWebGL.html">Create an SVG image</a>

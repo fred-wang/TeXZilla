@@ -21,16 +21,16 @@ public class TeXZillaParser {
 
     private static final String TEXZILLA_JS = "../TeXZilla.js";
 
-    public static void main(String[] args) {
+    public static void main(String[] aArgs) {
         // Verify parameters.
-        if (args.length == 0) {
+        if (aArgs.length == 0) {
             System.out.println("usage: java TeXZillaParser aTeX [aDisplay] [aRTL] [aThrowExceptionOnError]");
             System.exit(1);
         }
-        String tex = args[0];
-        boolean display = args.length >= 2 && args[1].equals("true");
-        boolean rtl = args.length >= 3 && args[2].equals("true");
-        boolean throwException = args.length >= 4 && args[3].equals("true");
+        String tex = aArgs[0];
+        boolean display = aArgs.length >= 2 && aArgs[1].equals("true");
+        boolean rtl = aArgs.length >= 3 && aArgs[2].equals("true");
+        boolean throwException = aArgs.length >= 4 && aArgs[3].equals("true");
 
         // Try and find a Javascript engine.
         ScriptEngineManager scriptEngineManager =
@@ -44,7 +44,7 @@ public class TeXZillaParser {
             }
         }
 
-        // Load the TeXZilla.js and execute TeXZilla.toMathMLString with the
+        // Load TeXZilla.js and execute TeXZilla.toMathMLString with the
         // specified arguments.
         try {
             jsEngine.eval(new FileReader(TEXZILLA_JS));
