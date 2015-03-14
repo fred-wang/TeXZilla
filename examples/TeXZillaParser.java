@@ -19,7 +19,7 @@ import java.io.FileReader;
 
 public class TeXZillaParser {
 
-    private static final String TEXZILLA_JS = "../TeXZilla.js";
+    private static final String TEXZILLA_JS = "../TeXZilla-min.js";
 
     public static void main(String[] aArgs) {
         // Verify parameters.
@@ -47,8 +47,9 @@ public class TeXZillaParser {
         // Load TeXZilla.js and execute TeXZilla.toMathMLString with the
         // specified arguments.
         try {
+            jsEngine.eval("var window = {};");
             jsEngine.eval(new FileReader(TEXZILLA_JS));
-            Object TeXZilla = jsEngine.get("TeXZilla");
+            Object TeXZilla = jsEngine.eval("window.TeXZilla");
             Invocable invocable = (Invocable) jsEngine;
             System.out.println(invocable.
                                invokeMethod(TeXZilla, "toMathMLString",
