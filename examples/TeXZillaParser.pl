@@ -16,7 +16,7 @@ use warnings;
 use File::Slurp;
 use JavaScript::V8;
 
-my $TEXZILLA_JS = "../TeXZilla.js";
+my $TEXZILLA_JS = "../TeXZilla-min.js";
 
 # Verify that we have at least one argument.
 my $argc = $#ARGV + 1;
@@ -27,6 +27,7 @@ if ($argc == 0) {
 
 # Prepare the V8 Javascript engine and load TeXZilla.js
 my $context = JavaScript::V8::Context->new();
+$context->name_global("window");
 $context->eval(scalar read_file $TEXZILLA_JS);
 
 # Bind the arguments to Javascript variables.

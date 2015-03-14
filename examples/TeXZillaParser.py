@@ -17,7 +17,7 @@ import spidermonkey
 
 class TeXZillaParser:
 
-    TEXZILLA_JS = "../TeXZilla.js"
+    TEXZILLA_JS = "../TeXZilla-min.js"
 
     def main(self, aArgs):
         # Verify parameters.
@@ -35,10 +35,11 @@ class TeXZillaParser:
 
         # Load TeXZilla.js and execute TeXZilla.toMathMLString with the
         # specified arguments.
+        cx.execute("var window = {}")
         f = open(self.TEXZILLA_JS, "r")
         cx.execute(f.read())
         f.close()
-        TeXZilla = cx.execute("TeXZilla")
+        TeXZilla = cx.execute("window.TeXZilla")
         try:
             print(TeXZilla.toMathMLString(tex, display, rtl, throwException))
         except Exception, e:
