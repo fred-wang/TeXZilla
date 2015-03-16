@@ -60,9 +60,16 @@ TeXZilla-web.js: TeXZilla.jison TeXZilla.jisonlex MPL-header.js
 	@SED@ -i "s|var TeXZillaWeb =|var TeXZilla =|" $@
 # Always use the custom parseError function. This also removes the use of
 # getPrototypeOf, which causes problems on some engines.
-	@SED@ -i "s|typeof this.yy.parseError === 'function'|true|" $@
-	@SED@ -i "s|this.parseError = this.yy.parseError|this.parseError = parseError|" $@
-	@SED@ -i "s|this.parseError = Object.getPrototypeOf(this).parseError;||" $@
+# First insert the line "this.parseError = parseError"
+	@SED@ -i "/typeof this.yy.parseError === 'function'/i 'this.parseError = parseError;'" $@
+# ... and delete the conditional branches
+#    if (typeof this.yy.parseError === 'function') {
+#        this.parseError = this.yy.parseError;
+#    } else {
+#        this.parseError = Object.getPrototypeOf(this).parseError;
+#    }
+	@SED@ -i "/typeof this.yy.parseError === 'function'/,/}"$$"/d" $@
+
 # Add the header
 	cat MPL-header.js $@ > tmp.js
 	mv tmp.js $@
