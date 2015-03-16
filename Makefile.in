@@ -61,7 +61,7 @@ TeXZilla-web.js: TeXZilla.jison TeXZilla.jisonlex MPL-header.js
 # Always use the custom parseError function. This also removes the use of
 # getPrototypeOf, which causes problems on some engines.
 # First insert the line "this.parseError = parseError"
-	@SED@ -i "/typeof this.yy.parseError === 'function'/i 'this.parseError = parseError;'" $@
+	@SED@ -i "/typeof this.yy.parseError === 'function'/i this.parseError = parseError;" $@
 # ... and delete the conditional branches
 #    if (typeof this.yy.parseError === 'function') {
 #        this.parseError = this.yy.parseError;
@@ -71,7 +71,8 @@ TeXZilla-web.js: TeXZilla.jison TeXZilla.jisonlex MPL-header.js
 	@SED@ -i "/typeof this.yy.parseError === 'function'/,/}"$$"/d" $@
 
 # Add the header
-	cat MPL-header.js $@ > tmp.js
+	@SED@ -i "1 i \"use strict\";" $@
+	cat MPL-header.js $@ >> tmp.js
 	mv tmp.js $@
 
 TeXZilla.js: TeXZilla-web.js commonJS.js
@@ -84,6 +85,10 @@ TeXZilla-min.js: TeXZilla-web.js web.js MPL-header.js
 	cat TeXZilla-web.js web.js > t1.js;
 	@CLOSURE_COMPILER@ --charset UTF-8 \
 		--compilation_level ADVANCED_OPTIMIZATIONS --js t1.js > t2.js
+	 # wrap the content inside an anonymous function (see issue #40)
+	@SED@ -i "1 i (function() {" t2.js
+	@SED@ -i "2 i \"using strict\";" t2.js
+	echo "})();" >> t2.js
 	 # Add the MPL header.
 	cat MPL-header.js t2.js > $@
 	rm t1.js t2.js
