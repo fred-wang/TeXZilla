@@ -11,5 +11,6 @@
     { "name": "Frédéric Wang" }
   ],
   "files": ["TeXZilla.js", "npmbin.sh", "README.md"],
-  "bin": "npmbin.sh"
+  "bin": "npmbin.sh",
+  "main": "TeXZilla.js"
 }
