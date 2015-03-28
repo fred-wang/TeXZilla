@@ -1,4 +1,4 @@
-TeXZilla RELEASENUMBER
+TeXZilla 0.9.9
 
 License
 -------
