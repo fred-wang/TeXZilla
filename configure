@@ -1762,7 +1762,7 @@ fi
   test -n "$CLOSURE_COMPILER" && break
 done
 
-for ac_prog in phantomjs slimerjs nodejs
+for ac_prog in phantomjs slimerjs nodejs node
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
