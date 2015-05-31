@@ -33,7 +33,7 @@ Build Instructions
 
 The following dependencies are required:
 
-- [coreutils](https://www.gnu.org/software/coreutils/), [sed](https://www.gnu.org/software/sed/), [curl](http://curl.haxx.se/), [make](https://www.gnu.org/software/make/)
+- [coreutils](https://www.gnu.org/software/coreutils/), [sed](https://www.gnu.org/software/sed/), [curl](http://curl.haxx.se/), [make](https://www.gnu.org/software/make/), procps, grep
 - [xsltproc](http://xmlsoft.org/XSLT/xsltproc2.html)
 - [Python](http://www.python.org/)
 - [Jison](http://zaach.github.io/jison).
