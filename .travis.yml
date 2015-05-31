@@ -4,5 +4,5 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y bash coreutils grep make procps sed
   - sudo apt-get install -y curl git python xsltproc
-install: sudo npm install jison -g
+install: npm install jison -g
 script: ./configure && make tests-all
