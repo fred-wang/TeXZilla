@@ -597,7 +597,7 @@ closedTerm
   }
   | left styledExpression TEXCHOOSE styledExpression right {
     $$ = newTag("mfrac", newMrow($2) + newMrow($4),
-                "linethickness=\"0\"");
+                "linethickness=\"0px\"");
     $$ = newTag("mrow", $1 + $$ + $3);
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
@@ -664,11 +664,11 @@ closedTerm
     $$ = newTag("mstyle", $$, "displaystyle=\"false\"");
   }
   | BINOM closedTerm closedTerm {
-    $$ = newTag("mfrac", $2 + $3, "linethickness=\"0\"");
+    $$ = newTag("mfrac", $2 + $3, "linethickness=\"0px\"");
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | TBINOM closedTerm closedTerm {
-    $$ = newTag("mfrac", $2 + $3, "linethickness=\"0\"");
+    $$ = newTag("mfrac", $2 + $3, "linethickness=\"0px\"");
     $$ = newTag("mstyle", $$, "displaystyle=\"false\"");
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
