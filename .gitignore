@@ -9,5 +9,6 @@ chars.txt
 commands.txt
 config.log
 config.status
-unicode.xml
 examples/TeXZillaParser.class
+node_modules
+unicode.xml
