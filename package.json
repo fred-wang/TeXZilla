@@ -28,10 +28,10 @@
   "directories": {
     "example": "examples"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "jison": "^0.4.13"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
