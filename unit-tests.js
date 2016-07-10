@@ -122,9 +122,9 @@ var tests = [
     /* \tfrac */
     ["\\tfrac a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="false"><mfrac><mi>a</mi><mi>b</mi></mfrac></mstyle><annotation encoding="TeX">\\tfrac a b</annotation></semantics></math>'],
     /* \binom */
-    ["\\binom a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mfrac linethickness="0"><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><annotation encoding="TeX">\\binom a b</annotation></semantics></math>'],
+    ["\\binom a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mfrac linethickness="0px"><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><annotation encoding="TeX">\\binom a b</annotation></semantics></math>'],
     /* \tbinom */
-    ["\\tbinom a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mstyle displaystyle="false"><mfrac linethickness="0"><mi>a</mi><mi>b</mi></mfrac></mstyle><mo>)</mo></mrow><annotation encoding="TeX">\\tbinom a b</annotation></semantics></math>'],
+    ["\\tbinom a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mstyle displaystyle="false"><mfrac linethickness="0px"><mi>a</mi><mi>b</mi></mfrac></mstyle><mo>)</mo></mrow><annotation encoding="TeX">\\tbinom a b</annotation></semantics></math>'],
     /* \pmod */
     ["\\pmod a", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="mediummathspace">(</mo><mo rspace="thinmathspace">mod</mo><mi>a</mi><mo rspace="mediummathspace">)</mo></mrow><annotation encoding="TeX">\\pmod a</annotation></semantics></math>'],
     /* \underbrace, \underline, \overbrace */
