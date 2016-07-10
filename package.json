@@ -1,6 +1,6 @@
 {
   "name": "texzilla",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "A Javascript LaTeX-to-MathML converter compatible with Unicode.",
   "keywords": "mathml,tex,latex,unicode",
   "homepage": "https://github.com/fred-wang/TeXZilla/",
@@ -11,5 +11,6 @@
     { "name": "Frédéric Wang" }
   ],
   "files": ["TeXZilla.js", "npmbin.sh", "README.md"],
-  "bin": "npmbin.sh"
+  "bin": "npmbin.sh",
+  "main": "TeXZilla.js"
 }

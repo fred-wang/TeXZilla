@@ -7,6 +7,7 @@ COMMONJS=$1
 TEXZILLA="$COMMONJS TeXZilla.js"
 CURL=$2
 KILL=$3
+PKILL=$4
 EXITCODE=0
 
 testEqual () {
@@ -17,6 +18,10 @@ testEqual () {
     EXITCODE=1
   fi;
 }
+
+echo
+echo "********************************************************************************"
+echo "Testing TeXZilla with $COMMONJS..."
 
 # Test the common JS API
 $COMMONJS unit-tests.js
@@ -43,6 +48,11 @@ testEqual "Testing webserver (HTTP)..." "`$CURL -H "Content-Type: application/js
 
 testEqual "Testing webserver (GET)..." "`curl "http://localhost:$PORT/?tex=x+y&rtl=true"`" '"{\"tex\":\"x+y\",\"mathml\":\"<math dir=\\\"rtl\\\" xmlns=\\\"http://www.w3.org/1998/Math/MathML\\\"><semantics><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><annotation encoding=\\\"TeX\\\">x+y</annotation></semantics></math>\",\"exception\":null}"'
 
+sleep 1
+
 $KILL $PID
+if [ "$COMMONJS" == "slimerjs" ]; then
+  $PKILL xulrunner
+fi
 
 exit $EXITCODE
