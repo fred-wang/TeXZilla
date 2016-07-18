@@ -44,6 +44,7 @@ On Debian-based Linux distributions, try `sudo apt-get install coreutils sed cur
 
 To build TeXZilla, run the tests and generate the minified version:
 
+      npm install
       ./configure
       make all
       make minify

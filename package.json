@@ -2,15 +2,42 @@
   "name": "texzilla",
   "version": "0.9.9",
   "description": "A Javascript LaTeX-to-MathML converter compatible with Unicode.",
-  "keywords": "mathml,tex,latex,unicode",
-  "homepage": "https://github.com/fred-wang/TeXZilla/",
-  "bugs": "https://github.com/fred-wang/TeXZilla/issues",
-  "license" : "MPL-2.0",
-  "contributors": [
-    { "name": "Raniere Silva" },
-    { "name": "Frédéric Wang" }
+  "keywords": [
+    "mathml",
+    "tex",
+    "latex",
+    "unicode"
   ],
-  "files": ["TeXZilla.js", "npmbin.sh", "README.md"],
-  "bin": "npmbin.sh",
-  "main": "TeXZilla.js"
+  "homepage": "https://github.com/fred-wang/TeXZilla/",
+  "bugs": {
+    "url": "https://github.com/fred-wang/TeXZilla/issues"
+  },
+  "license": "MPL-2.0",
+  "contributors": [
+    "Raniere Silva",
+  ],
+  "files": [
+    "TeXZilla.js",
+    "npmbin.sh",
+    "README.md"
+  ],
+  "bin": {
+    "texzilla": "npmbin.sh"
+  },
+  "main": "TeXZilla.js",
+  "directories": {
+    "example": "examples"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jison": "^0.4.13"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fred-wang/TeXZilla.git"
+  },
+  "author": "Frédéric Wang"
 }
