@@ -11,3 +11,4 @@ config.log
 config.status
 unicode.xml
 examples/TeXZillaParser.class
+texzilla-web-extension.zip

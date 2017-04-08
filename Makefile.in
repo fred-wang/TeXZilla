@@ -22,6 +22,9 @@ help:
 	@echo "make tests-all"
 	@echo "  Run the unit tests with nodejs, phantomjs and slimerjs."
 	@echo
+	@echo "make extension"
+	@echo "  Package the Web Extension."
+	@echo
 	@echo "make release"
 	@echo "  Publish a new release of TeXZilla."
 	@echo
@@ -108,6 +111,13 @@ build: TeXZilla.js
 minify: TeXZilla-min.js
 
 all: tests build
+
+texzilla-web-extension.zip: TeXZilla-min.js web-extension
+# Package the Web Extension.
+	cp TeXZilla-min.js web-extension/tab/
+	cd web-extension; @ZIP@ -r ../$@ *
+
+extension: texzilla-web-extension.zip
 
 clean:
 # Remove all generated files except unicode.xml and LaTeX-min.js
