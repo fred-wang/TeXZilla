@@ -112,12 +112,12 @@ minify: TeXZilla-min.js
 
 all: tests build
 
-texzilla-web-extension.zip: TeXZilla-min.js web-extension
+webextension-texzilla.zip: TeXZilla-min.js webextension
 # Package the Web Extension.
-	cp TeXZilla-min.js web-extension/tab/
-	cd web-extension; @ZIP@ -r ../$@ *
+	cp TeXZilla-min.js webextension/tab/
+	cd webextension; @ZIP@ -r ../$@ *
 
-extension: texzilla-web-extension.zip
+extension: webextension-texzilla.zip
 
 clean:
 # Remove all generated files except unicode.xml and LaTeX-min.js
