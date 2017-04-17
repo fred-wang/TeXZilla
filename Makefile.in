@@ -12,6 +12,9 @@ help:
 	@echo "make build"
 	@echo "  Build the TeXZilla.js parser."
 	@echo
+	@echo "make install"
+	@echo "  Install the TeXZilla.js parser."
+	@echo
 	@echo "make minify"
 	@echo "  Build the TeXZilla-min.js parser."
 	@echo "  (This requires Google Closure Compiler)"
@@ -107,6 +110,13 @@ tests-all: TeXZilla.js
 	done
 
 build: TeXZilla.js
+
+install: build
+	mkdir -p @bindir@
+	cp TeXZilla.js @libdir@
+	echo '#!/bin/bash' > @bindir@/texzilla
+	echo "nodejs @libdir@/TeXZilla.js \$$@" >> @bindir@/texzilla
+	chmod a+wrx @bindir@/texzilla
 
 minify: TeXZilla-min.js
 
