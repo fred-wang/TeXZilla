@@ -1,0 +1,98 @@
+/* Styles for TexZilla */
+*{
+  box-sizing: border-box;
+}
+html{
+  font-size: 62.5%;
+}
+body{
+  margin: 0;
+  font: 1.4rem Arial;
+  background: #e8e8e8;
+}
+a{
+  color: #008080;
+}
+select{
+  appearance: none;
+  border: 0;
+  height: 30px;
+  margin-right: 10px;
+  background: #cfcfcf;
+}
+.row{
+  display: flex;
+}
+.col{
+  flex: 1;
+}
+.txtright{
+  text-align: right;
+}
+.txtleft{
+  text-align: left;
+}
+.txtcenter{
+  text-align: center;
+}
+.header{
+  padding: 10px 40px;
+  background: #008080;
+  color: white;
+}
+.header__title{
+  font-family: Times;
+}
+.header__caption h1, .header__caption h3{
+  margin: 0;
+}
+.header__caption h3{
+  font-weight: lighter;
+}
+.header__gitlogo{
+  width: 40px;
+  margin-top: 5px;
+}
+.controls{
+  padding: 10px 40px;
+  background: #676767;
+  color: #aaa;
+}
+.controls a{
+  color: #21d9d9;
+}
+.interactive{
+  position: relative;
+}
+.interactive::before{
+  content: '';
+  position: absolute;
+  left: 49%;
+  width: 8px;
+  height: 100%;
+  background: #e8e8e8;
+  border-left: solid thin #dedede;
+  border-right: solid thin #dedede;
+}
+.interactive__header{
+  padding: 10px 20px;
+  background: #e8e8e8;
+  color: #818181;
+}
+.interactive__header h3{
+  margin: 0;
+}
+.interactive__text{
+  height: 400px;
+  padding: 10px;
+  background: white;
+}
+.interactive__text textarea{
+  width: 100%;
+  height: 100%;
+  border: 0;
+  resize: none;
+}
+.info{
+  padding: 40px;
+}
