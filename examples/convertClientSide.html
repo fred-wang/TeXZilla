@@ -8,794 +8,797 @@
          file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
     <script type="text/javascript" src="../TeXZilla-min.js"></script>
     <script type="text/javascript" src="TeXZilla-parse.js"></script>
+    <link rel="stylesheet" href="/style.css">
   </head>
   <body>
 
-<h1>Converting the TeX source when the DOM is ready</h1>
-
-<p>This page contains some inline TeX expressions like
-<code style="color: blue">&lt;span class="tex"&gt;\int_{a}^b f(x) d x = F(b) - F(a)&lt;/span&gt;</code> (inline mode) or 
-<code style="color: red">&lt;div class="tex"&gt;\int_0^{\pi} 2 \cos(\theta) - 3 \sin(\theta) d\theta =
-\left[ 2 \sin(\theta) + 3 \cos(\theta) \right]_{\theta=0}^\pi = -6&lt;/div&gt;</code> (display mode) that are converted into MathML by TeXZilla when the DOM is
-ready.</p>
+    <article class="info">
+      <h1>Converting the TeX source when the DOM is ready</h1>
+
+      <p>This page contains some inline TeX expressions like
+      <code style="color: blue">&lt;span class="tex"&gt;\int_{a}^b f(x) d x = F(b) - F(a)&lt;/span&gt;</code> (inline mode) or
+      <code style="color: red">&lt;div class="tex"&gt;\int_0^{\pi} 2 \cos(\theta) - 3 \sin(\theta) d\theta =
+      \left[ 2 \sin(\theta) + 3 \cos(\theta) \right]_{\theta=0}^\pi = -6&lt;/div&gt;</code> (display mode) that are converted into MathML by TeXZilla when the DOM is
+      ready.</p>
 
-<h2>Copyright</h2>
+      <h2>Copyright</h2>
 
-<pre>
-    Copyright (C) 2013 Frédéric Wang
+      <pre>
+          Copyright (C) 2013 Frédéric Wang
+
+          Permission is granted to copy, distribute and/or modify this document
+          under the terms of the GNU Free Documentation License, Version 1.3
+          or any later version published by the Free Software Foundation;
+          with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+          A copy of the license is included in the section entitled "GNU
+          Free Documentation License".
+      </pre>
 
-    Permission is granted to copy, distribute and/or modify this document
-    under the terms of the GNU Free Documentation License, Version 1.3
-    or any later version published by the Free Software Foundation;
-    with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
-    A copy of the license is included in the section entitled "GNU
-    Free Documentation License".
-</pre>
+      <h2>Basic Integration</h2>
 
-<h2>Basic Integration</h2>
+      <h3>Ideas</h3>
 
-<h3>Ideas</h3>
+      <p>If <span class="tex">F</span> is a primitive of <span class="tex">f</span> then <span class="tex">\int_{a}^b f(x) d x = F(b) - F(a)</span>,
+      provided the integrand and integral have no singularities on the path of
+      integration. As a consequence, we can use a table of derivatives:</p>
 
-<p>If <span class="tex">F</span> is a primitive of <span class="tex">f</span> then <span class="tex">\int_{a}^b f(x) d x = F(b) - F(a)</span>,
-provided the integrand and integral have no singularities on the path of
-integration. As a consequence, we can use a table of derivatives:</p>
+      <table style="margin-left: auto; margin-right: auto;" border="1">
+      <tr><td></td><td>Function</td><td>Derivative</td></tr>
+      <tr><td>Linearity  </td><td> <span class="tex">a f + b g</span> </td><td> <span class="tex">a f' + b g'</span> </td></tr>
+      <tr><td>Leibniz rule </td><td> <span class="tex">f g</span> </td><td> <span class="tex">f' g + g f'</span> </td></tr>
+      <tr><td>Reciprocal rule </td><td> <span class="tex">\frac{1}{f}</span> </td><td> <span class="tex">-\frac{f'}{f^2}</span> </td></tr>
+      <tr><td>Chain Rule </td><td> <span class="tex">f \circ g</span> </td><td> <span class="tex">(f' \circ g) g'</span> </td></tr>
+      <tr><td>Inverse function rule </td><td> <span class="tex">f^{-1}</span> </td><td> <span class="tex">\frac{1}{f' \circ f^{-1}}</span> </td></tr>
+      <tr><td>Elementary power rule </td><td> <span class="tex">x^n</span> </td><td> <span class="tex">n x^{n-1}</span> </td></tr>
+      <tr><td>Generalized power rule </td><td> <span class="tex">f^g = e^{g \ln(f)}</span> </td><td> <span class="tex">f^g \left( f' \frac{g}{f} + g' \ln(f) \right)</span> </td></tr>
+      <tr><td> Exponential </td><td> <span class="tex">\exp x</span> </td><td> <span class="tex">\exp x</span> </td></tr>
+      <tr><td> Logarithm </td><td> <span class="tex">\ln x</span> </td><td> <span class="tex">\frac{1}{x}</span> </td></tr>
+      <tr><td> Sine </td><td> <span class="tex">\sin x</span> </td><td> <span class="tex">\cos x</span> </td></tr>
+      <tr><td> Cosine </td><td> <span class="tex">\cos x</span> </td><td> <span class="tex">-\sin x</span> </td></tr>
+      <tr><td> Tangent </td><td> <span class="tex">\tan x </span> </td><td> <span class="tex">\frac{1}{\cos^2 x} = 1+\tan^2 x</span> </td></tr>
+      </table>
 
-<table style="margin-left: auto; margin-right: auto;" border="1">
-<tr><td></td><td>Function</td><td>Derivative</td></tr>
-<tr><td>Linearity  </td><td> <span class="tex">a f + b g</span> </td><td> <span class="tex">a f' + b g'</span> </td></tr>
-<tr><td>Leibniz rule </td><td> <span class="tex">f g</span> </td><td> <span class="tex">f' g + g f'</span> </td></tr>
-<tr><td>Reciprocal rule </td><td> <span class="tex">\frac{1}{f}</span> </td><td> <span class="tex">-\frac{f'}{f^2}</span> </td></tr>
-<tr><td>Chain Rule </td><td> <span class="tex">f \circ g</span> </td><td> <span class="tex">(f' \circ g) g'</span> </td></tr>
-<tr><td>Inverse function rule </td><td> <span class="tex">f^{-1}</span> </td><td> <span class="tex">\frac{1}{f' \circ f^{-1}}</span> </td></tr>
-<tr><td>Elementary power rule </td><td> <span class="tex">x^n</span> </td><td> <span class="tex">n x^{n-1}</span> </td></tr>
-<tr><td>Generalized power rule </td><td> <span class="tex">f^g = e^{g \ln(f)}</span> </td><td> <span class="tex">f^g \left( f' \frac{g}{f} + g' \ln(f) \right)</span> </td></tr>
-<tr><td> Exponential </td><td> <span class="tex">\exp x</span> </td><td> <span class="tex">\exp x</span> </td></tr>
-<tr><td> Logarithm </td><td> <span class="tex">\ln x</span> </td><td> <span class="tex">\frac{1}{x}</span> </td></tr>
-<tr><td> Sine </td><td> <span class="tex">\sin x</span> </td><td> <span class="tex">\cos x</span> </td></tr>
-<tr><td> Cosine </td><td> <span class="tex">\cos x</span> </td><td> <span class="tex">-\sin x</span> </td></tr>
-<tr><td> Tangent </td><td> <span class="tex">\tan x </span> </td><td> <span class="tex">\frac{1}{\cos^2 x} = 1+\tan^2 x</span> </td></tr>
-</table>
+      <h3>Examples</h3>
 
-<h3>Examples</h3>
+      <p>Using linearity and elementary power rule:</p>
 
-<p>Using linearity and elementary power rule:</p>
+      <div class="tex">
+      \int_0^{1} u^4 - 2u^3 + 5u^2 + 4 du =
+      \left[ \frac{u^5}{5} - 2 \frac{u^4}{4} + 5 \frac{u^3}{3} + 4u \right]_{u=0}^1 =
+      \frac{161}{30}
+      </div>
 
-<div class="tex">
-\int_0^{1} u^4 - 2u^3 + 5u^2 + 4 du =
-\left[ \frac{u^5}{5} - 2 \frac{u^4}{4} + 5 \frac{u^3}{3} + 4u \right]_{u=0}^1 =
-\frac{161}{30}
-</div>
+      <p>Using linearity and sine/cosine:</p>
 
-<p>Using linearity and sine/cosine:</p>
+      <div class="tex">\int_0^{\pi} 2 \cos(\theta) - 3 \sin(\theta) d\theta =
+      \left[ 2 \sin(\theta) + 3 \cos(\theta) \right]_{\theta=0}^\pi = -6</div>
 
-<div class="tex">\int_0^{\pi} 2 \cos(\theta) - 3 \sin(\theta) d\theta =
-\left[ 2 \sin(\theta) + 3 \cos(\theta) \right]_{\theta=0}^\pi = -6</div>
+      <p>Using Leibniz rule, Chain rule and Exponential/Power:</p>
 
-<p>Using Leibniz rule, Chain rule and Exponential/Power:</p>
+      <div class="tex">
+      \int_{0}^{2} 2x e^{-3x} - 3 x^2 e^{-3x} d x =
+      \left[ x^2 e^{-3x}  \right]_0^2 = \frac{4}{e^{12}}
+      </div>
 
-<div class="tex">
-\int_{0}^{2} 2x e^{-3x} - 3 x^2 e^{-3x} d x = 
-\left[ x^2 e^{-3x}  \right]_0^2 = \frac{4}{e^{12}}
-</div>
+      <p>Using the inverse function rule and tangent:</p>
 
-<p>Using the inverse function rule and tangent:</p>
+      <div class="tex">
+      \int_{0}^{1} \frac{1}{1 + x^2} d x =
+      \int_{0}^{1} \frac{1}{\tan'(\arctan(x))} d x = \left[ \arctan(x) \right]_0^1 = \frac{\pi}{4}
+      </div>
 
-<div class="tex">
-\int_{0}^{1} \frac{1}{1 + x^2} d x = 
-\int_{0}^{1} \frac{1}{\tan'(\arctan(x))} d x = \left[ \arctan(x) \right]_0^1 = \frac{\pi}{4}
-</div>
+      <p>Using linearity, reciprocal rule and logarithm:</p>
 
-<p>Using linearity, reciprocal rule and logarithm:</p>
+      <div class="tex">
+      \int_{2}^{3} \frac{1}{v (\ln(v))^2} d v =
+      - \int_{2}^{3} - \frac{\frac{1}{v}}{(\ln(v))^2} d v =
+      - \left[ \frac{1}{\ln(v)}  \right]_2^3 = \frac{1}{\ln 2} - \frac{1}{\ln 3}
+      </div>
 
-<div class="tex">
-\int_{2}^{3} \frac{1}{v (\ln(v))^2} d v = 
-- \int_{2}^{3} - \frac{\frac{1}{v}}{(\ln(v))^2} d v =
-- \left[ \frac{1}{\ln(v)}  \right]_2^3 = \frac{1}{\ln 2} - \frac{1}{\ln 3}
-</div>
+      <p>Using the power rules and chain rule:</p>
 
-<p>Using the power rules and chain rule:</p>
+      <div class="tex">
+      \int_{0}^1
+      \frac{3t^2}{(t^3+1)^5} d t =
+      -\frac{1}{4}
+      \int_0^1
+      (t^3+1)^{-4} \left( 3t^2 \frac{-4}{t^3+1} + 0 \right) d t =
+      -\frac{1}{4} \left[ (t^3+1)^{-4} \right]_0^1 = \frac{15}{64}
+      </div>
 
-<div class="tex">
-\int_{0}^1
-\frac{3t^2}{(t^3+1)^5} d t = 
--\frac{1}{4}
-\int_0^1
-(t^3+1)^{-4} \left( 3t^2 \frac{-4}{t^3+1} + 0 \right) d t =
--\frac{1}{4} \left[ (t^3+1)^{-4} \right]_0^1 = \frac{15}{64}
-</div>
+      <h2>Integration by Substitution</h2>
 
-<h2>Integration by Substitution</h2>
+      <h3>Idea</h3>
 
-<h3>Idea</h3>
+      <p>Do a substitution <span class="tex">x = g(y)</span> to simplify an integral. We have
+      <span class="tex">\frac{dx}{dy} = g'(y)</span> and
+      <span class="tex">\int f(x) dx = \int f(g(y)) g'(y) dy</span>: this is the chain rule!</p>
 
-<p>Do a substitution <span class="tex">x = g(y)</span> to simplify an integral. We have
-<span class="tex">\frac{dx}{dy} = g'(y)</span> and
-<span class="tex">\int f(x) dx = \int f(g(y)) g'(y) dy</span>: this is the chain rule!</p>
+      <h3>Example 1</h3>
 
-<h3>Example 1</h3>
+      <div class="tex">
+      \int_{0}^1 x (x^2 - 1) dx
+      </div>
 
-<div class="tex">
-\int_{0}^1 x (x^2 - 1) dx
-</div>
+      <p>Let <span class="tex">y = x^2 - 1</span>, <span class="tex">dy = 2 x dx</span> then we get</p>
 
-<p>Let <span class="tex">y = x^2 - 1</span>, <span class="tex">dy = 2 x dx</span> then we get</p>
+      <div class="tex">
+      \frac{1}{2} \int_{y=-1}^0 y dy = \left[\frac{y^2}{4}\right]_{y=-1}^0 = -\frac{1}{4}
+      </div>
 
-<div class="tex">
-\frac{1}{2} \int_{y=-1}^0 y dy = \left[\frac{y^2}{4}\right]_{y=-1}^0 = -\frac{1}{4}
-</div>
+      <p>We find the same result as </p>
 
-<p>We find the same result as </p>
+      <div class="tex">
+      \int_{0}^1 x^3 - x dx = \left[ \frac{x^4}{4} - \frac{x^2}{2} \right]_{x=0}^1
+      = \frac{1}{4} - \frac{1}{2} = -\frac{1}{4}
+      </div>
 
-<div class="tex">
-\int_{0}^1 x^3 - x dx = \left[ \frac{x^4}{4} - \frac{x^2}{2} \right]_{x=0}^1
-= \frac{1}{4} - \frac{1}{2} = -\frac{1}{4}
-</div>
+      <h3>Example 2</h3>
 
-<h3>Example 2</h3>
+      <p>Consider</p>
 
-<p>Consider</p>
+      <div class="tex">
+      \int_2^3 6x^2 \cos(x^3 - 2) d x
+      </div>
 
-<div class="tex">
-\int_2^3 6x^2 \cos(x^3 - 2) d x 
-</div>
+      <p>Let <span class="tex">y = x^3 - 2</span>, <span class="tex">dy = 3x^2 dx</span> so</p>
 
-<p>Let <span class="tex">y = x^3 - 2</span>, <span class="tex">dy = 3x^2 dx</span> so</p>
+      <div class="tex">
+      \int_{2}^{3} 6 x^2 \cos(x^3 - 2) d x =
+      2 \int_{y=6}^{25} \cos(y) d y = 2 [\sin(y)]_{y=6}^{25}
+      = 2 \sin(25) - 2 \sin(6)
+      </div>
 
-<div class="tex">
-\int_{2}^{3} 6 x^2 \cos(x^3 - 2) d x =
-2 \int_{y=6}^{25} \cos(y) d y = 2 [\sin(y)]_{y=6}^{25}
-= 2 \sin(25) - 2 \sin(6)
-</div>
+      <h3>Example 3</h3>
 
-<h3>Example 3</h3>
+      <p>Consider </p>
 
-<p>Consider </p>
+      <div class="tex">
+      \int_{v=1}^2 \frac{dv}{v^3 e^{\frac{1}{v^2}}}
+      </div>
 
-<div class="tex">
-\int_{v=1}^2 \frac{dv}{v^3 e^{\frac{1}{v^2}}}
-</div>
+      <p>Let <span class="tex">u = -\frac{1}{v^2}</span>, <span class="tex">du = \frac{2}{v^3} dv</span>:</p>
 
-<p>Let <span class="tex">u = -\frac{1}{v^2}</span>, <span class="tex">du = \frac{2}{v^3} dv</span>:</p>
+      <div class="tex">
+      \int_{v=1}^2 \frac{dv}{v^3 e^{\frac{1}{v^2}}} = \frac{1}{2}
+      \int_{u=-1}^{-\frac{1}{4}} e^{u} du =
+      \frac{1}{2} \left(\frac{1}{\sqrt[4]{e}} - \frac{1}{e}\right)
+      </div>
 
-<div class="tex">
-\int_{v=1}^2 \frac{dv}{v^3 e^{\frac{1}{v^2}}} = \frac{1}{2} 
-\int_{u=-1}^{-\frac{1}{4}} e^{u} du =
-\frac{1}{2} \left(\frac{1}{\sqrt[4]{e}} - \frac{1}{e}\right)
-</div>
+      <h3>Example 4</h3>
 
-<h3>Example 4</h3>
+      <p>Consider</p>
 
-<p>Consider</p>
+      <div class="tex">
+      \int_{-\sqrt{2}}^{-1} \frac{5t}{\sqrt{4 - t^2}} d t
+      </div>
 
-<div class="tex">
-\int_{-\sqrt{2}}^{-1} \frac{5t}{\sqrt{4 - t^2}} d t
-</div>
+      <p>Let <span class="tex">t = 2 \sin \theta</span> and so <span class="tex">dt = 2 \cos \theta d \theta</span>. We have</p>
 
-<p>Let <span class="tex">t = 2 \sin \theta</span> and so <span class="tex">dt = 2 \cos \theta d \theta</span>. We have</p>
+      <div class="tex">
+      \int_{\frac{3\pi}{4}}^{\frac{7\pi}{6}} \frac{10 \sin \theta}{\sqrt{4 - 4\sin^2 {\theta}}} 2 \cos \theta d \theta =
+      10 \int_\frac{3\pi}{4}^{\frac{7\pi}{6}} \sin \theta \frac{\cos \theta}{\sqrt{\cos^2 \theta}} d \theta
+      </div>
 
-<div class="tex">
-\int_{\frac{3\pi}{4}}^{\frac{7\pi}{6}} \frac{10 \sin \theta}{\sqrt{4 - 4\sin^2 {\theta}}} 2 \cos \theta d \theta =
-10 \int_\frac{3\pi}{4}^{\frac{7\pi}{6}} \sin \theta \frac{\cos \theta}{\sqrt{\cos^2 \theta}} d \theta
-</div>
+      <p>We have <span class="tex">-1 &lt; \cos \theta &lt; 0</span> on
+      <span class="tex">\left[\frac{3\pi}{4},\frac{7\pi}{6}\right]</span> and so</p>
 
-<p>We have <span class="tex">-1 &lt; \cos \theta &lt; 0</span> on
-<span class="tex">\left[\frac{3\pi}{4},\frac{7\pi}{6}\right]</span> and so</p>
+      <div class="tex">
+      \int_{-\sqrt{2}}^{-1} \frac{5t}{\sqrt{4 - t^2}} d t =
+      -10 \int_\frac{3\pi}{4}^{\frac{7\pi}{6}} \sin \theta d \theta =
+      10 \left[\cos \theta\right]_\frac{3\pi}{4}^{\frac{7\pi}{6}} =
+      5 (\sqrt{2} - \sqrt{3})
+      </div>
 
-<div class="tex">
-\int_{-\sqrt{2}}^{-1} \frac{5t}{\sqrt{4 - t^2}} d t = 
--10 \int_\frac{3\pi}{4}^{\frac{7\pi}{6}} \sin \theta d \theta =
-10 \left[\cos \theta\right]_\frac{3\pi}{4}^{\frac{7\pi}{6}} =
-5 (\sqrt{2} - \sqrt{3})
-</div>
+      <h3>Example 5</h3>
 
-<h3>Example 5</h3>
+      <p>Consider</p>
 
-<p>Consider</p>
+      <div class="tex">
+      \int_{\frac{3}{2}}^{+\infty} \frac{dx}{2x^2 - 6x + 7}
+      </div>
 
-<div class="tex">
-\int_{\frac{3}{2}}^{+\infty} \frac{dx}{2x^2 - 6x + 7}
-</div>
+      <p>We first write</p>
 
-<p>We first write</p>
+      <div class="tex">2x^2 - 6x + 7 = 2\left(x^2 - 3x + \frac{7}{2}\right) =
+      2\left( \left(x - \frac{3}{2}\right)^2 + \frac{5}{4} \right) =
+      \frac{5}{2} \left( \left(\frac{x - \frac{3}{2}}{\sqrt{\frac{5}{4}}}\right)^2 + 1 \right)
+      </div>
 
-<div class="tex">2x^2 - 6x + 7 = 2\left(x^2 - 3x + \frac{7}{2}\right) =
-2\left( \left(x - \frac{3}{2}\right)^2 + \frac{5}{4} \right) =
-\frac{5}{2} \left( \left(\frac{x - \frac{3}{2}}{\sqrt{\frac{5}{4}}}\right)^2 + 1 \right)
-</div>
+      <p>Now doing the substitution <span class="tex">y = \frac{x - \frac{3}{2}}{\sqrt{\frac{5}{4}}}</span>,
+      <span class="tex">dy = \frac{dx}{\sqrt{\frac{5}{4}}}</span> we get</p>
 
-<p>Now doing the substitution <span class="tex">y = \frac{x - \frac{3}{2}}{\sqrt{\frac{5}{4}}}</span>,
-<span class="tex">dy = \frac{dx}{\sqrt{\frac{5}{4}}}</span> we get</p>
+      <div class="tex">
+      \int_0^{+\infty} \frac{\sqrt{\frac{5}{4}} dy}{\frac{5}{2}(y^2+1)} =
+      \frac{1}{\sqrt{5}} \int_0^{+\infty} \frac{dy}{y^2+1}
+      </div>
 
-<div class="tex">
-\int_0^{+\infty} \frac{\sqrt{\frac{5}{4}} dy}{\frac{5}{2}(y^2+1)} = 
-\frac{1}{\sqrt{5}} \int_0^{+\infty} \frac{dy}{y^2+1}
-</div>
+      <p>But we have already met this integral in the basic methods:</p>
 
-<p>But we have already met this integral in the basic methods:</p>
+      <div class="tex">
+      \int_{\frac{3}{2}}^{+\infty} \frac{dx}{2x^2 - 6x + 7} = \frac{1}{\sqrt{5}}
+      [\arctan y]_{y=0}^{\infty} = \frac{\pi}{2 \sqrt{5}}
+      </div>
 
-<div class="tex">
-\int_{\frac{3}{2}}^{+\infty} \frac{dx}{2x^2 - 6x + 7} = \frac{1}{\sqrt{5}}
-[\arctan y]_{y=0}^{\infty} = \frac{\pi}{2 \sqrt{5}}
-</div>
+      <h3>Example 6</h3>
 
-<h3>Example 6</h3>
+      <p>Consider</p>
 
-<p>Consider</p>
+      <div class="tex">
+      \int_{\frac{\pi}{6}}^{\frac{\pi}{3}}
+      \tan\left(\frac{\theta}{2}\right) \frac{{(1 + \cos \theta)}^2}{\sin^3 \theta} d \theta
+      </div>
 
-<div class="tex">
-\int_{\frac{\pi}{6}}^{\frac{\pi}{3}}
-\tan\left(\frac{\theta}{2}\right) \frac{{(1 + \cos \theta)}^2}{\sin^3 \theta} d \theta
-</div>
+      <p>We do the substitution <span class="tex">t = \tan\left(\frac{\theta}{2}\right)</span>. We have
+      <span class="tex">d \theta = \frac{2 dt}{1+t^2}</span>, <span class="tex">\cos \theta = \frac{1-t^2}{1+t^2}</span> and
+      <span class="tex">\sin \theta = \frac{2t}{1+t^2}</span>. Also, we have</p>
 
-<p>We do the substitution <span class="tex">t = \tan\left(\frac{\theta}{2}\right)</span>. We have
-<span class="tex">d \theta = \frac{2 dt}{1+t^2}</span>, <span class="tex">\cos \theta = \frac{1-t^2}{1+t^2}</span> and
-<span class="tex">\sin \theta = \frac{2t}{1+t^2}</span>. Also, we have</p>
+      <div class="tex">\tan\left(\frac{\pi}{12}\right) =
+      \frac{1-\cos\left(\frac{\pi}{6}\right)}{1-\sin\left(\frac{\pi}{6}\right)}
+      = 2 - \sqrt{3}
+      </div>
 
-<div class="tex">\tan\left(\frac{\pi}{12}\right) =
-\frac{1-\cos\left(\frac{\pi}{6}\right)}{1-\sin\left(\frac{\pi}{6}\right)}
-= 2 - \sqrt{3}
-</div>
+      <p>and so</p>
 
-<p>and so</p>
+      <div class="tex">
+      \int_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}}
+      t \frac{\left(\frac{2}{1+t^2}\right)^2}{\left( \frac{2t}{1+t^2}\right)^3} \frac{2 dt}{1+t^2} =
+      \int_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}}
+      \frac{1}{t^2} dt =
+      \left[ -\frac{1}{t} \right]_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}} =
+      \frac{1}{2-\sqrt{3}}-\sqrt{3}
+      </div>
 
-<div class="tex">
-\int_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}}
-t \frac{\left(\frac{2}{1+t^2}\right)^2}{\left( \frac{2t}{1+t^2}\right)^3} \frac{2 dt}{1+t^2} =
-\int_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}}
-\frac{1}{t^2} dt = 
-\left[ -\frac{1}{t} \right]_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}} =
-\frac{1}{2-\sqrt{3}}-\sqrt{3}
-</div>
 
+      <p>and finally</p>
 
-<p>and finally</p>
+      <div class="tex">
+      \int_{\frac{\pi}{6}}^{\frac{\pi}{3}}
+      \tan\left(\frac{\theta}{2}\right) \frac{{(1 + \cos \theta)}^2}{\sin^3 \theta} d \theta = 2
+      </div>
 
-<div class="tex">
-\int_{\frac{\pi}{6}}^{\frac{\pi}{3}}
-\tan\left(\frac{\theta}{2}\right) \frac{{(1 + \cos \theta)}^2}{\sin^3 \theta} d \theta = 2
-</div>
+      <h2>Integration by parts</h2>
 
-<h2>Integration by parts</h2>
+      <h3>Idea</h3>
 
-<h3>Idea</h3>
+      <p>Given a two function <span class="tex">f, g</span> we have</p>
 
-<p>Given a two function <span class="tex">f, g</span> we have</p>
+      <div class="tex">
+      \int f g'  = f g - \int f' g
+      </div>
 
-<div class="tex">
-\int f g'  = f g - \int f' g
-</div>
+      <p>this is Leibniz rule!</p>
 
-<p>this is Leibniz rule!</p>
+      <h3>Example 1</h3>
 
-<h3>Example 1</h3>
+      <p>Consider</p>
 
-<p>Consider</p>
+      <div class="tex">
+      \int_{0}^{+\infty} (x^2 + x + 1) e^{-3x} d x
+      </div>
 
-<div class="tex">
-\int_{0}^{+\infty} (x^2 + x + 1) e^{-3x} d x
-</div>
+      <p>We consider <span class="tex">f(x) = x^2 + x + 1</span> and <span class="tex">g(x) = \frac{e^{-3x}}{-3}</span> that is
+      <span class="tex">f'(x) = 2x+1</span> and <span class="tex">g'(x) = e^{-3x}</span>. The integral
+      can be written <span class="tex">\int f g' dx</span> and hence we get</p>
 
-<p>We consider <span class="tex">f(x) = x^2 + x + 1</span> and <span class="tex">g(x) = \frac{e^{-3x}}{-3}</span> that is
-<span class="tex">f'(x) = 2x+1</span> and <span class="tex">g'(x) = e^{-3x}</span>. The integral
-can be written <span class="tex">\int f g' dx</span> and hence we get</p>
+      <div class="tex">
+      \left[(x^2 + x + 1) \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} -
+      \int_{0}^{+\infty}
+      (2x+1) \frac{e^{-3x}}{-3}
+        d x = \frac{1}{3} + \frac{1}{3}
+      \int_{0}^{+\infty}
+      (2x+1) e^{-3x}
+        d x
+      </div>
 
-<div class="tex">
-\left[(x^2 + x + 1) \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} -
-\int_{0}^{+\infty}
-(2x+1) \frac{e^{-3x}}{-3}
-  d x = \frac{1}{3} + \frac{1}{3}
-\int_{0}^{+\infty}
-(2x+1) e^{-3x}
-  d x
-</div>
- 
-<p>We now consider <span class="tex">h(x) = 2x+1, h'(x)=2</span> the second integral can be written
-<span class="tex">\int h g' dx</span> and hence </p>
+      <p>We now consider <span class="tex">h(x) = 2x+1, h'(x)=2</span> the second integral can be written
+      <span class="tex">\int h g' dx</span> and hence </p>
 
-<div class="tex">
-\int_{0}^{+\infty}
-(2x+1) e^{-3x}
-  d x
-= \left[(2x + 1) \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} -
-\int_{0}^{+\infty}
-2 \frac{e^{-3x}}{-3}
-  d x = \frac{1}{3} + \frac{2}{3}
-\int_{0}^{+\infty} e^{-3x} d x
-</div>
+      <div class="tex">
+      \int_{0}^{+\infty}
+      (2x+1) e^{-3x}
+        d x
+      = \left[(2x + 1) \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} -
+      \int_{0}^{+\infty}
+      2 \frac{e^{-3x}}{-3}
+        d x = \frac{1}{3} + \frac{2}{3}
+      \int_{0}^{+\infty} e^{-3x} d x
+      </div>
 
-<p>We now recognize <span class="tex">g'</span> in the last integral and so</p>
+      <p>We now recognize <span class="tex">g'</span> in the last integral and so</p>
 
-<div class="tex">
-\int_{0}^{+\infty} e^{-3x} d x = 
-\left[ \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} = \frac{1}{3}
-</div>
+      <div class="tex">
+      \int_{0}^{+\infty} e^{-3x} d x =
+      \left[ \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} = \frac{1}{3}
+      </div>
 
-<p>Finally,</p>
+      <p>Finally,</p>
 
-<div class="tex">
-\int_{0}^{+\infty} (x^2 + x + 1) e^{-3x} d x = 
-\frac{1}{3} + \frac{1}{3} \times \left( 
-\frac{1}{3} + \frac{2}{3} \times \frac{1}{3}
-\right) = \frac{14}{27}
-</div>
+      <div class="tex">
+      \int_{0}^{+\infty} (x^2 + x + 1) e^{-3x} d x =
+      \frac{1}{3} + \frac{1}{3} \times \left(
+      \frac{1}{3} + \frac{2}{3} \times \frac{1}{3}
+      \right) = \frac{14}{27}
+      </div>
 
-<h3>Example 2</h3>
+      <h3>Example 2</h3>
 
-<div class="tex">
-\int_1^2
-x^3 (2\ln x + 7\arctan x) d x
-</div>
+      <div class="tex">
+      \int_1^2
+      x^3 (2\ln x + 7\arctan x) d x
+      </div>
 
-<p>We let <span class="tex">f(x) = 2\ln x + 7\arctan x</span> and <span class="tex">g(x) = \frac{x^3}{3}</span>. Hence
-<span class="tex">f'(x) = \frac{2}{x} + \frac{7}{1+x^2}</span> and <span class="tex">g'(x) = x^3</span>. The integration
-by parts gives:</p>
+      <p>We let <span class="tex">f(x) = 2\ln x + 7\arctan x</span> and <span class="tex">g(x) = \frac{x^3}{3}</span>. Hence
+      <span class="tex">f'(x) = \frac{2}{x} + \frac{7}{1+x^2}</span> and <span class="tex">g'(x) = x^3</span>. The integration
+      by parts gives:</p>
 
-<div class="tex">
-\left[\frac{x^3}{3} \left(2\ln x + 7\arctan x\right) \right]_1^2 - 
-\int_1^2
-\frac{x^3}{3} \left(\frac{2}{x} + \frac{7}{1+x^2}\right) d x
-</div>
+      <div class="tex">
+      \left[\frac{x^3}{3} \left(2\ln x + 7\arctan x\right) \right]_1^2 -
+      \int_1^2
+      \frac{x^3}{3} \left(\frac{2}{x} + \frac{7}{1+x^2}\right) d x
+      </div>
 
-<p>The integral can be written</p>
+      <p>The integral can be written</p>
 
-<div class="tex">
-\int_1^2
-\frac{2}{3} x^2 + \frac{7}{3} \frac{x(x^2+1) - x}{x^2+1} dx =
-\int_2^2
-\frac{2}{3} x^2 + \frac{7}{3} x - \frac{7}{6} \frac{2x}{x^2+1} dx
-</div>
+      <div class="tex">
+      \int_1^2
+      \frac{2}{3} x^2 + \frac{7}{3} \frac{x(x^2+1) - x}{x^2+1} dx =
+      \int_2^2
+      \frac{2}{3} x^2 + \frac{7}{3} x - \frac{7}{6} \frac{2x}{x^2+1} dx
+      </div>
 
-<p>Finally</p>
+      <p>Finally</p>
 
-<div class="tex">
-\int_1^2
-x^3 (2\ln x + 7\arctan x) d x =
-\left[\frac{x^3}{3} \left(2\ln x + 7\arctan x\right)
-- \frac{2}{9} x^3 -\frac{7}{6} x^2 + \frac{7}{6} \ln (x^2 + 1)
- \right]_1^2 =
-\frac{28}{9} \ln(5) + \frac{89}{18} \ln(2) + \frac{56}{3} \arctan(2) 
-- \frac{7 \pi}{12} - \frac{301}{18}
-</div>
+      <div class="tex">
+      \int_1^2
+      x^3 (2\ln x + 7\arctan x) d x =
+      \left[\frac{x^3}{3} \left(2\ln x + 7\arctan x\right)
+      - \frac{2}{9} x^3 -\frac{7}{6} x^2 + \frac{7}{6} \ln (x^2 + 1)
+       \right]_1^2 =
+      \frac{28}{9} \ln(5) + \frac{89}{18} \ln(2) + \frac{56}{3} \arctan(2)
+      - \frac{7 \pi}{12} - \frac{301}{18}
+      </div>
 
-<h3>Example 3</h3>
+      <h3>Example 3</h3>
 
-<p>Consider</p>
+      <p>Consider</p>
 
-<div class="tex">
-I =\int_{0}^{\frac{\pi}{2}}
-\sin(3 \theta) e^{2 \theta} d \theta
-</div>
+      <div class="tex">
+      I =\int_{0}^{\frac{\pi}{2}}
+      \sin(3 \theta) e^{2 \theta} d \theta
+      </div>
 
-<p>We do an integration by parts with <span class="tex">f(\theta) = \sin(3 \theta)</span> and
-<span class="tex">g'(\theta) =  e^{2 \theta}</span>:</p>
+      <p>We do an integration by parts with <span class="tex">f(\theta) = \sin(3 \theta)</span> and
+      <span class="tex">g'(\theta) =  e^{2 \theta}</span>:</p>
 
-<div class="tex">
-I = \left[\sin(3 \theta) \frac{e^{2 \theta}}{2}\right]_{0}^{\frac{\pi}{2}} -
-\frac{3}{2}
-\int_{0}^{\frac{\pi}{2}}
-\cos(3 \theta) e^{2 \theta} d \theta
-</div>
+      <div class="tex">
+      I = \left[\sin(3 \theta) \frac{e^{2 \theta}}{2}\right]_{0}^{\frac{\pi}{2}} -
+      \frac{3}{2}
+      \int_{0}^{\frac{\pi}{2}}
+      \cos(3 \theta) e^{2 \theta} d \theta
+      </div>
 
 
-<p>We repeat a similar integration by parts on the remaining integral:</p>
-<div class="tex">\int_{0}^{\frac{\pi}{2}}
-\cos(3 \theta) e^{2 \theta} d \theta =
-\left[\cos(3 \theta) \frac{e^{2 \theta}}{2}\right]_{0}^{\frac{\pi}{2}} +
-\frac{3}{2}
-\int_{0}^{\frac{\pi}{2}}
-\sin(3 \theta) e^{2 \theta} d \theta
-</div>
+      <p>We repeat a similar integration by parts on the remaining integral:</p>
+      <div class="tex">\int_{0}^{\frac{\pi}{2}}
+      \cos(3 \theta) e^{2 \theta} d \theta =
+      \left[\cos(3 \theta) \frac{e^{2 \theta}}{2}\right]_{0}^{\frac{\pi}{2}} +
+      \frac{3}{2}
+      \int_{0}^{\frac{\pi}{2}}
+      \sin(3 \theta) e^{2 \theta} d \theta
+      </div>
 
-<p>We note that we found the initial integral <span class="tex">I</span>. We get:</p>
+      <p>We note that we found the initial integral <span class="tex">I</span>. We get:</p>
 
-<div class="tex">
-I = \left[\sin(3 \theta) \frac{e^{2 \theta}}{2} -\frac{3}{4}
-\cos(3 \theta) e^{2 \theta}
-\right]_{0}^{\frac{\pi}{2}} - \frac{9}{4} I
-</div>
+      <div class="tex">
+      I = \left[\sin(3 \theta) \frac{e^{2 \theta}}{2} -\frac{3}{4}
+      \cos(3 \theta) e^{2 \theta}
+      \right]_{0}^{\frac{\pi}{2}} - \frac{9}{4} I
+      </div>
 
-<p>Finally, </p>
+      <p>Finally, </p>
 
-<div class="tex">
-I =\int_{0}^{\frac{\pi}{2}}
-\sin(3 \theta) e^{2 \theta} d \theta
-= \frac{4}{13} \left[\left(\frac{1}{2} \sin(3 \theta)  -\frac{3}{4}
-\cos(3 \theta)\right) e^{2 \theta}
-\right]_{0}^{\frac{\pi}{2}} = \frac{3 - 2 e^\pi}{13}
-</div>
+      <div class="tex">
+      I =\int_{0}^{\frac{\pi}{2}}
+      \sin(3 \theta) e^{2 \theta} d \theta
+      = \frac{4}{13} \left[\left(\frac{1}{2} \sin(3 \theta)  -\frac{3}{4}
+      \cos(3 \theta)\right) e^{2 \theta}
+      \right]_{0}^{\frac{\pi}{2}} = \frac{3 - 2 e^\pi}{13}
+      </div>
 
-<h2>Integration by Partial Fraction Decomposition</h2>
+      <h2>Integration by Partial Fraction Decomposition</h2>
 
-<h3>Idea</h3>
+      <h3>Idea</h3>
 
-<p>Given a rational function <span class="tex">\frac{P}{Q}</span>, write its partial fraction
-decomposition and integrate each term.</p>
+      <p>Given a rational function <span class="tex">\frac{P}{Q}</span>, write its partial fraction
+      decomposition and integrate each term.</p>
 
-<h3>Example 1</h3>
+      <h3>Example 1</h3>
 
-<div class="tex">
-\int_{x=2}^{3} \frac{2x^4-6x^3+41x^2-44x+12}{6x^5-18x^4+18x^3-6x^2} d x
-</div>
+      <div class="tex">
+      \int_{x=2}^{3} \frac{2x^4-6x^3+41x^2-44x+12}{6x^5-18x^4+18x^3-6x^2} d x
+      </div>
 
-<p>Clearly, we have <span class="tex">6x^5-18x^4+18x^3-6x^2 = 
-6 x^2 (x^3-3x^2+3x-1)</span> and <span class="tex">1</span> is a trivial root of the second factor so we can
-factor it by <span class="tex">(x-1)</span> and obtain:</p>
+      <p>Clearly, we have <span class="tex">6x^5-18x^4+18x^3-6x^2 =
+      6 x^2 (x^3-3x^2+3x-1)</span> and <span class="tex">1</span> is a trivial root of the second factor so we can
+      factor it by <span class="tex">(x-1)</span> and obtain:</p>
 
-<div class="tex">6x^5-18x^4+18x^3-6x^2 = 6 x^2 (x-1) (x^2-2x+1) = 6x^2 (x-1)^3</div>
+      <div class="tex">6x^5-18x^4+18x^3-6x^2 = 6 x^2 (x-1) (x^2-2x+1) = 6x^2 (x-1)^3</div>
 
-<p>Hence we search a decomposition of</p>
+      <p>Hence we search a decomposition of</p>
 
-<div class="tex">
-F(x) =
-\frac{2x^4-6x^3+41x^2-44x+12}{6 x^2 (x^3-3x^2+3x-1)} =
-\frac{A}{x} + \frac{B}{x^2} + 
-\frac{C}{x-1} + \frac{D}{(x-1)^2} + \frac{E}{(x-1)^3}
-</div>
+      <div class="tex">
+      F(x) =
+      \frac{2x^4-6x^3+41x^2-44x+12}{6 x^2 (x^3-3x^2+3x-1)} =
+      \frac{A}{x} + \frac{B}{x^2} +
+      \frac{C}{x-1} + \frac{D}{(x-1)^2} + \frac{E}{(x-1)^3}
+      </div>
 
-<p>for some constants <span class="tex">A, B, C, D, E \in \mathbb{R}</span>. We have</p>
+      <p>for some constants <span class="tex">A, B, C, D, E \in \mathbb{R}</span>. We have</p>
 
-<div class="tex">
-\lim_{x \rightarrow 1} (x - 1)^3 F(x) = E = \frac{2 - 6 + 41 - 44 + 12}{6} =
-\frac{5}{6}
-</div>
+      <div class="tex">
+      \lim_{x \rightarrow 1} (x - 1)^3 F(x) = E = \frac{2 - 6 + 41 - 44 + 12}{6} =
+      \frac{5}{6}
+      </div>
 
-<div class="tex">
-\lim_{x \rightarrow 0} x^2 F(x) = B = \frac{12}{-6} = -2
-</div>
+      <div class="tex">
+      \lim_{x \rightarrow 0} x^2 F(x) = B = \frac{12}{-6} = -2
+      </div>
 
-<div class="tex">
-\lim_{x \rightarrow 0} (x^2 F(x))' = A = 
-\frac{-44 \times -1 - 12 \times 3}{6} = \frac{4}{3}
-</div>
+      <div class="tex">
+      \lim_{x \rightarrow 0} (x^2 F(x))' = A =
+      \frac{-44 \times -1 - 12 \times 3}{6} = \frac{4}{3}
+      </div>
 
-<div class="tex">
-\lim_{x \rightarrow +\infty} x F(x) = A + C = \frac{2}{6} \rightarrow C = 
-\frac{2}{6} - \frac{4}{3} = -1
-</div>
+      <div class="tex">
+      \lim_{x \rightarrow +\infty} x F(x) = A + C = \frac{2}{6} \rightarrow C =
+      \frac{2}{6} - \frac{4}{3} = -1
+      </div>
 
-<div class="tex">
-F(2) = \frac{A}{2} + \frac{B}{4} + C + D + E = \frac{2\times16 - 6\times8+41\times4-44\times2+12}{6 \times 4} = 3 \rightarrow D = 3 - \frac{2}{3} + \frac{1}{2} + 1
-- \frac{5}{6} = 3</div>
+      <div class="tex">
+      F(2) = \frac{A}{2} + \frac{B}{4} + C + D + E = \frac{2\times16 - 6\times8+41\times4-44\times2+12}{6 \times 4} = 3 \rightarrow D = 3 - \frac{2}{3} + \frac{1}{2} + 1
+      - \frac{5}{6} = 3</div>
 
-<p>Finally,</p>
+      <p>Finally,</p>
 
-<div class="tex">
-\int_{x=2}^{3} F(x) d x =
-\left[ \frac{4}{3} \ln |x| + \frac{2}{x} - \ln |x - 1| - \frac{3}{x-1}
-- \frac{5}{12} \frac{1}{(x-1)^2}
-\right]_{x=2}^3 = \frac{4}{3} \ln(3) - \frac{7}{3} \ln(2) + \frac{71}{48}
-</div>
+      <div class="tex">
+      \int_{x=2}^{3} F(x) d x =
+      \left[ \frac{4}{3} \ln |x| + \frac{2}{x} - \ln |x - 1| - \frac{3}{x-1}
+      - \frac{5}{12} \frac{1}{(x-1)^2}
+      \right]_{x=2}^3 = \frac{4}{3} \ln(3) - \frac{7}{3} \ln(2) + \frac{71}{48}
+      </div>
 
-<h3>Example 2</h3>
+      <h3>Example 2</h3>
 
-<div class="tex">
-\int_{u=1}^{5} \frac{2u^4-5u^3+24u^2-26u+50}{u^5-4u^4+14u^3-20u^2+25u} d u
-</div>
+      <div class="tex">
+      \int_{u=1}^{5} \frac{2u^4-5u^3+24u^2-26u+50}{u^5-4u^4+14u^3-20u^2+25u} d u
+      </div>
 
-<p>The denominator can be written 
-<span class="tex">u^5-4u^4+14u^3-20u^2+25u = u(u^4-4u^3+14u^2-20u+25)</span>. Evaluating the
-second factor at <span class="tex">0, \pm1, \pm2</span> we don't find any trivial roots. Hence we try
-to convert it to a depressed quartic by setting <span class="tex">u = v - \frac{-4}{4} = v + 1</span>.
-We find <span class="tex">(u^4-4u^3+14u^2-20u+25) = v^4 + 8v^2 + 16 = (v^2 + 4)^2 = (u^2-2u+5)^2</span>.
-The discriminant of <span class="tex">u^2-2u+5</span> is <span class="tex">4(1-5) &lt; 0</span> so we have the decomposition
-in irreducible factors:</p>
+      <p>The denominator can be written
+      <span class="tex">u^5-4u^4+14u^3-20u^2+25u = u(u^4-4u^3+14u^2-20u+25)</span>. Evaluating the
+      second factor at <span class="tex">0, \pm1, \pm2</span> we don't find any trivial roots. Hence we try
+      to convert it to a depressed quartic by setting <span class="tex">u = v - \frac{-4}{4} = v + 1</span>.
+      We find <span class="tex">(u^4-4u^3+14u^2-20u+25) = v^4 + 8v^2 + 16 = (v^2 + 4)^2 = (u^2-2u+5)^2</span>.
+      The discriminant of <span class="tex">u^2-2u+5</span> is <span class="tex">4(1-5) &lt; 0</span> so we have the decomposition
+      in irreducible factors:</p>
 
-<div class="tex">
-u^5-4u^4+14u^3-20u^2+25u = u (u^2-2u+5)^2
-</div>
+      <div class="tex">
+      u^5-4u^4+14u^3-20u^2+25u = u (u^2-2u+5)^2
+      </div>
 
-<p>We now try to find <span class="tex">A, B, C, D, E \in \mathbb{R}</span> such that</p>
+      <p>We now try to find <span class="tex">A, B, C, D, E \in \mathbb{R}</span> such that</p>
 
-<div class="tex">
-F(u) = 
-\frac{2u^4-5u^3+24u^2-27u+50}{u (u^2-2u+5)^2} =
-\frac{A}{u} + \frac{Bu+C}{u^2-2u+5} + \frac{Du+E}{(u^2-2u+5)^2}
-</div>
+      <div class="tex">
+      F(u) =
+      \frac{2u^4-5u^3+24u^2-27u+50}{u (u^2-2u+5)^2} =
+      \frac{A}{u} + \frac{Bu+C}{u^2-2u+5} + \frac{Du+E}{(u^2-2u+5)^2}
+      </div>
 
-<div class="tex">
-\lim_{u \rightarrow 0} uF(u) = A = \frac{50}{3 \times 25} = 2
-</div>
+      <div class="tex">
+      \lim_{u \rightarrow 0} uF(u) = A = \frac{50}{3 \times 25} = 2
+      </div>
 
-<div class="tex">
-\lim_{u \rightarrow +\infty} uF(u) = A + B = 2 \rightarrow B = 0
-</div>
+      <div class="tex">
+      \lim_{u \rightarrow +\infty} uF(u) = A + B = 2 \rightarrow B = 0
+      </div>
 
-<div class="tex">
-\lim_{u \rightarrow +\infty} u^2\left(F(u) - \frac{A}{u}\right) = C = 
-\lim_{u \rightarrow +\infty} u^2 \frac{2 u^4 - 5u^3 - 2(u^4-4u^3)}{u \times u^4} = 3
-</div>
+      <div class="tex">
+      \lim_{u \rightarrow +\infty} u^2\left(F(u) - \frac{A}{u}\right) = C =
+      \lim_{u \rightarrow +\infty} u^2 \frac{2 u^4 - 5u^3 - 2(u^4-4u^3)}{u \times u^4} = 3
+      </div>
 
-<div class="tex">
-F(1) = \frac{11}{4} = 2 + \frac{3}{4} + \frac{D+E}{16} \rightarrow
-D+E = 44 - 32 - 12 = 0
-</div>
+      <div class="tex">
+      F(1) = \frac{11}{4} = 2 + \frac{3}{4} + \frac{D+E}{16} \rightarrow
+      D+E = 44 - 32 - 12 = 0
+      </div>
 
-<div class="tex">
-F(2) = \frac{42}{25} = 1 + \frac{3}{5} + \frac{2D+E}{25} \rightarrow
-2D + E = 42 - 25 - 15 = 2
-</div>
+      <div class="tex">
+      F(2) = \frac{42}{25} = 1 + \frac{3}{5} + \frac{2D+E}{25} \rightarrow
+      2D + E = 42 - 25 - 15 = 2
+      </div>
 
-<p>From the two last equalities, we immediately get <span class="tex">D = 2</span> and <span class="tex">E = -2</span>. Finally,</p>
+      <p>From the two last equalities, we immediately get <span class="tex">D = 2</span> and <span class="tex">E = -2</span>. Finally,</p>
 
-<div class="tex">
-F(u) = 
-\frac{2}{u} + \frac{3}{u^2-2u+5} + \frac{2u - 2}{(u^2-2u+5)^2}
-</div>
+      <div class="tex">
+      F(u) =
+      \frac{2}{u} + \frac{3}{u^2-2u+5} + \frac{2u - 2}{(u^2-2u+5)^2}
+      </div>
 
-<p>We have</p>
+      <p>We have</p>
 
-<div class="tex">
-\int_{u=1}^{5} \frac{2}{u} d u= \left[ 
-2 \ln|u|
-\right]_{u=1}^5 = 2 \ln(5)
-</div>
+      <div class="tex">
+      \int_{u=1}^{5} \frac{2}{u} d u= \left[
+      2 \ln|u|
+      \right]_{u=1}^5 = 2 \ln(5)
+      </div>
 
-<div class="tex">
-\int_{u=1}^{5} \frac{3}{u^2-2u+5} d u=
-\frac{3}{4} \int_{u=1}^{5} \frac{d u}{(\frac{u-1}{2})^2+1} =
-\frac{3}{2} \int_{v=0}^{2} \frac{d v}{v^2+1} = 
-\frac{3}{2} \arctan(2)
-</div>
+      <div class="tex">
+      \int_{u=1}^{5} \frac{3}{u^2-2u+5} d u=
+      \frac{3}{4} \int_{u=1}^{5} \frac{d u}{(\frac{u-1}{2})^2+1} =
+      \frac{3}{2} \int_{v=0}^{2} \frac{d v}{v^2+1} =
+      \frac{3}{2} \arctan(2)
+      </div>
 
-<div class="tex">
-\int_{u=1}^{5} \frac{2u - 2}{(u^2-2u+5)^2} d u = \left[ 
-- \frac{1}{u^2-2u+5}
-\right]_{u=1}^5 = \frac{1}{5}
-</div>
+      <div class="tex">
+      \int_{u=1}^{5} \frac{2u - 2}{(u^2-2u+5)^2} d u = \left[
+      - \frac{1}{u^2-2u+5}
+      \right]_{u=1}^5 = \frac{1}{5}
+      </div>
 
-<p>hence</p>
+      <p>hence</p>
 
-<div class="tex">
-\int_{u=1}^5 F(u) d u =  2 \ln(5) + \frac{3}{2} \arctan(2) + \frac{1}{5}
-</div>
+      <div class="tex">
+      \int_{u=1}^5 F(u) d u =  2 \ln(5) + \frac{3}{2} \arctan(2) + \frac{1}{5}
+      </div>
 
-<h3>Example 3</h3>
+      <h3>Example 3</h3>
 
-<div class="tex">
-\int_{t=2}^{17} \frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} d t
-</div>
+      <div class="tex">
+      \int_{t=2}^{17} \frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} d t
+      </div>
 
-<p>By polynomial long division we find that</p>
+      <p>By polynomial long division we find that</p>
 
-<div class="tex">
-X^6-2x^5-3X^4+15X^3+4X^2-17 = (X^2-4X+5)(X^4+2X^3-X-2)+6X^3+2X^2-3X-7
-</div>
+      <div class="tex">
+      X^6-2x^5-3X^4+15X^3+4X^2-17 = (X^2-4X+5)(X^4+2X^3-X-2)+6X^3+2X^2-3X-7
+      </div>
 
-<p>and so </p>
+      <p>and so </p>
 
-<div class="tex">
-\frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} = 
-t^2-4t+5+\frac{6t^3+2t^2-3t-7}{t^4+2t^3-t-2}
-</div>
+      <div class="tex">
+      \frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} =
+      t^2-4t+5+\frac{6t^3+2t^2-3t-7}{t^4+2t^3-t-2}
+      </div>
 
-<p>The integral of the first term is:</p>
+      <p>The integral of the first term is:</p>
 
-<div class="tex">
-\int_{t=2}^{17} t^2-4t+5 d t =
-{\left[\frac{t^3}{3} - 2t^2 + 5t\right]}_{t=2}^{17} = 1140
-</div>
+      <div class="tex">
+      \int_{t=2}^{17} t^2-4t+5 d t =
+      {\left[\frac{t^3}{3} - 2t^2 + 5t\right]}_{t=2}^{17} = 1140
+      </div>
 
-<p>First we search trivial roots for the denominator.
-If we evaluate <span class="tex">t^4+2t^3-t-2</span> at <span class="tex">t=0,-1,1,-2,2</span> we find respectively
-<span class="tex">-2, -2, 0, 0, 28</span>. So we can factor <span class="tex">X^4+2X^4-X-2</span> by <span class="tex">(X - 1)(X + 2)</span>. We get
-</p>
+      <p>First we search trivial roots for the denominator.
+      If we evaluate <span class="tex">t^4+2t^3-t-2</span> at <span class="tex">t=0,-1,1,-2,2</span> we find respectively
+      <span class="tex">-2, -2, 0, 0, 28</span>. So we can factor <span class="tex">X^4+2X^4-X-2</span> by <span class="tex">(X - 1)(X + 2)</span>. We get
+      </p>
 
-<div class="tex">
-X^4+2X^3-X-2 = (X - 1)(X + 2)(X^2+X+1)
-</div>
+      <div class="tex">
+      X^4+2X^3-X-2 = (X - 1)(X + 2)(X^2+X+1)
+      </div>
 
-<p>The polynomial <span class="tex">X^2+X+1</span> is irreducible on <span class="tex">\mathbb{R}</span> because its
-discrimant is <span class="tex">1 - 4 = -3 &lt; 0</span>. Hence we search a decomposition of</p>
+      <p>The polynomial <span class="tex">X^2+X+1</span> is irreducible on <span class="tex">\mathbb{R}</span> because its
+      discrimant is <span class="tex">1 - 4 = -3 &lt; 0</span>. Hence we search a decomposition of</p>
 
-<div class="tex">
-F(t) = \frac{6t^3+2t^2-3t-7}{(t - 1)(t + 2)(t^2+t+1)} =
-\frac{A}{t - 1} + \frac{B}{t + 2} + \frac{C t + D}{t^2+t+1}
-</div>
+      <div class="tex">
+      F(t) = \frac{6t^3+2t^2-3t-7}{(t - 1)(t + 2)(t^2+t+1)} =
+      \frac{A}{t - 1} + \frac{B}{t + 2} + \frac{C t + D}{t^2+t+1}
+      </div>
 
-<p>for some constants <span class="tex">A, B, C, D \in \mathbb{R}</span>. We have</p>
+      <p>for some constants <span class="tex">A, B, C, D \in \mathbb{R}</span>. We have</p>
 
-<div class="tex">
-\lim_{t \rightarrow 1} (t - 1)F(t) = A = \frac{6+2-3-7}{3 \times 3} = - \frac{2}{9}
-</div>
-<div class="tex">
-\lim_{t \rightarrow -2} (t + 2)F(t) = B = \frac{6\times-8+2\times4+3\times2-7}{-3 \times (4-2+1)} = \frac{41}{9}
-</div>
+      <div class="tex">
+      \lim_{t \rightarrow 1} (t - 1)F(t) = A = \frac{6+2-3-7}{3 \times 3} = - \frac{2}{9}
+      </div>
+      <div class="tex">
+      \lim_{t \rightarrow -2} (t + 2)F(t) = B = \frac{6\times-8+2\times4+3\times2-7}{-3 \times (4-2+1)} = \frac{41}{9}
+      </div>
 
-<div class="tex">
-\lim_{t \rightarrow +\infty} t F(t) = A + B + C = 6 \rightarrow
-C = 6 + \frac{2}{9} - \frac{41}{9} = \frac{5}{3}
-</div>
+      <div class="tex">
+      \lim_{t \rightarrow +\infty} t F(t) = A + B + C = 6 \rightarrow
+      C = 6 + \frac{2}{9} - \frac{41}{9} = \frac{5}{3}
+      </div>
 
-<div class="tex">
-F(0) = -A + \frac{B}{2} + D = \frac{-7}{-1 \times 2 \times 1} \rightarrow
-D = \frac{7}{2} -\frac{2}{9} - \frac{41}{18} = 1
-</div>
+      <div class="tex">
+      F(0) = -A + \frac{B}{2} + D = \frac{-7}{-1 \times 2 \times 1} \rightarrow
+      D = \frac{7}{2} -\frac{2}{9} - \frac{41}{18} = 1
+      </div>
 
-<p>So </p>
+      <p>So </p>
 
-<div class="tex">
-F(t) =
--\frac{2}{9(t - 1)} + \frac{41}{9(t + 2)} + \frac{\frac{5}{3} t + 1}{t^2+t+1}
-</div>
+      <div class="tex">
+      F(t) =
+      -\frac{2}{9(t - 1)} + \frac{41}{9(t + 2)} + \frac{\frac{5}{3} t + 1}{t^2+t+1}
+      </div>
 
-<p>The integral of the two first terms is easy to compute:</p>
+      <p>The integral of the two first terms is easy to compute:</p>
 
-<div class="tex">
-\int_{t=2}^{17} -\frac{2}{9(t - 1)} + \frac{41}{9(t + 2)} d t =
--\frac{2}{9} \left[\ln|t-1|\right]_{2}^{17} +
-\frac{41}{9} \left[\ln|t+2|\right]_{2}^{17} =
--\frac{2}{9} \ln(16) + \frac{41}{9} \ln(19) - \frac{41}{9} \ln(4)
-</div>
+      <div class="tex">
+      \int_{t=2}^{17} -\frac{2}{9(t - 1)} + \frac{41}{9(t + 2)} d t =
+      -\frac{2}{9} \left[\ln|t-1|\right]_{2}^{17} +
+      \frac{41}{9} \left[\ln|t+2|\right]_{2}^{17} =
+      -\frac{2}{9} \ln(16) + \frac{41}{9} \ln(19) - \frac{41}{9} \ln(4)
+      </div>
 
-<p>The last term can be split into two parts:</p>
+      <p>The last term can be split into two parts:</p>
 
-<div class="tex">
-\frac{\frac{5}{3} t + 1}{t^2+t+1} =
-\frac{5}{6} \frac{2t+1}{t^2+t+1} + \frac{1}{6} \times \frac{4}{3} \frac{1}{\left( \frac{t+\frac{1}{2}}{\sqrt{\frac{3}{4}}} \right)^2 + 1}
-</div>
+      <div class="tex">
+      \frac{\frac{5}{3} t + 1}{t^2+t+1} =
+      \frac{5}{6} \frac{2t+1}{t^2+t+1} + \frac{1}{6} \times \frac{4}{3} \frac{1}{\left( \frac{t+\frac{1}{2}}{\sqrt{\frac{3}{4}}} \right)^2 + 1}
+      </div>
 
-<p>We have</p>
+      <p>We have</p>
 
-<div class="tex">
-\int_{t=2}^{17}
-\frac{5}{6} \frac{2t}{t^2+t+1} d t =
-\frac{5}{6} \left[ \ln |t^2 + t + 1| \right]_{t=2}^{17}  =
-\frac{5}{6} \ln(307) - \frac{5}{6} \log(7)
-</div>
+      <div class="tex">
+      \int_{t=2}^{17}
+      \frac{5}{6} \frac{2t}{t^2+t+1} d t =
+      \frac{5}{6} \left[ \ln |t^2 + t + 1| \right]_{t=2}^{17}  =
+      \frac{5}{6} \ln(307) - \frac{5}{6} \log(7)
+      </div>
 
-<p>and</p>
+      <p>and</p>
 
-<div class="tex">
-\int_{t=2}^{17}
-\frac{2}{9} \frac{d t}{\left( \frac{t+\frac{1}{2}}{\sqrt{\frac{3}{4}}} \right)^2 + 1} = \frac{2}{9}
-\int_{u=\frac{5}{\sqrt{3}}}^{\frac{35}{\sqrt{3}}} \frac{\sqrt{\frac{3}{4}} d u}{u^2 + 1} =
-\frac{1}{3 \sqrt{3}} \left[ \arctan u \right]_{u=\frac{5}{\sqrt{3}}}^{\frac{35}{\sqrt{3}}}
-</div>
+      <div class="tex">
+      \int_{t=2}^{17}
+      \frac{2}{9} \frac{d t}{\left( \frac{t+\frac{1}{2}}{\sqrt{\frac{3}{4}}} \right)^2 + 1} = \frac{2}{9}
+      \int_{u=\frac{5}{\sqrt{3}}}^{\frac{35}{\sqrt{3}}} \frac{\sqrt{\frac{3}{4}} d u}{u^2 + 1} =
+      \frac{1}{3 \sqrt{3}} \left[ \arctan u \right]_{u=\frac{5}{\sqrt{3}}}^{\frac{35}{\sqrt{3}}}
+      </div>
 
-<p>Finally we get</p>
+      <p>Finally we get</p>
 
-<div class="tex">
-\int_{t=2}^{17} \frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} d t =
-1140
--\frac{2}{9} \ln(16) + \frac{41}{9} \ln(19) - \frac{41}{9} \ln(4) +
-\frac{5}{6} \ln(307) - \frac{5}{6} \log(7) +
-\frac{1}{3 \sqrt{3}} \arctan\left(\frac{35}{\sqrt{3}}\right) -
-\frac{1}{3 \sqrt{3}} \arctan\left(\frac{5}{\sqrt{3}}\right)
-</div>
+      <div class="tex">
+      \int_{t=2}^{17} \frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} d t =
+      1140
+      -\frac{2}{9} \ln(16) + \frac{41}{9} \ln(19) - \frac{41}{9} \ln(4) +
+      \frac{5}{6} \ln(307) - \frac{5}{6} \log(7) +
+      \frac{1}{3 \sqrt{3}} \arctan\left(\frac{35}{\sqrt{3}}\right) -
+      \frac{1}{3 \sqrt{3}} \arctan\left(\frac{5}{\sqrt{3}}\right)
+      </div>
 
-<p>Alternatively, we can write</p>
+      <p>Alternatively, we can write</p>
 
-<div class="tex">
-G(t) = \frac{\frac{5}{3} t + 1}{t^2+t+1} =
-\frac{E}{t - t^+} + \frac{F}{t - t^-}
-</div>
+      <div class="tex">
+      G(t) = \frac{\frac{5}{3} t + 1}{t^2+t+1} =
+      \frac{E}{t - t^+} + \frac{F}{t - t^-}
+      </div>
 
-<p>where <span class="tex">t^\pm = \frac{-1\pm i \sqrt{3}}{2}</span> are the complex roots of
-<span class="tex">t^2+t+1</span>. We have</p>
+      <p>where <span class="tex">t^\pm = \frac{-1\pm i \sqrt{3}}{2}</span> are the complex roots of
+      <span class="tex">t^2+t+1</span>. We have</p>
 
-<div class="tex">
-\lim_{t \rightarrow t^+} (t-t^+) G(t) =  E = \frac{5\sqrt{3}+i}{6 \sqrt{3}}
-</div>
-<div class="tex">
-\lim_{t \rightarrow t^-} (t-t^-) G(t) =  F = \frac{5\sqrt{3}-i}{6 \sqrt{3}}
-</div>
+      <div class="tex">
+      \lim_{t \rightarrow t^+} (t-t^+) G(t) =  E = \frac{5\sqrt{3}+i}{6 \sqrt{3}}
+      </div>
+      <div class="tex">
+      \lim_{t \rightarrow t^-} (t-t^-) G(t) =  F = \frac{5\sqrt{3}-i}{6 \sqrt{3}}
+      </div>
 
-<p>We have</p>
+      <p>We have</p>
 
-<div class="tex">
-\int_{2}^{17} G(t) d t = 
-\left[ 
-E
-\left( \ln |t - t^+| + i \arctan \frac{t - \Re(t^+)}{\Im(t^+)} \right)
-+
-F
-\left(  \ln |t - t^-| + i \arctan \frac{t - \Re(t^-)}{\Im(t^-)} \right)
- \right]_{2}^{17}
-</div>
+      <div class="tex">
+      \int_{2}^{17} G(t) d t =
+      \left[
+      E
+      \left( \ln |t - t^+| + i \arctan \frac{t - \Re(t^+)}{\Im(t^+)} \right)
+      +
+      F
+      \left(  \ln |t - t^-| + i \arctan \frac{t - \Re(t^-)}{\Im(t^-)} \right)
+       \right]_{2}^{17}
+      </div>
 
-<p>After simplification, we get</p>
+      <p>After simplification, we get</p>
 
-<div class="tex">
-\int_{2}^{17} G(t) d t = 
-\frac{5}{6} \ln(307) - \frac{5}{6} \log(7) +
-\frac{1}{3 \sqrt{3}} \arctan\left(\frac{35}{\sqrt{3}}\right) -
-\frac{1}{3 \sqrt{3}} \arctan\left(\frac{5}{\sqrt{3}}\right)
-</div>
+      <div class="tex">
+      \int_{2}^{17} G(t) d t =
+      \frac{5}{6} \ln(307) - \frac{5}{6} \log(7) +
+      \frac{1}{3 \sqrt{3}} \arctan\left(\frac{35}{\sqrt{3}}\right) -
+      \frac{1}{3 \sqrt{3}} \arctan\left(\frac{5}{\sqrt{3}}\right)
+      </div>
 
-<p>as we already found above.</p>
+      <p>as we already found above.</p>
 
-<h2>Contour Integration</h2>
+      <h2>Contour Integration</h2>
 
-<h3>Idea</h3>
+      <h3>Idea</h3>
 
-<p>Consider contour integral <span class="tex">\oint_\gamma f(z) d z</span> along paths in complex
-plane to deduce integral along the real line.</p>
+      <p>Consider contour integral <span class="tex">\oint_\gamma f(z) d z</span> along paths in complex
+      plane to deduce integral along the real line.</p>
 
-<h3>Example 1</h3>
+      <h3>Example 1</h3>
 
-<p>Consider the integral</p>
+      <p>Consider the integral</p>
 
-<div class="tex">
-\int_{0}^{2 \pi} \frac{6 \cos(2 \theta)}{4 \sin(\theta) - 5} d\theta
-</div>
+      <div class="tex">
+      \int_{0}^{2 \pi} \frac{6 \cos(2 \theta)}{4 \sin(\theta) - 5} d\theta
+      </div>
 
-<p>Write <span class="tex">z = e^{i \theta}</span>, <span class="tex">d z = i z d \theta</span>. The integral becomes</p>
+      <p>Write <span class="tex">z = e^{i \theta}</span>, <span class="tex">d z = i z d \theta</span>. The integral becomes</p>
 
-<div class="tex">
-\oint_{\gamma} \frac{3 (z^2 + z^{-2})}{-2 i (z - z^{-1}) - 5} \frac{d z}{i z} =
-\oint_{\gamma}  \frac{3(z^4+1)}{2 z^2 (z - 2 i)\left(z - \frac{i}{2}\right)} d z
-</div>
+      <div class="tex">
+      \oint_{\gamma} \frac{3 (z^2 + z^{-2})}{-2 i (z - z^{-1}) - 5} \frac{d z}{i z} =
+      \oint_{\gamma}  \frac{3(z^4+1)}{2 z^2 (z - 2 i)\left(z - \frac{i}{2}\right)} d z
+      </div>
 
-<p>where <span class="tex">\gamma</span> is the unit circle traversed counterclockwise.
-<span class="tex">f : z \mapsto \frac{3(z^4+1)}{2 z^2 (z - 2 i)\left(z - \frac{i}{2}\right)}</span>
-has two
-singularities inside that circle: <span class="tex">0</span> and <span class="tex">\frac{i}{2}</span>.
-Hence the integral is the <span class="tex">2 \pi i</span> times the sum
-of the residues of <span class="tex">f</span> at these points:</p>
+      <p>where <span class="tex">\gamma</span> is the unit circle traversed counterclockwise.
+      <span class="tex">f : z \mapsto \frac{3(z^4+1)}{2 z^2 (z - 2 i)\left(z - \frac{i}{2}\right)}</span>
+      has two
+      singularities inside that circle: <span class="tex">0</span> and <span class="tex">\frac{i}{2}</span>.
+      Hence the integral is the <span class="tex">2 \pi i</span> times the sum
+      of the residues of <span class="tex">f</span> at these points:</p>
 
-<div class="tex">
-\mathrm{Res}(f, 0) = \lim_{z \rightarrow 0} \frac{d \left( z^2 f(z) \right)}{dz}
-= \frac{15 i}{4}
-</div>
+      <div class="tex">
+      \mathrm{Res}(f, 0) = \lim_{z \rightarrow 0} \frac{d \left( z^2 f(z) \right)}{dz}
+      = \frac{15 i}{4}
+      </div>
 
-<div class="tex">
-\mathrm{Res}(f, \frac{i}{2}) = \lim_{z \rightarrow 0} \left( z - \frac{i}{2} \right)
-f(z) = -\frac{17 i}{4}
-</div>
+      <div class="tex">
+      \mathrm{Res}(f, \frac{i}{2}) = \lim_{z \rightarrow 0} \left( z - \frac{i}{2} \right)
+      f(z) = -\frac{17 i}{4}
+      </div>
 
-<p>Hence </p>
+      <p>Hence </p>
 
-<div class="tex">
-\int_{0}^{2 \pi} \frac{6 \cos(2 \theta)}{4 \sin(\theta) - 5} d\theta = 
-\oint_{\gamma} f(z) d z =
-2 \pi i \left( \frac{15 i}{4} -\frac{17 i}{4} \right) = \pi
-</div>
+      <div class="tex">
+      \int_{0}^{2 \pi} \frac{6 \cos(2 \theta)}{4 \sin(\theta) - 5} d\theta =
+      \oint_{\gamma} f(z) d z =
+      2 \pi i \left( \frac{15 i}{4} -\frac{17 i}{4} \right) = \pi
+      </div>
 
-<h3>Example 2</h3>
+    <h3>Example 2</h3>
 
-<p>We want to know the value of the integral</p>
+    <p>We want to know the value of the integral</p>
 
-<div class="tex">
-\int_{-\infty}^{+\infty} \frac{16 \sin(2x+\pi)}{5(x^2+2x+5)^2} dx
-</div>
+    <div class="tex">
+    \int_{-\infty}^{+\infty} \frac{16 \sin(2x+\pi)}{5(x^2+2x+5)^2} dx
+    </div>
 
-<p>For that purpose, we introduce the function</p>
+    <p>For that purpose, we introduce the function</p>
 
-<div class="tex">
-f(z) = \frac{16 e^{-2\pi z}}{5(z^2+2z+5)^2}
-</div>
+    <div class="tex">
+    f(z) = \frac{16 e^{-2\pi z}}{5(z^2+2z+5)^2}
+    </div>
 
-<p>We note that <span class="tex">x \mapsto \Im(f(x))</span> is the integrand above. We also note that
- the
-poles of <span class="tex">f</span> are <span class="tex">z^\pm = -1 \pm 2 i</span>. By choosing the right contour, one can
-show that</p>
+    <p>We note that <span class="tex">x \mapsto \Im(f(x))</span> is the integrand above. We also note that
+     the
+    poles of <span class="tex">f</span> are <span class="tex">z^\pm = -1 \pm 2 i</span>. By choosing the right contour, one can
+    show that</p>
 
-<div class="tex">
-\int_{-\infty}^{+\infty} f(x) dx =
--2 i \pi \sum_{\stackrel{z \text{residue}}{\Im(z) &lt; 0}} \mathrm{Res}(f, z)
-</div>
+    <div class="tex">
+    \int_{-\infty}^{+\infty} f(x) dx =
+    -2 i \pi \sum_{\stackrel{z \text{residue}}{\Im(z) &lt; 0}} \mathrm{Res}(f, z)
+    </div>
 
-<p>We have</p>
+    <p>We have</p>
 
-<div class="tex">
-\mathrm{Res}(f, z^-) = \lim_{z \rightarrow z⁻}
-\frac{d \left( (z - z^-)^2 f(z) \right)}{dz} = \frac{i e^{2 i}}{2 e^4}
-</div>
+    <div class="tex">
+    \mathrm{Res}(f, z^-) = \lim_{z \rightarrow z⁻}
+    \frac{d \left( (z - z^-)^2 f(z) \right)}{dz} = \frac{i e^{2 i}}{2 e^4}
+    </div>
 
-<p>Hence</p>
+    <p>Hence</p>
 
-<div class="tex">
-\int_{-\infty}^{+\infty} \frac{16 \sin(2x+\pi)}{5(x^2+2x+5)^2} dx
-= \Im\left(\int_{-\infty}^{+\infty} f(x) dx\right) =
-\Im\left(-2 i \pi \frac{i e^{2 i}}{2 e^4}\right) =
-\Im\left(\frac{\pi e^{2 i}}{e^4}\right)
-</div>
+    <div class="tex">
+    \int_{-\infty}^{+\infty} \frac{16 \sin(2x+\pi)}{5(x^2+2x+5)^2} dx
+    = \Im\left(\int_{-\infty}^{+\infty} f(x) dx\right) =
+    \Im\left(-2 i \pi \frac{i e^{2 i}}{2 e^4}\right) =
+    \Im\left(\frac{\pi e^{2 i}}{e^4}\right)
+    </div>
 
-<p>Finally </p>
+    <p>Finally </p>
 
-<div class="tex">
-\int_{-\infty}^{+\infty} \frac{16 \sin(2x+\pi)}{5(x^2+2x+5)^2} dx =
-\frac{\pi \sin(2)}{e^4}
-</div>
+    <div class="tex">
+    \int_{-\infty}^{+\infty} \frac{16 \sin(2x+\pi)}{5(x^2+2x+5)^2} dx =
+    \frac{\pi \sin(2)}{e^4}
+    </div>
+  </article>
   </body>
 </html>

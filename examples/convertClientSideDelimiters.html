@@ -18,13 +18,15 @@
         TeXZilla.filterElement(document.getElementById("ElementToParse"));
       });
     </script>
+    <link rel="stylesheet" href="/style.css">
   </head>
   <body>
+    <article class="info">
 
 <h1>Converting the TeX fragments inside an element</h1>
 
 <p>This page contains some inline TeX expressions like
-<code style="color: blue">$\int_{a}^b f(x) d x = F(b) - F(a)$</code> (inline mode) or 
+<code style="color: blue">$\int_{a}^b f(x) d x = F(b) - F(a)$</code> (inline mode) or
 <code style="color: red">$$\int_0^{\pi} 2 \cos(\theta) - 3 \sin(\theta) d\theta =
 \left[ 2 \sin(\theta) + 3 \cos(\theta) \right]_{\theta=0}^\pi = -6$$</code> (display mode) that are converted into MathML by TeXZilla when the DOM is
 ready.</p>
@@ -86,21 +88,21 @@ $$\int_0^{\pi} 2 \cos(\theta) - 3 \sin(\theta) d\theta =
 <p>Using Leibniz rule, Chain rule and Exponential/Power:</p>
 
 $$
-\int_{0}^{2} 2x e^{-3x} - 3 x^2 e^{-3x} d x = 
+\int_{0}^{2} 2x e^{-3x} - 3 x^2 e^{-3x} d x =
 \left[ x^2 e^{-3x}  \right]_0^2 = \frac{4}{e^{12}}
 $$
 
 <p>Using the inverse function rule and tangent:</p>
 
 $$
-\int_{0}^{1} \frac{1}{1 + x^2} d x = 
+\int_{0}^{1} \frac{1}{1 + x^2} d x =
 \int_{0}^{1} \frac{1}{\tan'(\arctan(x))} d x = \left[ \arctan(x) \right]_0^1 = \frac{\pi}{4}
 $$
 
 <p>Using linearity, reciprocal rule and logarithm:</p>
 
 $$
-\int_{2}^{3} \frac{1}{v (\ln(v))^2} d v = 
+\int_{2}^{3} \frac{1}{v (\ln(v))^2} d v =
 - \int_{2}^{3} - \frac{\frac{1}{v}}{(\ln(v))^2} d v =
 - \left[ \frac{1}{\ln(v)}  \right]_2^3 = \frac{1}{\ln 2} - \frac{1}{\ln 3}
 $$
@@ -109,7 +111,7 @@ $$
 
 $$
 \int_{0}^1
-\frac{3t^2}{(t^3+1)^5} d t = 
+\frac{3t^2}{(t^3+1)^5} d t =
 -\frac{1}{4}
 \int_0^1
 (t^3+1)^{-4} \left( 3t^2 \frac{-4}{t^3+1} + 0 \right) d t =
@@ -148,7 +150,7 @@ $$
 <p>Consider</p>
 
 $$
-\int_2^3 6x^2 \cos(x^3 - 2) d x 
+\int_2^3 6x^2 \cos(x^3 - 2) d x
 $$
 
 <p>Let $y = x^3 - 2$, $dy = 3x^2 dx$ so</p>
@@ -170,7 +172,7 @@ $$
 <p>Let $u = -\frac{1}{v^2}$, $du = \frac{2}{v^3} dv$:</p>
 
 $$
-\int_{v=1}^2 \frac{dv}{v^3 e^{\frac{1}{v^2}}} = \frac{1}{2} 
+\int_{v=1}^2 \frac{dv}{v^3 e^{\frac{1}{v^2}}} = \frac{1}{2}
 \int_{u=-1}^{-\frac{1}{4}} e^{u} du =
 \frac{1}{2} \left(\frac{1}{\sqrt[4]{e}} - \frac{1}{e}\right)
 $$
@@ -194,7 +196,7 @@ $$
 $\left[\frac{3\pi}{4},\frac{7\pi}{6}\right]$ and so</p>
 
 $$
-\int_{-\sqrt{2}}^{-1} \frac{5t}{\sqrt{4 - t^2}} d t = 
+\int_{-\sqrt{2}}^{-1} \frac{5t}{\sqrt{4 - t^2}} d t =
 -10 \int_\frac{3\pi}{4}^{\frac{7\pi}{6}} \sin \theta d \theta =
 10 \left[\cos \theta\right]_\frac{3\pi}{4}^{\frac{7\pi}{6}} =
 5 (\sqrt{2} - \sqrt{3})
@@ -219,7 +221,7 @@ $$
 $dy = \frac{dx}{\sqrt{\frac{5}{4}}}$ we get</p>
 
 $$
-\int_0^{+\infty} \frac{\sqrt{\frac{5}{4}} dy}{\frac{5}{2}(y^2+1)} = 
+\int_0^{+\infty} \frac{\sqrt{\frac{5}{4}} dy}{\frac{5}{2}(y^2+1)} =
 \frac{1}{\sqrt{5}} \int_0^{+\infty} \frac{dy}{y^2+1}
 $$
 
@@ -254,7 +256,7 @@ $$
 \int_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}}
 t \frac{\left(\frac{2}{1+t^2}\right)^2}{\left( \frac{2t}{1+t^2}\right)^3} \frac{2 dt}{1+t^2} =
 \int_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}}
-\frac{1}{t^2} dt = 
+\frac{1}{t^2} dt =
 \left[ -\frac{1}{t} \right]_{2 - \sqrt{3}}^{\frac{1}{\sqrt{3}}} =
 \frac{1}{2-\sqrt{3}}-\sqrt{3}
 $$
@@ -300,7 +302,7 @@ $$
 (2x+1) e^{-3x}
   d x
 $$
- 
+
 <p>We now consider $h(x) = 2x+1, h'(x)=2$ the second integral can be written
 $\int h g' dx$ and hence </p>
 
@@ -318,15 +320,15 @@ $$
 <p>We now recognize $g'$ in the last integral and so</p>
 
 $$
-\int_{0}^{+\infty} e^{-3x} d x = 
+\int_{0}^{+\infty} e^{-3x} d x =
 \left[ \frac{e^{-3x}}{-3}\right]_{0}^{+\infty} = \frac{1}{3}
 $$
 
 <p>Finally,</p>
 
 $$
-\int_{0}^{+\infty} (x^2 + x + 1) e^{-3x} d x = 
-\frac{1}{3} + \frac{1}{3} \times \left( 
+\int_{0}^{+\infty} (x^2 + x + 1) e^{-3x} d x =
+\frac{1}{3} + \frac{1}{3} \times \left(
 \frac{1}{3} + \frac{2}{3} \times \frac{1}{3}
 \right) = \frac{14}{27}
 $$
@@ -343,7 +345,7 @@ $f'(x) = \frac{2}{x} + \frac{7}{1+x^2}$ and $g'(x) = x^3$. The integration
 by parts gives:</p>
 
 $$
-\left[\frac{x^3}{3} \left(2\ln x + 7\arctan x\right) \right]_1^2 - 
+\left[\frac{x^3}{3} \left(2\ln x + 7\arctan x\right) \right]_1^2 -
 \int_1^2
 \frac{x^3}{3} \left(\frac{2}{x} + \frac{7}{1+x^2}\right) d x
 $$
@@ -365,7 +367,7 @@ x^3 (2\ln x + 7\arctan x) d x =
 \left[\frac{x^3}{3} \left(2\ln x + 7\arctan x\right)
 - \frac{2}{9} x^3 -\frac{7}{6} x^2 + \frac{7}{6} \ln (x^2 + 1)
  \right]_1^2 =
-\frac{28}{9} \ln(5) + \frac{89}{18} \ln(2) + \frac{56}{3} \arctan(2) 
+\frac{28}{9} \ln(5) + \frac{89}{18} \ln(2) + \frac{56}{3} \arctan(2)
 - \frac{7 \pi}{12} - \frac{301}{18}
 $$
 
@@ -429,7 +431,7 @@ $$
 \int_{x=2}^{3} \frac{2x^4-6x^3+41x^2-44x+12}{6x^5-18x^4+18x^3-6x^2} d x
 $$
 
-<p>Clearly, we have $6x^5-18x^4+18x^3-6x^2 = 
+<p>Clearly, we have $6x^5-18x^4+18x^3-6x^2 =
 6 x^2 (x^3-3x^2+3x-1)$ and $1$ is a trivial root of the second factor so we can
 factor it by $(x-1)$ and obtain:</p>
 
@@ -440,7 +442,7 @@ $$6x^5-18x^4+18x^3-6x^2 = 6 x^2 (x-1) (x^2-2x+1) = 6x^2 (x-1)^3$$
 $$
 F(x) =
 \frac{2x^4-6x^3+41x^2-44x+12}{6 x^2 (x^3-3x^2+3x-1)} =
-\frac{A}{x} + \frac{B}{x^2} + 
+\frac{A}{x} + \frac{B}{x^2} +
 \frac{C}{x-1} + \frac{D}{(x-1)^2} + \frac{E}{(x-1)^3}
 $$
 
@@ -456,12 +458,12 @@ $$
 $$
 
 $$
-\lim_{x \rightarrow 0} (x^2 F(x))' = A = 
+\lim_{x \rightarrow 0} (x^2 F(x))' = A =
 \frac{-44 \times -1 - 12 \times 3}{6} = \frac{4}{3}
 $$
 
 $$
-\lim_{x \rightarrow +\infty} x F(x) = A + C = \frac{2}{6} \rightarrow C = 
+\lim_{x \rightarrow +\infty} x F(x) = A + C = \frac{2}{6} \rightarrow C =
 \frac{2}{6} - \frac{4}{3} = -1
 $$
 
@@ -484,7 +486,7 @@ $$
 \int_{u=1}^{5} \frac{2u^4-5u^3+24u^2-26u+50}{u^5-4u^4+14u^3-20u^2+25u} d u
 $$
 
-<p>The denominator can be written 
+<p>The denominator can be written
 $u^5-4u^4+14u^3-20u^2+25u = u(u^4-4u^3+14u^2-20u+25)$. Evaluating the
 second factor at $0, \pm1, \pm2$ we don't find any trivial roots. Hence we try
 to convert it to a depressed quartic by setting $u = v - \frac{-4}{4} = v + 1$.
@@ -499,7 +501,7 @@ $$
 <p>We now try to find $A, B, C, D, E \in \mathbb{R}$ such that</p>
 
 $$
-F(u) = 
+F(u) =
 \frac{2u^4-5u^3+24u^2-27u+50}{u (u^2-2u+5)^2} =
 \frac{A}{u} + \frac{Bu+C}{u^2-2u+5} + \frac{Du+E}{(u^2-2u+5)^2}
 $$
@@ -513,7 +515,7 @@ $$
 $$
 
 $$
-\lim_{u \rightarrow +\infty} u^2\left(F(u) - \frac{A}{u}\right) = C = 
+\lim_{u \rightarrow +\infty} u^2\left(F(u) - \frac{A}{u}\right) = C =
 \lim_{u \rightarrow +\infty} u^2 \frac{2 u^4 - 5u^3 - 2(u^4-4u^3)}{u \times u^4} = 3
 $$
 
@@ -530,14 +532,14 @@ $$
 <p>From the two last equalities, we immediately get $D = 2$ and $E = -2$. Finally,</p>
 
 $$
-F(u) = 
+F(u) =
 \frac{2}{u} + \frac{3}{u^2-2u+5} + \frac{2u - 2}{(u^2-2u+5)^2}
 $$
 
 <p>We have</p>
 
 $$
-\int_{u=1}^{5} \frac{2}{u} d u= \left[ 
+\int_{u=1}^{5} \frac{2}{u} d u= \left[
 2 \ln|u|
 \right]_{u=1}^5 = 2 \ln(5)
 $$
@@ -545,12 +547,12 @@ $$
 $$
 \int_{u=1}^{5} \frac{3}{u^2-2u+5} d u=
 \frac{3}{4} \int_{u=1}^{5} \frac{d u}{(\frac{u-1}{2})^2+1} =
-\frac{3}{2} \int_{v=0}^{2} \frac{d v}{v^2+1} = 
+\frac{3}{2} \int_{v=0}^{2} \frac{d v}{v^2+1} =
 \frac{3}{2} \arctan(2)
 $$
 
 $$
-\int_{u=1}^{5} \frac{2u - 2}{(u^2-2u+5)^2} d u = \left[ 
+\int_{u=1}^{5} \frac{2u - 2}{(u^2-2u+5)^2} d u = \left[
 - \frac{1}{u^2-2u+5}
 \right]_{u=1}^5 = \frac{1}{5}
 $$
@@ -576,7 +578,7 @@ $$
 <p>and so </p>
 
 $$
-\frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} = 
+\frac{t^6-2t^5-3t^4+15t^3+4t^2-17}{t^4+2t^3-t-2} =
 t^2-4t+5+\frac{6t^3+2t^2-3t-7}{t^4+2t^3-t-2}
 $$
 
@@ -695,8 +697,8 @@ $$
 <p>We have</p>
 
 $$
-\int_{2}^{17} G(t) d t = 
-\left[ 
+\int_{2}^{17} G(t) d t =
+\left[
 E
 \left( \ln |t - t^+| + i \arctan \frac{t - \Re(t^+)}{\Im(t^+)} \right)
 +
@@ -708,7 +710,7 @@ $$
 <p>After simplification, we get</p>
 
 $$
-\int_{2}^{17} G(t) d t = 
+\int_{2}^{17} G(t) d t =
 \frac{5}{6} \ln(307) - \frac{5}{6} \log(7) +
 \frac{1}{3 \sqrt{3}} \arctan\left(\frac{35}{\sqrt{3}}\right) -
 \frac{1}{3 \sqrt{3}} \arctan\left(\frac{5}{\sqrt{3}}\right)
@@ -758,7 +760,7 @@ $$
 <p>Hence </p>
 
 $$
-\int_{0}^{2 \pi} \frac{6 \cos(2 \theta)}{4 \sin(\theta) - 5} d\theta = 
+\int_{0}^{2 \pi} \frac{6 \cos(2 \theta)}{4 \sin(\theta) - 5} d\theta =
 \oint_{\gamma} f(z) d z =
 2 \pi i \left( \frac{15 i}{4} -\frac{17 i}{4} \right) = \pi
 $$
@@ -812,5 +814,6 @@ $$
 
 </div>
 
+</article>
   </body>
 </html>

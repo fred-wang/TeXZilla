@@ -132,7 +132,7 @@
         }
       }
     </script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
   </head>
   <body>
     <header class="header row">
@@ -146,8 +146,8 @@
         </a>
       </div>
     </header>
-    <div class="controls row">
-      <div class="col">
+    <div class="controls responsive row">
+      <div class="col col-50">
         <select id="mode" onchange="updateMode()">
           <option value="display">Display Mode</option>
           <option value="inline">Inline Mode</option>
@@ -246,7 +246,7 @@
   \nabla \cdot \vec{\mathbf{B}} & = 0 \end{aligned}">MathJax - Maxwell’s Equations</option>
         </select>
       </div>
-      <div class="col txtright">
+      <div class="col col-50 controls__font">
         <select id="MathFont" onchange="updateMathFont()">
           <option value="Default" selected="selected">Default fonts</option>
           <option value="Asana">Asana</option>
@@ -266,8 +266,8 @@
         <a href="https://developer.mozilla.org/en-US/docs/Mozilla/MathML_Project/Fonts">Fonts for Mozilla's MathML engine</a>
       </div>
     </div>
-    <div class="interactive row">
-      <div class="col">
+    <div class="interactive responsive row">
+      <div class="col col-50">
         <header class="interactive__header">
           <h3>LaTeX</h3>
         </header>
@@ -275,7 +275,7 @@
           <textarea id="input" cols="80" rows="5" oninput="update()" dir="ltr"></textarea>
         </div>
       </div>
-      <div class="col">
+      <div class="col col-50">
         <header class="interactive__header">
           <h3>MathML</h3>
         </header>

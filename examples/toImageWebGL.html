@@ -5,7 +5,7 @@
     <!-- This Source Code Form is subject to the terms of the Mozilla Public
          License, v. 2.0. If a copy of the MPL was not distributed with this
          file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
-    <meta charset="utf-8"/> 
+    <meta charset="utf-8"/>
     <script src="http://threejs.org/build/three.min.js" type="text/javascript"></script>
     <script src="http://threejs.org/examples/js/controls/OrbitControls.js" type="text/javascript"></script>
     <script src="../TeXZilla-min.js" type="text/javascript"></script>
@@ -45,10 +45,10 @@
           mathFormulas[i].rotation.z = aCamera.rotation.z;
         }
       }
-      
+
       function init(aId, aWidth, aHeight)
       {
-        var scene = new THREE.Scene(); 
+        var scene = new THREE.Scene();
 
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(aWidth, aHeight);
@@ -132,14 +132,17 @@
         render(renderer);
       }
     </script>
+    <link rel="stylesheet" href="/style.css">
   </head>
   <body onload="init('webgl', 800, 600)">
+    <article class="info">
 
-    <h1>MathML in WebGL</h1>
+      <h1>MathML in WebGL</h1>
 
-    <div style="margin-left: auto; margin-right: auto; width: 800px;">
-       <span id="webgl"></span>
-    </div>
+      <div style="margin-left: auto; margin-right: auto; width: 800px;">
+         <span id="webgl"></span>
+      </div>
+    </article>
 
   </body>
 </html>

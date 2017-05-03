@@ -29,19 +29,39 @@
         }
       }
     </script>
+    <link rel="stylesheet" href="/style.css">
   </head>
   <body onload="window.setInterval(refresh, 500)">
 
-    <h1>Handling Parsing Error</h1>
+    <header class="header">
+      <h1>Handling Parsing Error</h1>
+    </header>
+    <div class="interactive responsive row">
+      <div class="col col-50">
+        <header class="interactive__header">
+          <h3>LaTeX</h3>
+        </header>
+        <div class="interactive__text">
+          <textarea id="input" cols="80" rows="5">\frac{x}</textarea>
+        </div>
+      </div>
+      <div class="col col-50">
+        <header class="interactive__header">
+          <h3>MathML</h3>
+        </header>
+        <div class="interactive__text">
+          <div id="output"></div>
+        </div>
+      </div>
+    </div>
 
-    <p>This page calls TeXZilla.toMathML every 500ms to show a preview.
-      It passes the parameter <code>aThrowExceptionOnError = true</code> in
-      order to detect when the parsing fails and in that case shows the
-      original TeX source.</p>
+    <article class="info">
+      <p>This page calls TeXZilla.toMathML every 500ms to show a preview.
+        It passes the parameter <code>aThrowExceptionOnError = true</code> in
+        order to detect when the parsing fails and in that case shows the
+        original TeX source.</p>
+    </article>
 
-    <textarea id="input" cols="80" rows="5">\frac{x}</textarea>
-
-    <div id="output"></div>
 
   </body>
 </html>

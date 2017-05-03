@@ -20,26 +20,29 @@
         }
       });
     </script>
+    <link rel="stylesheet" href="/style.css">
   </head>
   <body>
 
-    <h1>TeXZilla.toImage</h1>
+    <article class="info">
+      <h1>TeXZilla.toImage</h1>
 
-    <p>This page contains a <code>&lt;canvas&gt;</code>. A mathematical
-      equation is inserted at the center using the following code:</p>
+      <p>This page contains a <code>&lt;canvas&gt;</code>. A mathematical
+        equation is inserted at the center using the following code:</p>
 
-<pre>
-  var image =
-    TeXZilla.toImage("\\vec{F} = G \\frac{m_1 m_2}{r^2} \\mathbf{u}");
-  image.onload = function() {
-    context.drawImage(image,
-                      (canvas.width - image.width) / 2,
-                      (canvas.height - image.height) / 2);
-</pre>
+      <pre contenteditable>
+        var image =
+          TeXZilla.toImage("\\vec{F} = G \\frac{m_1 m_2}{r^2} \\mathbf{u}");
+        image.onload = function() {
+          context.drawImage(image,
+                            (canvas.width - image.width) / 2,
+                            (canvas.height - image.height) / 2);
+      </pre>
 
-    <canvas id="canvas" width="600" height="300"
-            style="border: 1px solid black;">
-    </canvas>
+      <canvas id="canvas" width="600" height="300"
+              style="border: 1px solid black;">
+      </canvas>
+    </article>
 
   </body>
 </html>
