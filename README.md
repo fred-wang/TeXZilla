@@ -12,7 +12,7 @@ Description
 -----------
 
 TeXZilla is a Javascript LaTeX-to-MathML converter compatible
-with Unicode. It has perfmored as the fastest state of the art LaTeX-To-MathML converter according to recent research in this field (see [[1](#references)]). This is still a work in progress and things may change in the
+with Unicode. It has performed as the fastest state of the art LaTeX-To-MathML converter according to recent research in this field (see [[1](#references)]). This is still a work in progress and things may change in the
 future. Please report any bug you find to the
 [issue tracker](https://github.com/fred-wang/TeXZilla/issues?state=open).
 
