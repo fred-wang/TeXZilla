@@ -1,7 +1,7 @@
 {
   "name": "texzilla",
-  "version": "0.9.9",
-  "description": "A Javascript LaTeX-to-MathML converter compatible with Unicode.",
+  "version": "1.0.0",
+  "description": "A LALR Javascript LaTeX-to-MathML converter compatible with Unicode.",
   "keywords": "mathml,tex,latex,unicode",
   "homepage": "https://github.com/fred-wang/TeXZilla/",
   "bugs": "https://github.com/fred-wang/TeXZilla/issues",
