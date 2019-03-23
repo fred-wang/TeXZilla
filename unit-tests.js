@@ -133,7 +133,7 @@ var tests = [
     /* \tbinom */
     ["\\tbinom a b", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mstyle displaystyle="false"><mfrac linethickness="0px"><mi>a</mi><mi>b</mi></mfrac></mstyle><mo>)</mo></mrow><annotation encoding="TeX">\\tbinom a b</annotation></semantics></math>'],
     /* \pmod */
-    ["\\pmod a", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="mediummathspace">(</mo><mo rspace="thinmathspace">mod</mo><mi>a</mi><mo rspace="mediummathspace">)</mo></mrow><annotation encoding="TeX">\\pmod a</annotation></semantics></math>'],
+    ["\\pmod a", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0.2222222222222222em">(</mo><mo rspace="0.16666666666666666em">mod</mo><mi>a</mi><mo rspace="0.2222222222222222em">)</mo></mrow><annotation encoding="TeX">\\pmod a</annotation></semantics></math>'],
     /* \underbrace, \underline, \overbrace */
     ["\\underbrace x \\underline y \\overbrace z", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mi>x</mi><mo>⏟</mo></munder><munder><mi>y</mi><mo>_</mo></munder><mover><mi>z</mi><mo>⏞</mo></mover></mrow><annotation encoding="TeX">\\underbrace x \\underline y \\overbrace z</annotation></semantics></math>'],
     /* accents */

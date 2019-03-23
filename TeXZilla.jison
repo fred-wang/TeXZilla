@@ -680,7 +680,9 @@ closedTerm
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | PMOD closedTerm {
-    $$ = "<mrow><mo lspace=\"mediummathspace\">(</mo><mo rspace=\"thinmathspace\">mod</mo>" + $2 + "<mo rspace=\"mediummathspace\">)</mo></mrow>";
+    $$ = newTag("mrow", newMo("(", namedSpaceToEm("mediummathspace")) +
+                newMo("mod", undefined, namedSpaceToEm("thinmathspace")) + $2 +
+                newMo(")", undefined, namedSpaceToEm("mediummathspace")));
   }
   | UNDERBRACE closedTerm { $$ = newTag("munder", $2 + newMo("\u23DF")); }
   | UNDERLINE closedTerm { $$ = newTag("munder", $2 + newMo("_")); }
