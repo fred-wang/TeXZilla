@@ -35,7 +35,7 @@ $MAKE minify
 $NPM publish .
 
 # Remove all but the files to include in the release.
-rm .gitignore
+rm .gitignore .travis.yml
 ls | $EGREP -v "README-release.txt|TeXZilla.js|TeXZilla-min.js|examples|index.html" | xargs rm -rf
 
 # Set the version in the README-release.txt
