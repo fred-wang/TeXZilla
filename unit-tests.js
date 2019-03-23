@@ -94,7 +94,7 @@ var tests = [
     /* itex2MML compatibility note:
        \&[EntityName]; and \&[EntityNumber]; are not supported */
     /* \operatorname, \mathop, \mathbin, \mathrel */
-    ["\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="thinmathspace">x</mo><mo lspace="thinmathspace" rspace="thinmathspace">x</mo><mo lspace="mediummathspace" rspace="mediummathspace">x</mo><mo lspace="thickmathspace" rspace="thickmathspace">x</mo></mrow><annotation encoding="TeX">\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}</annotation></semantics></math>'],
+    ["\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="0.16666666666666666em">x</mo><mo lspace="0.16666666666666666em" rspace="0.16666666666666666em">x</mo><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">x</mo><mo lspace="0.2777777777777778em" rspace="0.2777777777777778em">x</mo></mrow><annotation encoding="TeX">\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}</annotation></semantics></math>'],
     /* \frac */
     ["\\frac x y", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>x</mi><mi>y</mi></mfrac><annotation encoding="TeX">\\frac x y</annotation></semantics></math>'],
     /* \atop, \over, \choose */

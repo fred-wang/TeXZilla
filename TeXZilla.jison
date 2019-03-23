@@ -18,19 +18,7 @@ function escapeQuote(aString) {
   return aString.replace(/"/g, "&#x22;");
 }
 
-function parseLength(aString) {
-  /* See http://www.w3.org/TR/MathML3/appendixa.html#parsing_length */
-  aString = aString.trim();
-  var lengthRegexp = /(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?/, result = lengthRegexp.exec(aString);
-  if (result) {
-    result[1] = parseFloat(result[1]);
-    if (!result[2]) {
-      /* Unitless values are treated as a percent */
-      result[1] *= 100;
-      result[2] = "%";
-    }
-    return { l: result[1], u: result[2] };
-  }
+function namedSpaceToEm(aString) {
   var index = [
     "negativeveryverythinmathspace",
     "negativeverythinmathspace",
@@ -47,7 +35,23 @@ function parseLength(aString) {
     "verythickmathspace",
     "veryverythickmathspace"
   ].indexOf(aString);
-  return { l: (index === -1 ? 0 : index - 6) / 18.0, u: "em" };
+  return (index === -1 ? 0 : index - 6) / 18.0;
+}
+
+function parseLength(aString) {
+  /* See http://www.w3.org/TR/MathML3/appendixa.html#parsing_length */
+  aString = aString.trim();
+  var lengthRegexp = /(-?[0-9]*(?:[0-9]\.?|\.[0-9])[0-9]*)(e[mx]|in|cm|mm|p[xtc]|%)?/, result = lengthRegexp.exec(aString);
+  if (result) {
+    result[1] = parseFloat(result[1]);
+    if (!result[2]) {
+      /* Unitless values are treated as a percent */
+      result[1] *= 100;
+      result[2] = "%";
+    }
+    return { l: result[1], u: result[2] };
+  }
+  return { l: namedSpaceToEm(aString), u: "em" };
 }
 
 function newTag(aTag, aContent, aAttributes) {
@@ -61,8 +65,8 @@ function newTag(aTag, aContent, aAttributes) {
 function newMo(aContent, aLeftSpace, aRightSpace) {
   /* Create a new operator */
   var tag = "<mo";
-  if (aLeftSpace) tag += " lspace=\"" + aLeftSpace + "\"";
-  if (aRightSpace) tag += " rspace=\"" + aRightSpace + "\"";
+  if (aLeftSpace !== undefined) tag += " lspace=\"" + aLeftSpace + "em\"";
+  if (aRightSpace !== undefined) tag += " rspace=\"" + aRightSpace + "em\"";
   tag += ">" + escapeText(aContent) + "</mo>";
   return tag;
 }
@@ -604,7 +608,7 @@ closedTerm
   | NUM { $$ = newTag("mn", $1); }
   | TEXT { $$ = newTag("mtext", $1); }
   | A { $$ = newTag("mi", escapeText($1)); }
-  | F { $$ = newMo($1, "0em", "0em"); }
+  | F { $$ = newMo($1, 0, 0); }
   | MI tokenContent { $$ = newTag("mi", $2); }
   | MN tokenContent { $$ = newTag("mn", $2); }
   | MO tokenContent { $$ = newMo($2); }
@@ -621,16 +625,19 @@ closedTerm
   | HIGH_SURROGATE LOW_SURROGATE { $$ = newTag("mtext", $1 + $2); }
   | BMP_CHARACTER { $$ = newTag("mtext", $1); }
   | OPERATORNAME textArg {
-    $$ = newMo($2, "0em", "thinmathspace");
+    $$ = newMo($2, 0, namedSpaceToEm("thinmathspace"));
   }
   | MATHOP textArg {
-    $$ = newMo($2, "thinmathspace", "thinmathspace");
+    $$ = newMo($2, namedSpaceToEm("thinmathspace"),
+                   namedSpaceToEm("thinmathspace"));
   }
   | MATHBIN textArg {
-    $$ = newMo($2, "mediummathspace", "mediummathspace");
+    $$ = newMo($2, namedSpaceToEm("mediummathspace"),
+                   namedSpaceToEm("mediummathspace"));
   }
   | MATHREL textArg {
-    $$ = newMo($2, "thickmathspace", "thickmathspace");
+    $$ = newMo($2, namedSpaceToEm("thickmathspace"),
+                   namedSpaceToEm("thickmathspace"));
   }
   | FRAC closedTerm closedTerm { $$ = newTag("mfrac", $2 + $3); }
   | ROOT closedTerm closedTerm { $$ = newTag("mroot", $3 + $2); }
@@ -887,7 +894,7 @@ compoundTerm
 
 opm
   : OPM { $$ = newMo($1); }
-  | FM { $$ = newMo($1, "0em", "0em"); }
+  | FM { $$ = newMo($1, 0, 0); }
   ;
 
 /* list of compound terms */
