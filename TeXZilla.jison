@@ -856,31 +856,33 @@ closedTermList
   }
   ;
 
+superScript
+  : "^" closedTerm {
+    $$ = $2;
+}
+  | OPP {
+    $$ = newMo($1);
+}
+  | OPP "^" closedTerm {
+    $$ = newTag("mrow", newMo($1) + $3);
+};
+
 /* compound terms (closed terms with scripts) */
 compoundTerm
   : TENSOR closedTerm subsupList {
     $$ = newTag("mmultiscripts", $2 + $3);
   }
-  | closedTerm "_" closedTerm "^" closedTerm {
-    $$ = newScript(false, $1, $3, $5);
+  | closedTerm "_" closedTerm superScript {
+    $$ = newScript(false, $1, $3, $4);
   }
-  | closedTerm "_" closedTerm OPP {
-    $$ = newScript(false, $1, $3, newMo($4));
-  }
-  | closedTerm "^" closedTerm "_" closedTerm {
-    $$ = newScript(false, $1, $5, $3);
-  }
-  | closedTerm OPP "_" closedTerm {
-    $$ = newScript(false, $1, $4, newMo($2));
+  | closedTerm superScript "_" closedTerm {
+    $$ = newScript(false, $1, $4, $2);
   }
   | closedTerm "_" closedTerm {
     $$ = newScript(false, $1, $3, null);
   }
-  | closedTerm "^" closedTerm {
-    $$ = newScript(false, $1, null, $3);
-  }
-  | closedTerm OPP {
-    $$ = newScript(false, $1, null, newMo($2));
+  | closedTerm superScript {
+    $$ = newScript(false, $1, null, $2);
   }
   | closedTerm { $$ = $1; }
   | opm "_" closedTerm "^" closedTerm {
