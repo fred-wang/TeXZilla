@@ -71,6 +71,10 @@ function newMo(aContent, aLeftSpace, aRightSpace) {
   return tag;
 }
 
+function newSpace(aWidth) {
+   return "<mspace width=\"" + aWidth + "em\"/>";
+}
+
 function newScript(aUnderOver, aBase, aScriptBot, aScriptTop) {
   /* Create a new MathML script element. */
   if (aUnderOver) {
@@ -697,14 +701,14 @@ closedTerm
   | SLASH closedTerm {
     $$ = newTag("menclose", $2, "notation=\"updiagonalstrike\"");
   }
-  | QUAD { $$ = "<mspace width=\"1em\"/>"; }
-  | QQUAD { $$ = "<mspace width=\"2em\"/>"; }
-  | NEGSPACE { $$ = "<mspace width=\"negativethinmathspace\"/>"; }
-  | NEGMEDSPACE { $$ = "<mspace width=\"negativemediummathspace\"/>"; }
-  | NEGTHICKSPACE { $$ = "<mspace width=\"negativethickmathspace\"/>"; }
-  | THINSPACE { $$ = "<mspace width=\"thinmathspace\"/>"; }
-  | MEDSPACE { $$ = "<mspace width=\"mediummathspace\"/>"; }
-  | THICKSPACE { $$ = "<mspace width=\"thickmathspace\"/>"; }
+  | QUAD { $$ = newSpace(1); }
+  | QQUAD { $$ = newSpace(2); }
+  | NEGSPACE { $$ = newSpace(namedSpaceToEm("negativethinmathspace")); }
+  | NEGMEDSPACE { $$ = newSpace(namedSpaceToEm("negativemediummathspace")); }
+  | NEGTHICKSPACE { $$ = newSpace(namedSpaceToEm("negativethickmathspace")); }
+  | THINSPACE { $$ = newSpace(namedSpaceToEm("thinmathspace")); }
+  | MEDSPACE { $$ = newSpace(namedSpaceToEm("mediummathspace")); }
+  | THICKSPACE { $$ = newSpace(namedSpaceToEm("thickmathspace")); }
   | SPACE textArg textArg textArg {
     $$ = "<mspace height=\"." + $2 + "ex\" depth=\"." + $3 + "ex\" " +
                   "width=\"." + $4 + "em\"/>";
