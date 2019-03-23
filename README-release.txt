@@ -1,4 +1,4 @@
-TeXZilla RELEASENUMBER
+TeXZilla 1.0.0
 
 License
 -------
