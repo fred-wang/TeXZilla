@@ -577,28 +577,28 @@ closedTerm
     $$ = newTag("mrow", $1 + newMrow($2) + $3);
   }
   | "{" styledExpression TEXATOP styledExpression "}" {
-    $$ = newTag("mfrac", newMrow($2) + newMrow($4), "linethickness=\"0\"");
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4), "linethickness=\"0px\"");
   }
   | left styledExpression TEXATOP styledExpression right {
-    $$ = newTag("mfrac", newMrow($2) + newMrow($4), "linethickness=\"0\"");
-    $$ = newTag("mrow", $1 + $$ + $3);
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4), "linethickness=\"0px\"");
+    $$ = newTag("mrow", $1 + $$ + $5);
   }
   | "{" styledExpression TEXOVER styledExpression "}" {
     $$ = newTag("mfrac", newMrow($2) + newMrow($4));
   }
   | left styledExpression TEXOVER styledExpression right {
     $$ = newTag("mfrac", newMrow($2) + newMrow($4));
-    $$ = newTag("mrow", $1 + $$ + $3);
+    $$ = newTag("mrow", $1 + $$ + $5);
   }
   | "{" styledExpression TEXCHOOSE styledExpression "}" {
     $$ = newTag("mfrac", newMrow($2) + newMrow($4),
-                "linethickness=\"0\"");
+                "linethickness=\"0px\"");
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | left styledExpression TEXCHOOSE styledExpression right {
     $$ = newTag("mfrac", newMrow($2) + newMrow($4),
                 "linethickness=\"0px\"");
-    $$ = newTag("mrow", $1 + $$ + $3);
+    $$ = newTag("mrow", $1 + $$ + $5);
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | NUM { $$ = newTag("mn", $1); }

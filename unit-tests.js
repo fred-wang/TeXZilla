@@ -97,6 +97,13 @@ var tests = [
     ["\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo lspace="0em" rspace="thinmathspace">x</mo><mo lspace="thinmathspace" rspace="thinmathspace">x</mo><mo lspace="mediummathspace" rspace="mediummathspace">x</mo><mo lspace="thickmathspace" rspace="thickmathspace">x</mo></mrow><annotation encoding="TeX">\\operatorname{x} \\mathop{x} \\mathbin{x} \\mathrel{x}</annotation></semantics></math>'],
     /* \frac */
     ["\\frac x y", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>x</mi><mi>y</mi></mfrac><annotation encoding="TeX">\\frac x y</annotation></semantics></math>'],
+    /* \atop, \over, \choose */
+    ["{x \\atop y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac linethickness="0px"><mi>x</mi><mi>y</mi></mfrac><annotation encoding="TeX">{x \\atop y}</annotation></semantics></math>'],
+    ["\\left( x \\atop y \\right)", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mfrac linethickness="0px"><mi>x</mi><mi>y</mi></mfrac><mo>)</mo></mrow><annotation encoding="TeX">\\left( x \\atop y \\right)</annotation></semantics></math>'],
+    ["{x \\over y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>x</mi><mi>y</mi></mfrac><annotation encoding="TeX">{x \\over y}</annotation></semantics></math>'],
+    ["\\left( x \\over y \\right)", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mfrac><mi>x</mi><mi>y</mi></mfrac><mo>)</mo></mrow><annotation encoding="TeX">\\left( x \\over y \\right)</annotation></semantics></math>'],
+    ["{x \\choose y}", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mfrac linethickness="0px"><mi>x</mi><mi>y</mi></mfrac><mo>)</mo></mrow><annotation encoding="TeX">{x \\choose y}</annotation></semantics></math>'],
+    ["\\left[ x \\choose y \\right]", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>(</mo><mrow><mo>[</mo><mfrac linethickness="0px"><mi>x</mi><mi>y</mi></mfrac><mo>]</mo></mrow><mo>)</mo></mrow><annotation encoding="TeX">\\left[ x \\choose y \\right]</annotation></semantics></math>'],
     /* \root */
     ["\\root 3 x", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mroot><mi>x</mi><mn>3</mn></mroot><annotation encoding="TeX">\\root 3 x</annotation></semantics></math>'],
     /* \sqrt */
