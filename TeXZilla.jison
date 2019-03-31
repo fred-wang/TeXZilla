@@ -83,26 +83,6 @@ function newSpace(aWidth) {
    return newTag("mspace", null, {"width": aWidth + "em"});
 }
 
-function newScript(aUnderOver, aBase, aScriptBot, aScriptTop) {
-  /* Create a new MathML script element. */
-  if (aUnderOver) {
-    if (!aScriptBot) {
-       return newTag("mover", [aBase, aScriptTop]);
-    }
-    if (!aScriptTop) {
-       return newTag("munder", [aBase, aScriptBot]);
-    }
-    return newTag("munderover", [aBase, aScriptBot, aScriptTop]);
-  }
-  if (!aScriptBot) {
-    return newTag("msup", [aBase, aScriptTop]);
-  }
-  if (!aScriptTop) {
-    return newTag("msub", [aBase, aScriptBot]);
-  }
-  return newTag("msubsup", [aBase, aScriptBot, aScriptTop]);
-}
-
 /* FIXME: try to restore the operator grouping when compoundTermList does not
    contain any fences.
    https://github.com/fred-wang/TeXZilla/issues/9 */
@@ -877,38 +857,38 @@ compoundTerm
     $$ = newTag("mmultiscripts", [$2].concat($3));
   }
   | closedTerm "_" closedTerm "^" closedTerm {
-    $$ = newScript(false, $1, $3, $5);
+    $$ = newTag("msubsup", [$1, $3, $5]);
   }
   | closedTerm "_" closedTerm OPP {
-    $$ = newScript(false, $1, $3, newMo($4));
+    $$ = newTag("msubsup", [$1, $3, newMo($4)]);
   }
   | closedTerm "^" closedTerm "_" closedTerm {
-    $$ = newScript(false, $1, $5, $3);
+    $$ = newTag("msubsup", [$1, $5, $3]);
   }
   | closedTerm OPP "_" closedTerm {
-    $$ = newScript(false, $1, $4, newMo($2));
+    $$ = newTag("msubsup", [$1, $4, newMo($2)]);
   }
   | closedTerm "_" closedTerm {
-    $$ = newScript(false, $1, $3, null);
+    $$ = newTag("msub", [$1, $3]);
   }
   | closedTerm "^" closedTerm {
-    $$ = newScript(false, $1, null, $3);
+    $$ = newTag("msup", [$1, $3]);
   }
   | closedTerm OPP {
-    $$ = newScript(false, $1, null, newMo($2));
+    $$ = newTag("msup", [$1, newMo($2)]);
   }
   | closedTerm { $$ = $1; }
   | opm "_" closedTerm "^" closedTerm {
-    $$ = newScript(true, $1, $3, $5);
+    $$ = newTag("munderover", [$1, $3, $5]);
   }
   | opm "^" closedTerm "_" closedTerm {
-    $$ = newScript(true, $1, $5, $3);
+    $$ = newTag("munderover", [$1, $5, $3]);
   }
   | opm "_" closedTerm {
-    $$ = newScript(true, $1, $3, null);
+    $$ = newTag("munder", [$1, $3]);
   }
   | opm "^" closedTerm {
-    $$ = newScript(true, $1, null, $3);
+    $$ = newTag("mover", [$1, $3]);
   }
   | opm { $$ = $1; }
   ;
