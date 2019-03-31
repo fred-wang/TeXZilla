@@ -226,7 +226,9 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
        throw e;
     }
     output = newMath(
-      ["<merror><mtext>" + escapeText(e.message) + "</mtext></merror>"], false,
+      [newTag("merror",
+              [newToken("mtext", escapeText(e.message))]
+             )], false,
       aTeX);
   }
 
@@ -556,7 +558,7 @@ right
 
 /* closed terms */
 closedTerm
-  : "{" "}" { $$ = "<mrow/>"; }
+  : "{" "}" { $$ = newTag("mrow"); }
   | "{" styledExpression "}" { $$ = newMrow($2); }
   | BIG OPFS {
     $$ = newToken("mo", $2, {"maxsize": "1.2em", "minsize": "1.2em"});
@@ -788,10 +790,10 @@ closedTerm
     $$ = newTag("mmultiscripts", [$2].concat($4));
   }
   | MULTI "{" subsupList "}" closedTerm "{" subsupList "}" {
-    $$ = newTag("mmultiscripts", [$5].concat($7).concat("<mprescripts/>").concat($3));
+    $$ = newTag("mmultiscripts", [$5].concat($7).concat(newTag("mprescripts")).concat($3));
   }
   | MULTI "{" subsupList "}" closedTerm "{" "}" {
-    $$ = newTag("mmultiscripts", [$5, "<mprescripts/>"].concat($3));
+    $$ = newTag("mmultiscripts", [$5, newTag("mprescripts")].concat($3));
   }
   | MULTI "{" "}" closedTerm "{" subsupList "}" {
     $$ = newTag("mmultiscripts", [$4].concat($6));
@@ -931,9 +933,9 @@ subsupTermScript
 /* subsup term as scripts */
 subsupTerm
   : "_" subsupTermScript "^" subsupTermScript { $$ = [$2, $4]; }
-  | "_" subsupTermScript { $$ = [$2, "<none/>"]; }
-  | "^" subsupTermScript { $$ = ["<none/>", $2]; }
-  | "_" "^" subsupTermScript { $$ = ["<none/>", $3]; }
+  | "_" subsupTermScript { $$ = [$2, newTag("none")]; }
+  | "^" subsupTermScript { $$ = [newTag("none"), $2]; }
+  | "_" "^" subsupTermScript { $$ = [newTag("none"), $3]; }
   ;
 
 /* list of subsup terms */
@@ -1007,7 +1009,7 @@ documentItem
   }
   | STARTMATH0 ENDMATH0 {
     // \( \)
-    $$ = newMath(["<mrow/>"], false, yy.tex);
+    $$ = newMath([newTag("mrow")], false, yy.tex);
   }
   | STARTMATH0 styledExpression ENDMATH0 {
     // \( ... \)
@@ -1015,7 +1017,7 @@ documentItem
   }
   | STARTMATH1 ENDMATH1 {
     // \[ \]
-    $$ = newMath(["<mrow/>"], true, yy.tex);
+    $$ = newMath([newTag("mrow")], true, yy.tex);
   }
   | STARTMATH1 styledExpression ENDMATH1 {
     // \[ ... \]
