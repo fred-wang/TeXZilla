@@ -65,11 +65,10 @@ function newTag(aTag, aContent, aAttributes) {
 
 function newMo(aContent, aLeftSpace, aRightSpace) {
   /* Create a new operator */
-  var tag = "<mo";
-  if (aLeftSpace !== undefined) tag += " lspace=\"" + aLeftSpace + "em\"";
-  if (aRightSpace !== undefined) tag += " rspace=\"" + aRightSpace + "em\"";
-  tag += ">" + escapeText(aContent) + "</mo>";
-  return tag;
+  var attributes = {};
+  if (aLeftSpace !== undefined) attributes.lspace = aLeftSpace + "em";
+  if (aRightSpace !== undefined) attributes.rspace = aRightSpace + "em";
+  return newTag("mo", escapeText(aContent), attributes);
 }
 
 function newSpace(aWidth) {
