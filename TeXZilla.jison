@@ -57,7 +57,8 @@ function parseLength(aString) {
 function newTag(aTag, aContent, aAttributes) {
   /* Create a new tag with the specified content and attributes. */
   var tag = "<" + aTag;
-  if (aAttributes) tag += " " + aAttributes
+  for (var name in aAttributes)
+    tag += " " + name + "=\"" + aAttributes[name] + "\"";
   tag += ">" + aContent + "</" + aTag + ">";
   return tag;
 }
@@ -107,10 +108,7 @@ function newMrow(aList, aTag, aAttributes) {
     }
     aTag = "mrow";
   }
-  tag = "<" + aTag;
-  if (aAttributes) tag += " " + aAttributes
-  tag += ">" + aList.join("") + "</" + aTag + ">";
-  return tag;
+  return newTag(aTag, aList.join(""), aAttributes);
 }
 
 function newMath(aList, aDisplay, aTeX)
@@ -411,12 +409,12 @@ lengthArg
 
 /* attribute optional argument */
 attrOptArg
-  : textOptArg { $$ = "\"" + escapeQuote($1) + "\""; }
+  : textOptArg { $$ = escapeQuote($1); }
   ;
 
 /* attribute argument */
 attrArg
-  : textArg { $$ = "\"" + escapeQuote($1) + "\""; }
+  : textArg { $$ = escapeQuote($1); }
   ;
 
 /* MathML token content */
@@ -470,22 +468,18 @@ columnAlign
   ;
 
 /* table attributes */
-/* FIXME: this may generate not well-formed XML markup when duplicate
-   attributes are used. Try to abstract the element/attribute creation to
-   better handle that.
-   https://github.com/fred-wang/TeXZilla/issues/10 */
-collayout: COLLAYOUT attrArg { $$ = "columnalign=" + $2; };
-colalign: COLALIGN attrArg { $$ = "columnalign=" + $2; };
-rowalign: ROWALIGN attrArg { $$ = "rowalign=" + $2; };
-rowspan: ROWSPAN attrArg { $$ = "rowspan=" + $2; };
-colspan: COLSPAN attrArg { $$ = "colspan=" + $2; };
-align: ALIGN attrArg { $$ = "align=" + $2; };
-eqrows: EQROWS attrArg { $$ = "equalrows=" + $2; };
-eqcols: EQCOLS attrArg { $$ = "equalcolumns=" + $2; };
-rowlines: ROWLINES attrArg { $$ = "rowlines=" + $2; };
-collines: COLLINES attrArg { $$ = "columnlines=" + $2; };
-frame: FRAME attrArg { $$ = "frame=" + $2; };
-padding: PADDING attrArg { $$ = "rowspacing=" + $2 + " columnspacing=" + $2; };
+collayout: COLLAYOUT attrArg { $$ = {"columnalign": $2}; };
+colalign: COLALIGN attrArg { $$ = {"columnalign": $2}; };
+rowalign: ROWALIGN attrArg { $$ = {"rowalign": $2}; };
+rowspan: ROWSPAN attrArg { $$ = {"rowspan": $2}; };
+colspan: COLSPAN attrArg { $$ = {"colspan": $2}; };
+align: ALIGN attrArg { $$ = {"align": $2}; };
+eqrows: EQROWS attrArg { $$ = {"equalrows": $2}; };
+eqcols: EQCOLS attrArg { $$ = {"equalcolumns": $2}; };
+rowlines: ROWLINES attrArg { $$ = {"rowlines": $2}; };
+collines: COLLINES attrArg { $$ = {"columnlines": $2}; };
+frame: FRAME attrArg { $$ = {"frame": $2}; };
+padding: PADDING attrArg { $$ = {"rowspacing": $2, "columnspacing": $2}; };
 
 /* cell option */
 cellopt
@@ -498,7 +492,7 @@ cellopt
 /* list of cell options */
 celloptList
   : cellopt { $$ = $1; }
-  | celloptList cellopt { $$ = $1 + " " + $2; }
+  | celloptList cellopt { $$ = Object.assign($1, $2); }
   ;
 
 /* row option */
@@ -524,13 +518,13 @@ arrayopt
 /* list of array options */
 arrayoptList
   : arrayopt { $$ = $1; }
-  | arrayoptList arrayopt { $$ = $1 + " " + $2; }
+  | arrayoptList arrayopt { $$ = Object.assign($1, $2); }
   ;
 
 /* list of row options */
 rowoptList
   : rowopt { $$ = $1; }
-  | rowoptList rowopt { $$ = $1 + " " + $2; }
+  | rowoptList rowopt { $$ = Object.assign($1, $2); }
   ;
 
 /* left fence */
@@ -558,37 +552,37 @@ closedTerm
   : "{" "}" { $$ = "<mrow/>"; }
   | "{" styledExpression "}" { $$ = newMrow($2); }
   | BIG OPFS {
-    $$ = newTag("mo", $2, "maxsize=\"1.2em\" minsize=\"1.2em\"");
+    $$ = newTag("mo", $2, {"maxsize": "1.2em", "minsize": "1.2em"});
   }
   | BBIG OPFS {
-    $$ = newTag("mo", $2, "maxsize=\"1.8em\" minsize=\"1.8em\"");
+    $$ = newTag("mo", $2, {"maxsize": "1.8em", "minsize": "1.8em"});
   } 
   | BIGG OPFS {
-    $$ = newTag("mo", $2, "maxsize=\"2.4em\" minsize=\"2.4em\"");
+    $$ = newTag("mo", $2, {"maxsize": "2.4em", "minsize": "2.4em"});
   }
   | BBIGG OPFS {
-    $$ = newTag("mo", $2, "maxsize=\"3em\" minsize=\"3em\"");
+    $$ = newTag("mo", $2, {"maxsize": "3em", "minsize": "3em"});
   }
   | BIGL OPFS {
-    $$ = newTag("mo", $2, "maxsize=\"1.2em\" minsize=\"1.2em\"");
+    $$ = newTag("mo", $2, {"maxsize": "1.2em", "minsize": "1.2em"});
   }
   | BBIGL OPFS {
-    $$ = newTag("mo", $2, "maxsize=\"1.8em\" minsize=\"1.8em\"");
+    $$ = newTag("mo", $2, {"maxsize": "1.8em", "minsize": "1.8em"});
   }
   | BIGGL OPFS {
-    $$ = newTag("mo", $2, "maxsize=\"2.4em\" minsize=\"2.4em\"");
+    $$ = newTag("mo", $2, {"maxsize": "2.4em", "minsize": "2.4em"});
   }
   | BBIGGL OPFS {
-    $$ = newTag("mo", $2, "maxsize=\"3em\" minsize=\"3em\"");
+    $$ = newTag("mo", $2, {"maxsize": "3em", "minsize": "3em"});
   }
   | left styledExpression right {
     $$ = newTag("mrow", $1 + newMrow($2) + $3);
   }
   | "{" styledExpression TEXATOP styledExpression "}" {
-    $$ = newTag("mfrac", newMrow($2) + newMrow($4), "linethickness=\"0px\"");
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4), {"linethickness": "0px"});
   }
   | left styledExpression TEXATOP styledExpression right {
-    $$ = newTag("mfrac", newMrow($2) + newMrow($4), "linethickness=\"0px\"");
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4), {"linethickness": "0px"});
     $$ = newTag("mrow", $1 + $$ + $5);
   }
   | "{" styledExpression TEXOVER styledExpression "}" {
@@ -599,13 +593,11 @@ closedTerm
     $$ = newTag("mrow", $1 + $$ + $5);
   }
   | "{" styledExpression TEXCHOOSE styledExpression "}" {
-    $$ = newTag("mfrac", newMrow($2) + newMrow($4),
-                "linethickness=\"0px\"");
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4), {"linethickness": "0px"});
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | left styledExpression TEXCHOOSE styledExpression right {
-    $$ = newTag("mfrac", newMrow($2) + newMrow($4),
-                "linethickness=\"0px\"");
+    $$ = newTag("mfrac", newMrow($2) + newMrow($4), {"linethickness": "0px"});
     $$ = newTag("mrow", $1 + $$ + $5);
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
@@ -618,12 +610,12 @@ closedTerm
   | MO tokenContent { $$ = newMo($2); }
   | "." { $$ = newMo($1); }
   | OP { $$ = newMo($1); }
-  | OPS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
-  | OPAS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
-  | OPFS { $$ = newTag("mo", $1, "stretchy=\"false\""); }
+  | OPS { $$ = newTag("mo", $1, {"stretchy": "false"}); }
+  | OPAS { $$ = newTag("mo", $1, {"stretchy": "false"}); }
+  | OPFS { $$ = newTag("mo", $1, {"stretchy": "false"}); }
   | MS tokenContent { $$ = newTag("ms", $2); }
   | MS attrOptArg attrOptArg tokenContent {
-     $$ = newTag("ms", $4, "lquote=" + $2 + " rquote=" + $3);
+     $$ = newTag("ms", $4, {"lquote": $2, "rquote": $3});
   }
   | MTEXT tokenContent { $$ = newTag("mtext", $2); }
   | HIGH_SURROGATE LOW_SURROGATE { $$ = newTag("mtext", $1 + $2); }
@@ -662,25 +654,25 @@ closedTerm
   | XARROW closedTerm {
     $$ = newTag("mover", newMo($1) + $2);
   }
-  | MATHRLAP closedTerm { $$ = newTag("mpadded", $2, "width=\"0em\""); }
+  | MATHRLAP closedTerm { $$ = newTag("mpadded", $2, {"width": "0em"}); }
   | MATHLLAP closedTerm {
-    $$ = newTag("mpadded", $2, "width=\"0em\" lspace=\"-100%width\"");
+    $$ = newTag("mpadded", $2, {"width": "0em", "lspace": "-100%width"});
   }
   | MATHCLAP closedTerm {
-    $$ = newTag("mpadded", $2, "width=\"0em\" lspace=\"-50%width\"");
+    $$ = newTag("mpadded", $2, {"width": "0em", "lspace": "-50%width"});
   }
   | PHANTOM closedTerm { $$ = newTag("mphantom", $2); }
   | TFRAC closedTerm closedTerm {
     $$ = newTag("mfrac", $2 + $3);
-    $$ = newTag("mstyle", $$, "displaystyle=\"false\"");
+    $$ = newTag("mstyle", $$, {"displaystyle": "false"});
   }
   | BINOM closedTerm closedTerm {
-    $$ = newTag("mfrac", $2 + $3, "linethickness=\"0px\"");
+    $$ = newTag("mfrac", $2 + $3, {"linethickness": "0px"});
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | TBINOM closedTerm closedTerm {
-    $$ = newTag("mfrac", $2 + $3, "linethickness=\"0px\"");
-    $$ = newTag("mstyle", $$, "displaystyle=\"false\"");
+    $$ = newTag("mfrac", $2 + $3, {"linethickness": "0px"});
+    $$ = newTag("mstyle", $$, {"displaystyle": "false"});
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | PMOD closedTerm {
@@ -695,11 +687,11 @@ closedTerm
     $$ = newTag("mover", $2 + newMo($1));
   }
   | ACCENTNS closedTerm {
-    $$ = newTag("mover", $2 + newTag("mo", $1, "stretchy=\"false\""));
+    $$ = newTag("mover", $2 + newTag("mo", $1, {"stretchy": "false"}));
   }
-  | BOXED closedTerm { $$ = newTag("menclose", $2, "notation=\"box\""); }
+  | BOXED closedTerm { $$ = newTag("menclose", $2, {"notation": "box"}); }
   | SLASH closedTerm {
-    $$ = newTag("menclose", $2, "notation=\"updiagonalstrike\"");
+    $$ = newTag("menclose", $2, {"notation": "updiagonalstrike"});
   }
   | QUAD { $$ = newSpace(1); }
   | QQUAD { $$ = newSpace(2); }
@@ -715,65 +707,72 @@ closedTerm
   }
   | MATHRAISEBOX lengthArg lengthOptArg lengthOptArg closedTerm {
     $$ = newTag("mpadded", $5,
-                "voffset=\"" + $2.l + $2.u + "\" " +
-                "height=\"" + $3.l + $3.u + "\" " +
-                "depth=\"" + $4.l + $4.u + "\"");
+                {"voffset": $2.l + $2.u,
+                 "height": $3.l + $3.u,
+                 "depth": $4.l + $4.u});
   }
   | MATHRAISEBOX lengthArg lengthOptArg closedTerm {
     $$ = newTag("mpadded", $4,
-                "voffset=\"" + $2.l + $2.u + "\" " +
-                "height=\"" + $3.l + $3.u + "\" depth=\"" +
-                ($2.l < 0 ? "+" + (-$2.l) + $2.u : "depth") + "\"");
+                {"voffset": $2.l + $2.u,
+                "height": $3.l + $3.u,
+                "depth": ($2.l < 0 ? "+" + (-$2.l) + $2.u : "depth")});
   }
   | MATHRAISEBOX lengthArg closedTerm {
-    $$ = newTag("mpadded", $3,
-                "voffset=\"" + $2.l + $2.u + "\" " +
-                ($2.l >= 0 ? "height=\"+" + $2.l + $2.u + "\"" :
-                 "height=\"0pt\" depth=\"+" + (-$2.l) + $2.u + "\""));
+    var attributes = {"voffset": $2.l + $2.u};
+    if ($2.l >= 0)
+      attributes.height = "+" + $2.l + $2.u;
+    else {
+      attributes.height = "0pt";
+      attributes.depth = "+" + (-$2.l) + $2.u;
+    }
+    $$ = newTag("mpadded", $3, attributes);
   }
   /* FIXME: mathvariant should be set on token element when possible.
      Try to abstract the element/attribute creation to better handle that.
      https://github.com/fred-wang/TeXZilla/issues/10 */
   | MATHBB closedTerm {
-    $$ = newTag("mstyle", $2, "mathvariant=\"double-struck\"");
+    $$ = newTag("mstyle", $2, {"mathvariant": "double-struck"});
   }
-  | MATHBF closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"bold\""); }
+  | MATHBF closedTerm { $$ = newTag("mstyle", $2, {"mathvariant": "bold"}); }
   | MATHBIT closedTerm { $$ = newTag("mstyle", $2,
-                                     "mathvariant=\"bold-italic\""); }
-  | MATHSCR closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"script\""); }
+                                     {"mathvariant": "bold-italic"}); }
+  | MATHSCR closedTerm { $$ = newTag("mstyle", $2,
+                                     {"mathvariant": "script"}); }
   | MATHBSCR closedTerm {
-    $$ = newTag("mstyle", $2, "mathvariant=\"bold-script\"");
+    $$ = newTag("mstyle", $2, {"mathvariant": "bold-script"});
   }
   | MATHSF closedTerm {
-    $$ = newTag("mstyle", $2, "mathvariant=\"sans-serif\"");
+    $$ = newTag("mstyle", $2, {"mathvariant": "sans-serif"});
   }
-  | MATHFRAK closedTerm {
-    $$ = newTag("mstyle", $2, "mathvariant=\"fraktur\"");
-  }
-  | MATHIT closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"italic\""); }
-  | MATHTT closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"monospace\""); }
-  | MATHRM closedTerm { $$ = newTag("mstyle", $2, "mathvariant=\"normal\""); }
+  | MATHFRAK closedTerm { $$ = newTag("mstyle", $2,
+                                      {"mathvariant": "fraktur"}); }
+  | MATHIT closedTerm { $$ = newTag("mstyle", $2,
+                                    {"mathvariant": "italic"}); }
+  | MATHTT closedTerm { $$ = newTag("mstyle", $2,
+                                    {"mathvariant": "monospace"}); }
+  | MATHRM closedTerm { $$ = newTag("mstyle", $2,
+                                    {"mathvariant": "normal"}); }
   | HREF attrArg closedTerm {
-    $$ = newTag("mrow", $3, yy.mSafeMode ? null : "href=" + $2);
+    $$ = newTag("mrow", $3, yy.mSafeMode ? null : {"href": $2});
   }
   | STATUSLINE textArg closedTerm {
     $$ = yy.mSafeMode ? $3 :
          newTag("maction",
-                $3 + newTag("mtext", $2), "actiontype=\"statusline\"");
+                $3 + newTag("mtext", $2), {"actiontype": "statusline"});
   }
   | TOOLTIP textArg closedTerm {
     $$ = yy.mSafeMode ? $3 :
          newTag("maction",
-                $3 + newTag("mtext", $2), "actiontype=\"tooltip\"");
+                $3 + newTag("mtext", $2), {"actiontype": "tooltip"});
   }
   | TOGGLE closedTerm closedTerm {
     /* Backward compatibility with itex2MML */
     $$ = yy.mSafeMode ? $3 :
-         newTag("maction", $2 + $3, "actiontype=\"toggle\" selection=\"2\"");
+         newTag("maction", $2 + $3, {"actiontype": "toggle", selection: "2"});
   }
   | BTOGGLE closedTermList ETOGGLE {
     $$ = yy.mSafeMode ? newTag("mrow", $2) :
-         newTag("maction", $2, "actiontype=\"toggle\"");
+         newTag("maction", $2, {"actiontype": "toggle"});
   }
   | TENSOR closedTerm "{" subsupList "}" {
     $$ = newTag("mmultiscripts", $2 + $4);
@@ -788,61 +787,65 @@ closedTerm
     $$ = newTag("mmultiscripts", $4 + $6);
   }
   | BMATRIX tableRowList EMATRIX {
-    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "false", "rowspacing": "0.5ex"});
   }
   | BGATHERED tableRowList EGATHERED {
-    $$ = newTag("mtable", $2, "displaystyle=\"true\" rowspacing=\"1.0ex\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "true", "rowspacing": "1.0ex"});
   }
   | BPMATRIX tableRowList EPMATRIX {
-    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "false", "rowspacing": "0.5ex"});
     $$ = newTag("mrow", newMo("(") + $$ + newMo(")"));
   }
   | BBMATRIX tableRowList EBMATRIX {
-    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "false", "rowspacing": "0.5ex"});
     $$ = newTag("mrow", newMo("[") + $$ + newMo("]"));
   }
   | BVMATRIX tableRowList EVMATRIX {
-    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "false", "rowspacing": "0.5ex"});
     $$ = newTag("mrow", newMo("|") + $$ + newMo("|"));
   }
   | BBBMATRIX tableRowList EBBMATRIX {
-    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "false", "rowspacing": "0.5ex"});
     $$ = newTag("mrow", newMo("{") + $$ + newMo("}"));
   }
   | BVVMATRIX tableRowList EVVMATRIX {
-    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "false", "rowspacing": "0.5ex"});
     $$ = newTag("mrow", newMo("\u2016") + $$ + newMo("\u2016"));
   }
   | BSMALLMATRIX tableRowList ESMALLMATRIX {
-    $$ = newTag("mtable", $2, "displaystyle=\"false\" rowspacing=\"0.5ex\"");
-    $$ = newTag("mstyle", $$, "scriptlevel=\"2\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "false", "rowspacing": "0.5ex"});
+    $$ = newTag("mstyle", $$, {"scriptlevel": "2"});
   }
   | BCASES tableRowList ECASES {
-    $$ = newTag("mtable", $2, "displaystyle=\"false\" columnalign=\"left left\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "false",
+                               "columnalign": "left left"});
     $$ = newTag("mrow", newMo("{") + $$);
   }
   | BALIGNED tableRowList EALIGNED {
-    $$ = newTag("mtable", $2, "displaystyle=\"true\" columnalign=\"right left right left right left right left right left\" columnspacing=\"0em\"");
+    $$ = newTag("mtable", $2, {"displaystyle": "true",
+                               "columnalign": "right left right left right left right left right left",
+                               "columnspacing": "0em"});
   }
   | BARRAY arrayAlign columnAlign tableRowList EARRAY {
     $$ = newTag("mtable", $4,
-                "displaystyle=\"false\" rowspacing=\"0.5ex\" " +
-                "align=\"" + $2 + "\" " +
-                "columnalign=\"" + $3 + "\"");
+                {"displaystyle": "false", "rowspacing": "0.5ex", "align": $2,
+                 "columnalign": $3});
   }
   | BARRAY columnAlign tableRowList EARRAY {
     $$ = newTag("mtable", $3,
-                "displaystyle=\"false\" rowspacing=\"0.5ex\" " +
-                "columnalign=\"" + $2 + "\"");
+                {"displaystyle": "false", "rowspacing": "0.5ex",
+                 "columnalign": $2});
   }
   | SUBSTACK "{" tableRowList "}" {
-    $$ = newTag("mtable", $3, "displaystyle=\"false\" columnalign=\"center\" rowspacing=\"0.5ex\"");
+    $$ = newTag("mtable", $3,
+                {"displaystyle": "false", "columnalign": "center",
+                 "rowspacing": "0.5ex"});
   }
   | ARRAY "{" tableRowList "}" {
-    $$ = newTag("mtable", $3, "displaystyle=\"false\"");
+    $$ = newTag("mtable", $3, {"displaystyle": "false"});
   }
   | ARRAY "{" ARRAYOPTS "{" arrayoptList "}" tableRowList "}" {
-    $$ = newTag("mtable", $7, "displaystyle=\"false\" " + $5);
+    $$ = newTag("mtable", $7, Object.assign($5, {"displaystyle": "false"}));
   }
   ;
 
@@ -931,13 +934,13 @@ subsupList
 
 /* text style */
 textstyle
-  : DISPLAYSTYLE { $$ = "displaystyle=\"true\""; }
-  | TEXTSTYLE { $$ = "displaystyle=\"false\""; }
-  | TEXTSIZE { $$ = "scriptlevel=\"0\""; }
-  | SCRIPTSIZE { $$ = "scriptlevel=\"1\""; }
-  | SCRIPTSCRIPTSIZE { $$ = "scriptlevel=\"2\""; }
-  | COLOR attrArg { $$ = "mathcolor=" + $2; }
-  | BGCOLOR attrArg { $$ = "mathbackground=" + $2; }
+  : DISPLAYSTYLE { $$ = {"displaystyle": "true"}; }
+  | TEXTSTYLE { $$ = {"displaystyle": "false"}; }
+  | TEXTSIZE { $$ = {"scriptlevel": "0"}; }
+  | SCRIPTSIZE { $$ = {"scriptlevel": "1"}; }
+  | SCRIPTSCRIPTSIZE { $$ = {"scriptlevel": "2"}; }
+  | COLOR attrArg { $$ = {"mathcolor": $2}; }
+  | BGCOLOR attrArg { $$ = {"mathbackground": $2}; }
   ;
 
 /* styled expression (compoundTermList with additional style) */
