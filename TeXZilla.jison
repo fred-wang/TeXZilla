@@ -55,20 +55,20 @@ function parseLength(aString) {
 }
 
 function serializeTree(aTree) {
-  var output = "<" + aTree.tag;
-  for (var name in aTree.attributes) {
-    if (aTree.attributes[name] !== undefined)
-      output += " " + name + "=\"" + aTree.attributes[name] + "\"";
+  var output = "<" + aTree["tag"];
+  for (var name in aTree["attributes"]) {
+    if (aTree["attributes"][name] !== undefined)
+      output += " " + name + "=\"" + aTree["attributes"][name] + "\"";
   }
-  if (aTree.content) {
+  if (aTree["content"]) {
     output += ">";
-    if (Array.isArray(aTree.content)) {
-      aTree.content.forEach(function(child) {
+    if (Array.isArray(aTree["content"])) {
+      aTree["content"].forEach(function(child) {
         output += serializeTree(child);
       });
     } else
-      output += aTree.content;
-    output += "</" + aTree.tag + ">";
+      output += aTree["content"];
+    output += "</" + aTree["tag"] + ">";
   } else {
     output += "/>";
   }
@@ -77,14 +77,14 @@ function serializeTree(aTree) {
 
 function newTag(aTag, aChildren, aAttributes) {
   return {
-   "tag": aTag,
-   "content": aChildren,
-   "attributes": aAttributes
+    "tag": aTag,
+    "content": aChildren,
+    "attributes": aAttributes
   };
 }
 
 function isEmptyMrow(aTree) {
-  return aTree.tag === "mrow" && !aTree.content && !aTree.attributes;
+  return aTree["tag"] === "mrow" && !aTree["content"] && !aTree["attributes"];
 }
 
 function newMo(aContent, aLeftSpace, aRightSpace) {
@@ -100,7 +100,7 @@ function newSpace(aWidth) {
 }
 
 function isToken(aTree) {
-  return ["mi", "mn", "mo", "mtext", "ms"].indexOf(aTree.tag) !== -1;
+  return ["mi", "mn", "mo", "mtext", "ms"].indexOf(aTree["tag"]) !== -1;
 }
 
 function areTokenAttributes(aAttributes) {
@@ -122,10 +122,10 @@ function newMrow(aList, aTag, aAttributes) {
       return child;
     if (aTag === "mstyle" &&
         isToken(child) && areTokenAttributes(aAttributes)) {
-      child.attributes = {};
+      child["attributes"] = {};
       for (var name in aAttributes) {
-        if (!child.attributes[name])
-          child.attributes[name] = aAttributes[name];
+        if (!child["attributes"][name])
+          child["attributes"][name] = aAttributes[name];
       }
       return child;
     }
