@@ -669,7 +669,7 @@ closedTerm
   | PHANTOM closedTerm { $$ = newTag("mphantom", [$2]); }
   | TFRAC closedTerm closedTerm {
     $$ = newTag("mfrac", [$2, $3]);
-    $$ = newTag("mstyle", [$$], {"displaystyle": "false"});
+    $$ = newMrow([$$], "mstyle", {"displaystyle": "false"});
   }
   | BINOM closedTerm closedTerm {
     $$ = newTag("mfrac", [$2, $3], {"linethickness": "0px"});
@@ -677,7 +677,7 @@ closedTerm
   }
   | TBINOM closedTerm closedTerm {
     $$ = newTag("mfrac", [$2, $3], {"linethickness": "0px"});
-    $$ = newTag("mstyle", [$$], {"displaystyle": "false"});
+    $$ = newMrow([$$], "mstyle", {"displaystyle": "false"});
     $$ = newTag("mrow", [newMo("("), $$, newMo(")")]);
   }
   | PMOD closedTerm {
@@ -739,26 +739,26 @@ closedTerm
      Try to abstract the element/attribute creation to better handle that.
      https://github.com/fred-wang/TeXZilla/issues/10 */
   | MATHBB closedTerm {
-    $$ = newTag("mstyle", [$2], {"mathvariant": "double-struck"});
+    $$ = newMrow([$2], "mstyle", {"mathvariant": "double-struck"});
   }
-  | MATHBF closedTerm { $$ = newTag("mstyle", [$2], {"mathvariant": "bold"}); }
-  | MATHBIT closedTerm { $$ = newTag("mstyle", [$2],
+  | MATHBF closedTerm { $$ = newMrow([$2], "mstyle", {"mathvariant": "bold"}); }
+  | MATHBIT closedTerm { $$ = newMrow([$2], "mstyle",
                                      {"mathvariant": "bold-italic"}); }
-  | MATHSCR closedTerm { $$ = newTag("mstyle", [$2],
+  | MATHSCR closedTerm { $$ = newMrow([$2], "mstyle",
                                      {"mathvariant": "script"}); }
   | MATHBSCR closedTerm {
-    $$ = newTag("mstyle", [$2], {"mathvariant": "bold-script"});
+    $$ = newMrow([$2], "mstyle", {"mathvariant": "bold-script"});
   }
   | MATHSF closedTerm {
-    $$ = newTag("mstyle", [$2], {"mathvariant": "sans-serif"});
+    $$ = newMrow([$2], "mstyle", {"mathvariant": "sans-serif"});
   }
-  | MATHFRAK closedTerm { $$ = newTag("mstyle", [$2],
+  | MATHFRAK closedTerm { $$ = newMrow([$2], "mstyle",
                                       {"mathvariant": "fraktur"}); }
-  | MATHIT closedTerm { $$ = newTag("mstyle", [$2],
+  | MATHIT closedTerm { $$ = newMrow([$2], "mstyle",
                                     {"mathvariant": "italic"}); }
-  | MATHTT closedTerm { $$ = newTag("mstyle", [$2],
+  | MATHTT closedTerm { $$ = newMrow([$2], "mstyle",
                                     {"mathvariant": "monospace"}); }
-  | MATHRM closedTerm { $$ = newTag("mstyle", [$2],
+  | MATHRM closedTerm { $$ = newMrow([$2], "mstyle",
                                     {"mathvariant": "normal"}); }
   | HREF attrArg closedTerm {
     $$ = newTag("mrow", [$3], yy.mSafeMode ? null : {"href": $2});
@@ -822,7 +822,7 @@ closedTerm
   }
   | BSMALLMATRIX tableRowList ESMALLMATRIX {
     $$ = newTag("mtable", $2, {"displaystyle": "false", "rowspacing": "0.5ex"});
-    $$ = newTag("mstyle", [$$], {"scriptlevel": "2"});
+    $$ = newMrow([$$], "mstyle", {"scriptlevel": "2"});
   }
   | BCASES tableRowList ECASES {
     $$ = newTag("mtable", $2, {"displaystyle": "false",
