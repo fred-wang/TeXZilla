@@ -57,8 +57,10 @@ function parseLength(aString) {
 function newTag(aTag, aChildren, aAttributes) {
   /* Create a new tag with the specified content and attributes. */
   var tag = "<" + aTag;
-  for (var name in aAttributes)
-    tag += " " + name + "=\"" + aAttributes[name] + "\"";
+  for (var name in aAttributes) {
+    if (aAttributes[name] !== undefined)
+      tag += " " + name + "=\"" + aAttributes[name] + "\"";
+  }
   if (aChildren) {
     tag += ">" + aChildren.join("") + "</" + aTag + ">";
   } else {
@@ -98,17 +100,18 @@ function newMrow(aList, aTag, aAttributes) {
   return newTag(aTag, aList, aAttributes);
 }
 
-function newMath(aList, aDisplay, aTeX)
+function newMath(aList, aDisplay, aRTL, aTeX)
 {
-  var tag = "<math xmlns=\"" + MathMLNameSpace + "\"";
-  if (aDisplay) {
-    tag += " display=\"block\""
-  }
-  tag += "><semantics>" + newMrow(aList);
-  tag += "<annotation encoding=\"TeX\">";
-  tag += escapeText(aTeX);
-  tag += "</annotation></semantics></math>";
-  return tag;
+  return newTag("math", [
+    newTag("semantics", [
+      newMrow(aList),
+      newToken("annotation", escapeText(aTeX), {"encoding": "TeX"})
+    ]),
+  ], {
+    "xmlns": MathMLNameSpace,
+    "display": aDisplay ? "block" : undefined,
+    "dir": aRTL ? "rtl" : undefined
+  });
 }
 
 function getTeXSourceInternal(aMathMLElement) {
@@ -201,6 +204,14 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
   /* Parse the TeX source and get the main MathML node. */
   try {
     output = this.parse("\\(" + aTeX + "\\)");
+    if (aRTL) {
+      /* Set the RTL mode if specified. */
+      output = output.replace(/^<math/, "<math dir=\"rtl\"");
+    }
+    if (aDisplay) {
+      /* Set the display mode if it is specified. */
+      output = output.replace(/^<math/, "<math display=\"block\"");
+    }
   } catch (e) {
     if (aThrowExceptionOnError) {
        throw e;
@@ -208,17 +219,8 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
     output = newMath(
       [newTag("merror",
               [newToken("mtext", escapeText(e.message))]
-             )], false,
-      aTeX);
-  }
-
-  if (aRTL) {
-    /* Set the RTL mode if specified. */
-    output = output.replace(/^<math/, "<math dir=\"rtl\"");
-  }
-  if (aDisplay) {
-    /* Set the display mode if it is specified. */
-    output = output.replace(/^<math/, "<math display=\"block\"");
+             )],
+      aDisplay, aRTL, aTeX);
   }
 
   return output;
@@ -989,26 +991,26 @@ documentItem
   }
   | STARTMATH0 ENDMATH0 {
     // \( \)
-    $$ = newMath([newTag("mrow")], false, yy.tex);
+    $$ = newMath([newTag("mrow")], false, false, yy.tex);
   }
   | STARTMATH0 styledExpression ENDMATH0 {
     // \( ... \)
-    $$ = newMath($2, false, yy.tex);
+    $$ = newMath($2, false, false, yy.tex);
   }
   | STARTMATH1 ENDMATH1 {
     // \[ \]
-    $$ = newMath([newTag("mrow")], true, yy.tex);
+    $$ = newMath([newTag("mrow")], true, false, yy.tex);
   }
   | STARTMATH1 styledExpression ENDMATH1 {
     // \[ ... \]
-    $$ = newMath($2, true, yy.tex);
+    $$ = newMath($2, true, false, yy.tex);
   }
   | STARTMATH2 styledExpression ENDMATH2 {
     // $ ... $
-    $$ = newMath($2, false, yy.tex);
+    $$ = newMath($2, false, false, yy.tex);
   }
   | STARTMATH3 styledExpression ENDMATH3 {
     // $$ ... $$
-    $$ = newMath($2, true, yy.tex);
+    $$ = newMath($2, true, false, yy.tex);
   }
   ;
