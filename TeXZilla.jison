@@ -99,17 +99,36 @@ function newSpace(aWidth) {
    return newTag("mspace", null, {"width": aWidth + "em"});
 }
 
+function isToken(aTree) {
+  return ["mi", "mn", "mo", "mtext", "ms"].indexOf(aTree.tag) !== -1;
+}
+
+function areTokenAttributes(aAttributes) {
+  for (var attribute in aAttributes) {
+    if (["mathcolor", "mathbackground", "mathvariant"].indexOf(attribute) === -1)
+      return false;
+  }
+  return true;
+}
+
 /* FIXME: try to restore the operator grouping when compoundTermList does not
    contain any fences.
    https://github.com/fred-wang/TeXZilla/issues/9 */
 function newMrow(aList, aTag, aAttributes) {
-  var tag;
-  if (!aTag) {
-    if (aList.length == 1) {
-      /* This list only has one element so we just return it. */
-      return aList[0];
+  aTag = aTag || "mrow";
+  if (aList.length == 1) {
+    var child = aList[0];
+    if (aTag === "mrow")
+      return child;
+    if (aTag === "mstyle" &&
+        isToken(child) && areTokenAttributes(aAttributes)) {
+      child.attributes = {};
+      for (var name in aAttributes) {
+        if (!child.attributes[name])
+          child.attributes[name] = aAttributes[name];
+      }
+      return child;
     }
-    aTag = "mrow";
   }
   return newTag(aTag, aList, aAttributes);
 }
