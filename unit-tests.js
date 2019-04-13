@@ -10,7 +10,7 @@ var hasDOMAPI = (typeof window !== "undefined" &&
 
 var tests = [
     /* Empty content */
-    ["", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow/><annotation encoding="TeX"></annotation></semantics></math>'],
+    ["", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow/><annotation encoding="TeX"/></semantics></math>'],
     /* escaped characters */
     ["\\& \\% \\$", '<math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>&amp;</mi><mi>%</mi><mi>$</mi></mrow><annotation encoding="TeX">\\&amp; \\% \\$</annotation></semantics></math>'],
     /* variable and numbers */
@@ -451,7 +451,7 @@ if (!success) {
 
 /* 2) empty math, new line and escaped characters */
 output = TeXZilla.filterString("blah \\[\\] \\(\\) \n \\$ \\\\ blah");
-success = (output === 'blah <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow/><annotation encoding="TeX"></annotation></semantics></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow/><annotation encoding="TeX"></annotation></semantics></math> \n $ \\ blah')
+success = (output === 'blah <math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow/><annotation encoding="TeX"/></semantics></math> <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow/><annotation encoding="TeX"/></semantics></math> \n $ \\ blah')
 printTestResult(success);
 if (!success) {
   console.log("Bad filterString output: " + output)

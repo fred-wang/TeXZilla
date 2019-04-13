@@ -54,23 +54,37 @@ function parseLength(aString) {
   return { l: namedSpaceToEm(aString), u: "em" };
 }
 
-function newTag(aTag, aChildren, aAttributes) {
-  /* Create a new tag with the specified content and attributes. */
-  var tag = "<" + aTag;
-  for (var name in aAttributes) {
-    if (aAttributes[name] !== undefined)
-      tag += " " + name + "=\"" + aAttributes[name] + "\"";
+function serializeTree(aTree) {
+  var output = "<" + aTree.tag;
+  for (var name in aTree.attributes) {
+    if (aTree.attributes[name] !== undefined)
+      output += " " + name + "=\"" + aTree.attributes[name] + "\"";
   }
-  if (aChildren) {
-    tag += ">" + aChildren.join("") + "</" + aTag + ">";
+  if (aTree.content) {
+    output += ">";
+    if (Array.isArray(aTree.content)) {
+      aTree.content.forEach(function(child) {
+        output += serializeTree(child);
+      });
+    } else
+      output += aTree.content;
+    output += "</" + aTree.tag + ">";
   } else {
-    tag += "/>";
+    output += "/>";
   }
-  return tag;
+  return output;
 }
 
-function newToken(aTag, aContent, aAttributes) {
-  return newTag(aTag, [aContent], aAttributes);
+function newTag(aTag, aChildren, aAttributes) {
+  return {
+   "tag": aTag,
+   "content": aChildren,
+   "attributes": aAttributes
+  };
+}
+
+function isEmptyMrow(aTree) {
+  return aTree.tag === "mrow" && !aTree.content && !aTree.attributes;
 }
 
 function newMo(aContent, aLeftSpace, aRightSpace) {
@@ -78,7 +92,7 @@ function newMo(aContent, aLeftSpace, aRightSpace) {
   var attributes = {};
   if (aLeftSpace !== undefined) attributes.lspace = aLeftSpace + "em";
   if (aRightSpace !== undefined) attributes.rspace = aRightSpace + "em";
-  return newToken("mo", escapeText(aContent), attributes);
+  return newTag("mo", escapeText(aContent), attributes);
 }
 
 function newSpace(aWidth) {
@@ -105,7 +119,7 @@ function newMath(aList, aDisplay, aRTL, aTeX)
   return newTag("math", [
     newTag("semantics", [
       newMrow(aList),
-      newToken("annotation", escapeText(aTeX), {"encoding": "TeX"})
+      newTag("annotation", escapeText(aTeX), {"encoding": "TeX"})
     ]),
   ], {
     "xmlns": MathMLNameSpace,
@@ -216,11 +230,11 @@ parser.toMathMLString = function(aTeX, aDisplay, aRTL, aThrowExceptionOnError) {
     if (aThrowExceptionOnError) {
        throw e;
     }
-    output = newMath(
+    output = serializeTree(newMath(
       [newTag("merror",
-              [newToken("mtext", escapeText(e.message))]
+              [newTag("mtext", escapeText(e.message))]
              )],
-      aDisplay, aRTL, aTeX);
+      aDisplay, aRTL, aTeX));
   }
 
   return output;
@@ -543,28 +557,28 @@ closedTerm
   : "{" "}" { $$ = newTag("mrow"); }
   | "{" styledExpression "}" { $$ = newMrow($2); }
   | BIG OPFS {
-    $$ = newToken("mo", $2, {"maxsize": "1.2em", "minsize": "1.2em"});
+    $$ = newTag("mo", $2, {"maxsize": "1.2em", "minsize": "1.2em"});
   }
   | BBIG OPFS {
-    $$ = newToken("mo", $2, {"maxsize": "1.8em", "minsize": "1.8em"});
+    $$ = newTag("mo", $2, {"maxsize": "1.8em", "minsize": "1.8em"});
   } 
   | BIGG OPFS {
-    $$ = newToken("mo", $2, {"maxsize": "2.4em", "minsize": "2.4em"});
+    $$ = newTag("mo", $2, {"maxsize": "2.4em", "minsize": "2.4em"});
   }
   | BBIGG OPFS {
-    $$ = newToken("mo", $2, {"maxsize": "3em", "minsize": "3em"});
+    $$ = newTag("mo", $2, {"maxsize": "3em", "minsize": "3em"});
   }
   | BIGL OPFS {
-    $$ = newToken("mo", $2, {"maxsize": "1.2em", "minsize": "1.2em"});
+    $$ = newTag("mo", $2, {"maxsize": "1.2em", "minsize": "1.2em"});
   }
   | BBIGL OPFS {
-    $$ = newToken("mo", $2, {"maxsize": "1.8em", "minsize": "1.8em"});
+    $$ = newTag("mo", $2, {"maxsize": "1.8em", "minsize": "1.8em"});
   }
   | BIGGL OPFS {
-    $$ = newToken("mo", $2, {"maxsize": "2.4em", "minsize": "2.4em"});
+    $$ = newTag("mo", $2, {"maxsize": "2.4em", "minsize": "2.4em"});
   }
   | BBIGGL OPFS {
-    $$ = newToken("mo", $2, {"maxsize": "3em", "minsize": "3em"});
+    $$ = newTag("mo", $2, {"maxsize": "3em", "minsize": "3em"});
   }
   | left styledExpression right {
     $$ = newTag("mrow", [$1, newMrow($2), $3]);
@@ -592,25 +606,25 @@ closedTerm
     $$ = newTag("mrow", [$1, $$, $5]);
     $$ = newTag("mrow", [newMo("("), $$, newMo(")")]);
   }
-  | NUM { $$ = newToken("mn", $1); }
-  | TEXT { $$ = newToken("mtext", $1); }
-  | A { $$ = newToken("mi", escapeText($1)); }
+  | NUM { $$ = newTag("mn", $1); }
+  | TEXT { $$ = newTag("mtext", $1); }
+  | A { $$ = newTag("mi", escapeText($1)); }
   | F { $$ = newMo($1, 0, 0); }
-  | MI tokenContent { $$ = newToken("mi", $2); }
-  | MN tokenContent { $$ = newToken("mn", $2); }
+  | MI tokenContent { $$ = newTag("mi", $2); }
+  | MN tokenContent { $$ = newTag("mn", $2); }
   | MO tokenContent { $$ = newMo($2); }
   | "." { $$ = newMo($1); }
   | OP { $$ = newMo($1); }
-  | OPS { $$ = newToken("mo", $1, {"stretchy": "false"}); }
-  | OPAS { $$ = newToken("mo", $1, {"stretchy": "false"}); }
-  | OPFS { $$ = newToken("mo", $1, {"stretchy": "false"}); }
-  | MS tokenContent { $$ = newToken("ms", $2); }
+  | OPS { $$ = newTag("mo", $1, {"stretchy": "false"}); }
+  | OPAS { $$ = newTag("mo", $1, {"stretchy": "false"}); }
+  | OPFS { $$ = newTag("mo", $1, {"stretchy": "false"}); }
+  | MS tokenContent { $$ = newTag("ms", $2); }
   | MS attrOptArg attrOptArg tokenContent {
-     $$ = newToken("ms", $4, {"lquote": $2, "rquote": $3});
+     $$ = newTag("ms", $4, {"lquote": $2, "rquote": $3});
   }
-  | MTEXT tokenContent { $$ = newToken("mtext", $2); }
-  | HIGH_SURROGATE LOW_SURROGATE { $$ = newToken("mtext", $1 + $2); }
-  | BMP_CHARACTER { $$ = newToken("mtext", $1); }
+  | MTEXT tokenContent { $$ = newTag("mtext", $2); }
+  | HIGH_SURROGATE LOW_SURROGATE { $$ = newTag("mtext", $1 + $2); }
+  | BMP_CHARACTER { $$ = newTag("mtext", $1); }
   | OPERATORNAME textArg {
     $$ = newMo($2, 0, namedSpaceToEm("thinmathspace"));
   }
@@ -638,7 +652,7 @@ closedTerm
     $$ = newTag("munderover", [$4, $2, $3]); }
   }
   | XARROW "[" styledExpression "]" closedTerm {
-    $$ = ($5 === "<mrow/>" ?
+    $$ = (isEmptyMrow($5) ?
           newTag("munder", [newMo($1), newMrow($3)]) :
           newTag("munderover", [newMo($1), newMrow($3), $5]));
   }
@@ -679,7 +693,7 @@ closedTerm
     $$ = newTag("mover", [$2, newMo($1)]);
   }
   | ACCENTNS closedTerm {
-    $$ = newTag("mover", [$2, newTag("mo", [$1], {"stretchy": "false"})]);
+    $$ = newTag("mover", [$2, newTag("mo", $1, {"stretchy": "false"})]);
   }
   | BOXED closedTerm { $$ = newTag("menclose", [$2], {"notation": "box"}); }
   | SLASH closedTerm {
@@ -752,12 +766,12 @@ closedTerm
   | STATUSLINE textArg closedTerm {
     $$ = yy.mSafeMode ? $3 :
          newTag("maction",
-                [$3, newToken("mtext", $2)], {"actiontype": "statusline"});
+                [$3, newTag("mtext", $2)], {"actiontype": "statusline"});
   }
   | TOOLTIP textArg closedTerm {
     $$ = yy.mSafeMode ? $3 :
          newTag("maction",
-                [$3, newToken("mtext", $2)], {"actiontype": "tooltip"});
+                [$3, newTag("mtext", $2)], {"actiontype": "tooltip"});
   }
   | TOGGLE closedTerm closedTerm {
     /* Backward compatibility with itex2MML */
@@ -986,10 +1000,14 @@ documentItemList
   ;
 
 documentItem
-  : TEXT {
-    $$ = $1;
+  : TEXT { $$ = $1; }
+  | mathItem {
+    $$ = serializeTree($1);
   }
-  | STARTMATH0 ENDMATH0 {
+  ;
+
+mathItem
+  : STARTMATH0 ENDMATH0 {
     // \( \)
     $$ = newMath([newTag("mrow")], false, false, yy.tex);
   }
