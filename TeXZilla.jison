@@ -120,7 +120,7 @@ function newMath(aList, aDisplay, aRTL, aTeX)
     newTag("semantics", [
       newMrow(aList),
       newTag("annotation", escapeText(aTeX), {"encoding": "TeX"})
-    ]),
+    ])
   ], {
     "xmlns": MathMLNameSpace,
     "display": aDisplay ? "block" : undefined,
