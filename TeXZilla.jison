@@ -88,11 +88,10 @@ function isEmptyMrow(aTree) {
 }
 
 function newMo(aContent, aLeftSpace, aRightSpace) {
-  /* Create a new operator */
-  var attributes = {};
-  if (aLeftSpace !== undefined) attributes.lspace = aLeftSpace + "em";
-  if (aRightSpace !== undefined) attributes.rspace = aRightSpace + "em";
-  return newTag("mo", escapeText(aContent), attributes);
+  return newTag("mo", escapeText(aContent), {
+     "lspace": aLeftSpace !== undefined ? aLeftSpace + "em" : undefined,
+     "rspace": aRightSpace !== undefined ? aRightSpace + "em" : undefined
+  });
 }
 
 function newSpace(aWidth) {
