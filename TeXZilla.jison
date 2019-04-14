@@ -526,6 +526,9 @@ function applyMathVariant(aToken, aMathVariant) {
 /* FIXME: try to restore the operator grouping when compoundTermList does not
    contain any fences.
    https://github.com/fred-wang/TeXZilla/issues/9 */
+/* FIXME: We can apply the mathvariant mapping when mstyle contains only
+   token elements, to handle basic use case like \mathfrak{sl}
+   https://github.com/fred-wang/TeXZilla/issues/61 */
 function newMrow(aList, aTag, aAttributes) {
   aTag = aTag || "mrow";
   if (aList.length == 1) {
