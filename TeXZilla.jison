@@ -102,12 +102,425 @@ function isToken(aTree) {
   return ["mi", "mn", "mo", "mtext", "ms"].indexOf(aTree["tag"]) !== -1;
 }
 
+function isSingleCharMi(aTree) {
+  if (aTree["tag"] !== "mi")
+    return false;
+  var content = aTree["content"];
+  var c = content["codePointAt"](0);
+  return content.length === 1 && c <= 0xFFFF ||
+         content.length === 2 && c > 0xFFFF;
+}
+
 function areTokenAttributes(aAttributes) {
   for (var attribute in aAttributes) {
     if (["mathcolor", "mathbackground", "mathvariant"].indexOf(attribute) === -1)
       return false;
   }
   return true;
+}
+
+function applyMathVariantToCharacter(codePoint, aMathVariant) {
+  // FIXME: We should have LaTeX commmands for all these variants.
+  // See https://github.com/fred-wang/TeXZilla/issues/64
+  var mathvariant = [
+    "bold",
+    "italic",
+    "bold-italic",
+    "script",
+    "bold-script",
+    "fraktur",
+    "double-struck",
+    "bold-fraktur",
+    "sans-serif",
+    "bold-sans-serif",
+    "sans-serif-italic",
+    "sans-serif-bold-italic",
+    "monospace",
+    "initial",
+    "tailed",
+    "looped",
+    "stretched"
+  ].indexOf(aMathVariant);
+  var Bold = 0;
+  var Italic = 1;
+  var BoldItalic = 2;
+  var Script = 3;
+  var BoldScript = 4;
+  var Fraktur = 5;
+  var DoubleStruck = 6;
+  var BoldFraktur = 7;
+  var SansSerif = 8;
+  var BoldSansSerif = 9;
+  var SansSerifItalic = 10;
+  var SansSerifBoldItalic = 11;
+  var Monospace = 12;
+  var Initial = 13;
+  var Tailed = 14;
+  var Looped = 15;
+  var Stretched = 16;
+
+  var greekUpperTheta = 0x03F4;
+  var holeGreekUpperTheta = 0x03A2;
+  var nabla = 0x2207;
+  var partialDifferential = 0x2202;
+  var greekUpperAlpha = 0x0391;
+  var greekUpperOmega = 0x03A9;
+  var greekLowerAlpha = 0x03B1;
+  var greekLowerOmega = 0x03C9;
+  var greekLunateEpsilonSymbol = 0x03F5;
+  var greekThetaSymbol = 0x03D1;
+  var greekKappaSymbol = 0x03F0;
+  var greekPhiSymbol = 0x03D5;
+  var greekRhoSymbol = 0x03F1;
+  var greekPiSymbol = 0x03D6;
+  var greekLetterDigamma = 0x03DC;
+  var greekSmallLetterDigamma = 0x03DD;
+  var mathBoldCapitalDigamma = 0x1D7CA;
+  var mathBoldSmallDigamma = 0x1D7CB;
+
+  var latinSmallLetterDotlessI = 0x0131;
+  var latinSmallLetterDotlessJ = 0x0237;
+
+  var mathItalicSmallDotlessI = 0x1D6A4;
+  var mathItalicSmallDotlessJ = 0x1D6A5;
+
+  var digit0 = 0x30;
+  var digit9 = 0x39;
+  var upperA = 0x41;
+  var upperZ = 0x5A;
+  var smallA = 0x61;
+  var smallZ = 0x7A;
+
+  var mathBoldUpperA = 0x1D400;
+  var mathItalicUpperA = 0x1D434;
+  var mathBoldSmallA = 0x1D41A;
+  var mathBoldUpperAlpha = 0x1D6A8;
+  var mathBoldSmallAlpha = 0x1D6C2;
+  var mathItalicUpperAlpha = 0x1D6E2;
+  var mathBoldDigitZero = 0x1D7CE;
+  var mathDoubleStruckZero = 0x1D7D8;
+
+  var mathBoldUpperTheta = 0x1D6B9;
+  var mathBoldNabla = 0x1D6C1;
+  var mathBoldPartialDifferential = 0x1D6DB;
+  var mathBoldEpsilonSymbol = 0x1D6DC;
+  var mathBoldThetaSymbol = 0x1D6DD;
+  var mathBoldKappaSymbol = 0x1D6DE;
+  var mathBoldPhiSymbol = 0x1D6DF;
+  var mathBoldRhoSymbol = 0x1D6E0;
+  var mathBoldPiSymbol = 0x1D6E1;
+
+  /* Exceptional characters with at most one possible transformation. */
+  if (codePoint == holeGreekUpperTheta)
+    return codePoint;
+  if (codePoint == greekLetterDigamma) {
+    if (mathvariant == Bold)
+      return mathBoldCapitalDigamma;
+    return codePoint;
+  }
+  if (codePoint == greekSmallLetterDigamma) {
+    if (mathvariant == Bold)
+      return mathBoldSmallDigamma;
+    return codePoint;
+  }
+  if (codePoint == latinSmallLetterDotlessI) {
+    if (mathvariant == Italic)
+      return mathItalicSmallDotlessI;
+    return codePoint;
+  }
+  if (codePoint == latinSmallLetterDotlessJ) {
+    if (mathvariant == Italic)
+      return mathItalicSmallDotlessJ;
+    return codePoint;
+  }
+
+  var baseChar, multiplier, map;
+
+  /* Latin */
+  if (upperA <= codePoint && codePoint <= upperZ ||
+      smallA <= codePoint && codePoint <= smallZ) {
+    baseChar = codePoint <= upperZ ? codePoint - upperA :
+               mathBoldSmallA - mathBoldUpperA + codePoint - smallA;
+    multiplier = mathvariant;
+    if (mathvariant > Monospace)
+      return codePoint; // Latin doesn't support the Arabic mathvariants
+    var transformedChar = baseChar + mathBoldUpperA +
+                          multiplier * (mathItalicUpperA - mathBoldUpperA);
+    map = {
+      0x1D455: 0x210E,
+      0x1D49D: 0x212C,
+      0x1D4A0: 0x2130,
+      0x1D4A1: 0x2131,
+      0x1D4A3: 0x210B,
+      0x1D4A4: 0x2110,
+      0x1D4A7: 0x2112,
+      0x1D4A8: 0x2133,
+      0x1D4AD: 0x211B,
+      0x1D4BA: 0x212F,
+      0x1D4BC: 0x210A,
+      0x1D4C4: 0x2134,
+      0x1D506: 0x212D,
+      0x1D50B: 0x210C,
+      0x1D50C: 0x2111,
+      0x1D515: 0x211C,
+      0x1D51D: 0x2128,
+      0x1D53A: 0x2102,
+      0x1D53F: 0x210D,
+      0x1D545: 0x2115,
+      0x1D547: 0x2119,
+      0x1D548: 0x211A,
+      0x1D549: 0x211D,
+      0x1D551: 0x2124
+    };
+    return map[transformedChar] ? map[transformedChar] : transformedChar;
+  }
+
+  /* Digits */
+  if (digit0 <= codePoint && codePoint <= digit9) {
+    baseChar = codePoint - digit0;
+    switch (mathvariant) {
+      case Bold:
+        multiplier = 0;
+        break;
+      case DoubleStruck:
+        multiplier = 1;
+        break;
+      case SansSerif:
+        multiplier = 2;
+        break;
+      case BoldSansSerif:
+        multiplier = 3;
+        break;
+      case Monospace:
+        multiplier = 4;
+        break;
+      default:
+        return codePoint;
+    }
+    return baseChar + multiplier * (mathDoubleStruckZero - mathBoldDigitZero) +
+           mathBoldDigitZero;
+  }
+
+  // Arabic characters are defined within this range
+  if (0x0600 <= codePoint && codePoint <= 0x06FF) {
+    // The Arabic mathematical block is not continuous, nor does it have a
+    // monotonic mapping to the unencoded characters, requiring the use of a
+    // lookup table.
+    switch (mathvariant) {
+      case Initial:
+        map = {
+          0x628: 0x1EE21,
+          0x62A: 0x1EE35,
+          0x62B: 0x1EE36,
+          0x62C: 0x1EE22,
+          0x62D: 0x1EE27,
+          0x62E: 0x1EE37,
+          0x633: 0x1EE2E,
+          0x634: 0x1EE34,
+          0x635: 0x1EE31,
+          0x636: 0x1EE39,
+          0x639: 0x1EE2F,
+          0x63A: 0x1EE3B,
+          0x641: 0x1EE30,
+          0x642: 0x1EE32,
+          0x643: 0x1EE2A,
+          0x644: 0x1EE2B,
+          0x645: 0x1EE2C,
+          0x646: 0x1EE2D,
+          0x647: 0x1EE24,
+          0x64A: 0x1EE29
+        };
+      break;
+      case Tailed:
+        map = {
+          0x62C: 0x1EE42,
+          0x62D: 0x1EE47,
+          0x62E: 0x1EE57,
+          0x633: 0x1EE4E,
+          0x634: 0x1EE54,
+          0x635: 0x1EE51,
+          0x636: 0x1EE59,
+          0x639: 0x1EE4F,
+          0x63A: 0x1EE5B,
+          0x642: 0x1EE52,
+          0x644: 0x1EE4B,
+          0x646: 0x1EE4D,
+          0x64A: 0x1EE49,
+          0x66F: 0x1EE5F,
+          0x6BA: 0x1EE5D
+        };
+      break;
+      case Stretched:
+        map = {
+          0x628: 0x1EE61,
+          0x62A: 0x1EE75,
+          0x62B: 0x1EE76,
+          0x62C: 0x1EE62,
+          0x62D: 0x1EE67,
+          0x62E: 0x1EE77,
+          0x633: 0x1EE6E,
+          0x634: 0x1EE74,
+          0x635: 0x1EE71,
+          0x636: 0x1EE79,
+          0x637: 0x1EE68,
+          0x638: 0x1EE7A,
+          0x639: 0x1EE6F,
+          0x63A: 0x1EE7B,
+          0x641: 0x1EE70,
+          0x642: 0x1EE72,
+          0x643: 0x1EE6A,
+          0x645: 0x1EE6C,
+          0x646: 0x1EE6D,
+          0x647: 0x1EE64,
+          0x64A: 0x1EE69,
+          0x66E: 0x1EE7C,
+          0x6A1: 0x1EE7E
+        };
+      break;
+      case Looped:
+        map = {
+          0x627: 0x1EE80,
+          0x628: 0x1EE81,
+          0x62A: 0x1EE95,
+          0x62B: 0x1EE96,
+          0x62C: 0x1EE82,
+          0x62D: 0x1EE87,
+          0x62E: 0x1EE97,
+          0x62F: 0x1EE83,
+          0x630: 0x1EE98,
+          0x631: 0x1EE93,
+          0x632: 0x1EE86,
+          0x633: 0x1EE8E,
+          0x634: 0x1EE94,
+          0x635: 0x1EE91,
+          0x636: 0x1EE99,
+          0x637: 0x1EE88,
+          0x638: 0x1EE9A,
+          0x639: 0x1EE8F,
+          0x63A: 0x1EE9B,
+          0x641: 0x1EE90,
+          0x642: 0x1EE92,
+          0x644: 0x1EE8B,
+          0x645: 0x1EE8C,
+          0x646: 0x1EE8D,
+          0x647: 0x1EE84,
+          0x648: 0x1EE85,
+          0x64A: 0x1EE89
+        };
+      break;
+      case DoubleStruck:
+        map = {
+          0x628: 0x1EEA1,
+          0x62A: 0x1EEB5,
+          0x62B: 0x1EEB6,
+          0x62C: 0x1EEA2,
+          0x62D: 0x1EEA7,
+          0x62E: 0x1EEB7,
+          0x62F: 0x1EEA3,
+          0x630: 0x1EEB8,
+          0x631: 0x1EEB3,
+          0x632: 0x1EEA6,
+          0x633: 0x1EEAE,
+          0x634: 0x1EEB4,
+          0x635: 0x1EEB1,
+          0x636: 0x1EEB9,
+          0x637: 0x1EEA8,
+          0x638: 0x1EEBA,
+          0x639: 0x1EEAF,
+          0x63A: 0x1EEBB,
+          0x641: 0x1EEB0,
+          0x642: 0x1EEB2,
+          0x644: 0x1EEAB,
+          0x645: 0x1EEAC,
+          0x646: 0x1EEAD,
+          0x648: 0x1EEA5,
+          0x64A: 0x1EEA9
+        };
+      break;
+      default:
+        return codePoint;
+    }
+    return map[codePoint] ? map[codePoint] : codePoint;
+  }
+
+  // Greek
+  if (greekUpperAlpha <= codePoint && codePoint <= greekUpperOmega) {
+    baseChar = codePoint - greekUpperAlpha;
+  } else if (greekLowerAlpha <= codePoint && codePoint <= greekLowerOmega) {
+    baseChar = mathBoldSmallAlpha - mathBoldUpperAlpha + codePoint - greekLowerAlpha;
+  } else {
+    switch (codePoint) {
+    case greekUpperTheta:
+        baseChar = mathBoldUpperTheta - mathBoldUpperAlpha;
+        break;
+    case nabla:
+        baseChar = mathBoldNabla - mathBoldUpperAlpha;
+        break;
+    case partialDifferential:
+        baseChar = mathBoldPartialDifferential - mathBoldUpperAlpha;
+        break;
+    case greekLunateEpsilonSymbol:
+        baseChar = mathBoldEpsilonSymbol - mathBoldUpperAlpha;
+        break;
+    case greekThetaSymbol:
+        baseChar = mathBoldThetaSymbol - mathBoldUpperAlpha;
+        break;
+    case greekKappaSymbol:
+        baseChar = mathBoldKappaSymbol - mathBoldUpperAlpha;
+        break;
+    case greekPhiSymbol:
+        baseChar = mathBoldPhiSymbol - mathBoldUpperAlpha;
+        break;
+    case greekRhoSymbol:
+        baseChar = mathBoldRhoSymbol - mathBoldUpperAlpha;
+        break;
+    case greekPiSymbol:
+        baseChar = mathBoldPiSymbol - mathBoldUpperAlpha;
+        break;
+    default:
+        return codePoint;
+    }
+  }
+
+  switch (mathvariant) {
+    case Bold:
+      multiplier = 0;
+      break;
+    case Italic:
+      multiplier = 1;
+      break;
+    case BoldItalic:
+      multiplier = 2;
+      break;
+    case BoldSansSerif:
+      multiplier = 3;
+      break;
+    case SansSerifBoldItalic:
+      multiplier = 4;
+      break;
+    default:
+      // This mathvariant isn't defined for Greek or is otherwise normal.
+      return codePoint;
+  }
+
+  return baseChar + mathBoldUpperAlpha + multiplier * (mathItalicUpperAlpha - mathBoldUpperAlpha);
+}
+
+function applyMathVariant(aToken, aMathVariant) {
+  var content = aToken["content"];
+  var transformedText = "";
+  for (var i = 0; i < content.length; i++) {
+    var c = content["codePointAt"](i);
+    if (c > 0xFFFF) {
+      transformedText += content[i]; i++;
+      transformedText += content[i];
+    } else {
+      transformedText += String["fromCodePoint"](
+        applyMathVariantToCharacter(c, aMathVariant)
+      );
+    }
+  }
+  aToken["content"] = transformedText;
 }
 
 /* FIXME: try to restore the operator grouping when compoundTermList does not
@@ -122,6 +535,17 @@ function newMrow(aList, aTag, aAttributes) {
     if (aTag === "mstyle" &&
         isToken(child) && areTokenAttributes(aAttributes)) {
       child["attributes"] = {};
+      if (aAttributes["mathvariant"]) {
+        if (aAttributes["mathvariant"] === "normal") {
+          // Explicit "normal" attribute is only needed on single-char <mi>'s.
+          if (!isSingleCharMi(child))
+            delete aAttributes["mathvariant"];
+        } else {
+          // Transform the text instead of using a mathvariant attribute.
+          applyMathVariant(child, aAttributes["mathvariant"]);
+          delete aAttributes["mathvariant"];
+        }
+      }
       for (var name in aAttributes) {
         if (!child["attributes"][name])
           child["attributes"][name] = aAttributes[name];
@@ -753,9 +1177,6 @@ closedTerm
     }
     $$ = newTag("mpadded", [$3], attributes);
   }
-  /* FIXME: mathvariant should be set on token element when possible.
-     Try to abstract the element/attribute creation to better handle that.
-     https://github.com/fred-wang/TeXZilla/issues/10 */
   | MATHBB closedTerm {
     $$ = newMrow([$2], "mstyle", {"mathvariant": "double-struck"});
   }
