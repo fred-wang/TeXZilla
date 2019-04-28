@@ -98,27 +98,6 @@ function newSpace(aWidth) {
    return newTag("mspace", null, {"width": aWidth + "em"});
 }
 
-function isToken(aTree) {
-  return ["mi", "mn", "mo", "mtext", "ms"].indexOf(aTree["tag"]) !== -1;
-}
-
-function isSingleCharMi(aTree) {
-  if (aTree["tag"] !== "mi")
-    return false;
-  var content = aTree["content"];
-  var c = content["codePointAt"](0);
-  return content.length === 1 && c <= 0xFFFF ||
-         content.length === 2 && c > 0xFFFF;
-}
-
-function areTokenAttributes(aAttributes) {
-  for (var attribute in aAttributes) {
-    if (["mathcolor", "mathbackground", "mathvariant"].indexOf(attribute) === -1)
-      return false;
-  }
-  return true;
-}
-
 function applyMathVariantToCharacter(codePoint, aMathVariant) {
   // FIXME: We should have LaTeX commmands for all these variants.
   // See https://github.com/fred-wang/TeXZilla/issues/64
@@ -507,6 +486,8 @@ function applyMathVariantToCharacter(codePoint, aMathVariant) {
 }
 
 function applyMathVariant(aToken, aMathVariant) {
+  if (aMathVariant === "normal")
+    return;
   var content = aToken["content"];
   var transformedText = "";
   for (var i = 0; i < content.length; i++) {
@@ -523,47 +504,87 @@ function applyMathVariant(aToken, aMathVariant) {
   aToken["content"] = transformedText;
 }
 
+function isToken(aTree) {
+  return ["mi", "mn", "mo", "mtext", "ms"].indexOf(aTree["tag"]) !== -1;
+}
+
+function isSingleCharMi(aTree) {
+  if (aTree["tag"] !== "mi")
+    return false;
+  var content = aTree["content"];
+  var c = content["codePointAt"](0);
+  return content.length === 1 && c <= 0xFFFF ||
+         content.length === 2 && c > 0xFFFF;
+}
+
+function isTokenAttribute(aAttribute) {
+  return ["mathcolor", "mathbackground", "mathvariant"].indexOf(aAttribute) !== -1;
+}
+
+function applyTokenAttributes(aChildren, aAttributes) {
+  var allAttributesAppliedToAllChildren = true;
+  for (var name in aAttributes) {
+    // Only consider mstyle attributes that apply to token elements.
+    if (!isTokenAttribute(name)) {
+      allAttributesAppliedToAllChildren = false;
+      continue;
+    }
+    // In general, keep mstyle element if there are multiple children.
+    if (name !== "mathvariant" && aChildren.length != 1) {
+      allAttributesAppliedToAllChildren = false;
+      continue;
+    }
+    aChildren.forEach(function(child) {
+      if (!isToken(child)) {
+        allAttributesAppliedToAllChildren = false;
+        return;
+      }
+      if (!child["attributes"])
+        child["attributes"] = {};
+      if (child["attributes"][name])
+        return;
+      if (name === "mathvariant") {
+        // Transform the text instead of using a mathvariant attribute.
+        // Explicit "normal" attribute is only needed on single-char <mi>'s.
+        if (aAttributes[name] !== "normal" || !isSingleCharMi(child))
+          applyMathVariant(child, aAttributes[name])
+        else
+          child["attributes"][name] = aAttributes[name];
+      } else {
+       // Apply the token attribute to the child.
+       child["attributes"][name] = aAttributes[name];
+      }
+    });
+  }
+  return allAttributesAppliedToAllChildren;
+}
+
 /* FIXME: try to restore the operator grouping when compoundTermList does not
    contain any fences.
    https://github.com/fred-wang/TeXZilla/issues/9 */
-/* FIXME: We can apply the mathvariant mapping when mstyle contains only
-   token elements, to handle basic use case like \mathfrak{sl}
-   https://github.com/fred-wang/TeXZilla/issues/61 */
-function newMrow(aList, aTag, aAttributes) {
+function newMrow(aChildren, aTag, aAttributes) {
   aTag = aTag || "mrow";
-  if (aList.length == 1) {
-    var child = aList[0];
-    if (aTag === "mrow")
-      return child;
-    if (aTag === "mstyle" &&
-        isToken(child) && areTokenAttributes(aAttributes)) {
-      child["attributes"] = {};
-      if (aAttributes["mathvariant"]) {
-        if (aAttributes["mathvariant"] === "normal") {
-          // Explicit "normal" attribute is only needed on single-char <mi>'s.
-          if (!isSingleCharMi(child))
-            delete aAttributes["mathvariant"];
-        } else {
-          // Transform the text instead of using a mathvariant attribute.
-          applyMathVariant(child, aAttributes["mathvariant"]);
-          delete aAttributes["mathvariant"];
-        }
-      }
-      for (var name in aAttributes) {
-        if (!child["attributes"][name])
-          child["attributes"][name] = aAttributes[name];
-      }
-      return child;
-    }
+  if (aTag === "mstyle") {
+    // Mstyle with one mrow child that does not have any attribute.
+    if (aChildren.length == 1 &&
+        aChildren[0]["tag"] === "mrow" && !aChildren[0]["attributes"])
+      return newMrow(aChildren[0]["content"], aTag, aAttributes);
+
+    // Try an apply all the attributes to chidren and replace mstyle with mrow.
+    if (applyTokenAttributes(aChildren, aAttributes))
+      return newMrow(aChildren);
   }
-  return newTag(aTag, aList, aAttributes);
+  // Mrow with one child and no attributes: return the child.
+  if (aChildren.length == 1 && aTag === "mrow" && !aAttributes)
+    return aChildren[0];
+  return newTag(aTag, aChildren, aAttributes);
 }
 
-function newMath(aList, aDisplay, aRTL, aTeX)
+function newMath(aChildren, aDisplay, aRTL, aTeX)
 {
   return newTag("math", [
     newTag("semantics", [
-      newMrow(aList),
+      newMrow(aChildren),
       newTag("annotation", escapeText(aTeX), {"encoding": "TeX"})
     ])
   ], {
