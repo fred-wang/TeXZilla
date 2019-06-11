@@ -31,7 +31,7 @@
           this.mo = new MutationObserver((recs) => {
             updateMathMLOutput(this);
           })
-          this.mo.observe(this, { characterData: true, childList: true })
+          this.mo.observe(this, { characterData: true, childList: true, attributes: true })
         }
     
         attributeChangedCallback(aName, aOld, aNew) {

@@ -13,18 +13,9 @@
 
     <h1>&lt;x-tex&gt; Custom Element</h1>
 
-    <h2>Warning</h2>
+    <h2>Note</h2>
 
-    <p>This demo relies on <strong>experimental technologies</strong>
-      (Web components and shadow DOM) that might not work perfectly. It is
-      basically only provided as a proof-of-concept. If you use a Gecko browser,
-      you need to enable the <code>dom.webcomponents.enable</code> option.
-      See the <a href="customElement.js">customElement.js</a> file for how
-      it is implemented.
-      For a version using the X-Tag Polylib,
-      see <a href="https://github.com/fred-wang/x-tex">this
-        GitHub repository</a>.
-    </p>
+    <p>This demo relies on <strong>MathML</strong> support.</p>
 
     <h2>Basic Usage</h2>
 
@@ -62,11 +53,11 @@
     <p>Just like the &lt;math&gt; tag, the <code>&lt;x-tex&gt;</code> tag can
       be used in other languages from the HTML5 family as shown below.
       Note that clicking on the HTML button below
-      will retrieve the original TeX source, via the <code>source</code>
+      will retrieve the original TeX source, via the <code>.textContent</code>
       property of the <code>&lt;x-tex&gt;</code> element.</p>
 
     <button style="width: 100%"
-            onclick="alert(this.firstElementChild.source)">
+            onclick="alert(this.firstElementChild.textContent)">
       <x-tex display="block">f(x)=\sum_{n=-\infty}^\infty c_n e^{2\pi i(n/T) x} = \sum_{n=-\infty}^\infty \hat{f}(\xi_n) e^{2\pi i\xi_n x}\Delta\xi</x-tex>
     </button>
 
@@ -106,7 +97,7 @@
 
       function updateSource() {
         var tex = document.getElementById("tex");
-        tex.source = document.getElementById("source").value;
+        tex.textContent = document.getElementById("source").value;
       }
     </script>
 
@@ -114,7 +105,7 @@
       in the following example where we use Javascript to modify the
       <code>display</code> and
       <code>dir</code> attributes of the <code>&lt;x-tex&gt;</code> tag or
-      to set its <code>source</code> property.
+      to set its <code>.textContent</code> property.
       <select id="mode" onchange="updateDisplay()">
         <option value="inline">Inline Mode</option>
         <option value="display">Display Mode</option>
