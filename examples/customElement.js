@@ -25,29 +25,24 @@
     }
 
     class XTexElement extends HTMLElement {
-      get source() {
-        return this.textContent;
-      }
-  
-      set source(aTeX) {
-        this.textContent = aTeX;
-        updateMathMLOutput(this);
-      }
-  
-      connectedCallback() {
-        this.attachShadow({ mode: "open" });
-        updateMathMLOutput(this);
-      }
-
-      attributeChangedCallback(aName, aOld, aNew) {
-        if (aName === "dir" || aName === "display") {
-          if (aNew === null) {
-            this.shadowRoot.firstElementChild.removeAttribute(aName);
-          } else {
-            this.shadowRoot.firstElementChild.setAttribute(aName, aNew);
+        constructor() {
+          super()
+          this.attachShadow({ mode: "open" });
+          this.mo = new MutationObserver((recs) => {
+            updateMathMLOutput(this);
+          })
+          this.mo.observe(this, { characterData: true, childList: true })
+        }
+    
+        attributeChangedCallback(aName, aOld, aNew) {
+          if (aName === "dir" || aName === "display") {
+            if (aNew === null) {
+              this.shadowRoot.firstElementChild.removeAttribute(aName);
+            } else {
+              this.shadowRoot.firstElementChild.setAttribute(aName, aNew);
+            }
           }
         }
-      }
     } 
 
     customElements.define("x-tex", XTexElement);
