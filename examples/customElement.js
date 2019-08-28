@@ -10,7 +10,7 @@
         display = aElement.getAttribute("display"),
         dir = aElement.getAttribute("dir");
       try {
-        // Parse the TeX input and replace it with the MathML output.
+        // Parse the LaTeX input and replace it with the MathML output.
         aElement.shadowRoot.innerHTML = TeXZilla.toMathMLString(
           tex,
           display === "block",
@@ -18,13 +18,13 @@
           true
         );
       } catch (e) {
-        // Parsing failed: use an <merror> with the original TeX input.
+        // Parsing failed: use an <merror> with the original LaTeX input.
         aElement.shadowRoot.innerHTML =
           "<math><merror><mtext>" + tex + "</mtext></merror></math>";
       }
     }
 
-    class XTexElement extends HTMLElement {
+    class LaTeX_Element extends HTMLElement {
         constructor() {
           super()
           this.attachShadow({ mode: "open" });
@@ -45,6 +45,6 @@
         }
     } 
 
-    customElements.define("x-tex", XTexElement);
+    customElements.define("la-tex", LaTeX_Element);
   })();
   
