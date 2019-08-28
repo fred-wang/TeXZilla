@@ -10,3 +10,4 @@ config.log
 config.status
 unicode.xml
 examples/TeXZillaParser.class
+webextension-texzilla.zip

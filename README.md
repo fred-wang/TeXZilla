@@ -12,7 +12,7 @@ Description
 -----------
 
 TeXZilla is a Javascript LaTeX-to-MathML converter compatible
-with Unicode. This is still a work in progress and things may change in the
+with Unicode. It has performed as the fastest state of the art LaTeX-To-MathML converter according to recent research in this field (see [[1](#references)]). This is still a work in progress and things may change in the
 future. Please report any bug you find to the
 [issue tracker](https://github.com/fred-wang/TeXZilla/issues?state=open).
 
@@ -33,14 +33,14 @@ Build Instructions
 
 The following dependencies are required:
 
-- [coreutils](https://www.gnu.org/software/coreutils/), [sed](https://www.gnu.org/software/sed/), [patch](https://www.gnu.org/software/patch/), [wget](https://www.gnu.org/software/wget/), [make](https://www.gnu.org/software/make/)
+- [coreutils](https://www.gnu.org/software/coreutils/), [sed](https://www.gnu.org/software/sed/), [curl](http://curl.haxx.se/), [make](https://www.gnu.org/software/make/), procps, grep
 - [xsltproc](http://xmlsoft.org/XSLT/xsltproc2.html)
 - [Python](http://www.python.org/)
 - [Jison](http://zaach.github.io/jison).
 - To run unit tests: [slimerJS](http://slimerjs.org/) or [phantomJS](http://phantomjs.org/), [bash](https://www.gnu.org/software/bash/). [nodejs](http://nodejs.org/) can be used to run the DOM-less tests.
 - To generate the minified version `TeXZilla-min.js`: [Google Closure Compiler](https://developers.google.com/closure/compiler/).
 
-On Debian-based Linux distributions, try `sudo apt-get install coreutils sed patch wget make xsltproc python npm phantomjs bash closure-compiler` and install Jison with `npm install jison -g`.
+On Debian-based Linux distributions, try `sudo apt-get install coreutils sed curl make xsltproc python npm phantomjs bash closure-compiler` and install Jison with `npm install jison -g`.
 
 To build TeXZilla, run the tests and generate the minified version:
 
@@ -49,3 +49,8 @@ To build TeXZilla, run the tests and generate the minified version:
       make minify
 
 Type `make help` for more commands.
+
+
+References
+------------------
+[1] _"Improving the Representation and Conversion of Mathematical Formulae by Considering their Textual Context"_ by M. Schubotz, et al. In: _Proceedings of the ACM/IEEE-CS Joint Conference on Digital Libraries (JCDL)_. Fort Worth, USA, June 2018. [DOI:10.1145/3197026.3197058](dx.doi.org/10.1145/3197026.3197058)
