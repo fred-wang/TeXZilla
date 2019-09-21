@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "TeXZilla",
-  "version": "1.0.0.0",
+  "version": "1.0.2.0",
   "description": "Add-on giving access to TeXZilla, a LALR Javascript LaTeX-to-MathML converter compatible with Unicode.",
   "author": "Frédéric Wang",
   "homepage_url": "https://github.com/fred-wang/texzilla",
