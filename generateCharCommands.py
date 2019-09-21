@@ -10,6 +10,21 @@ import argparse
 import re
 import sys
 
+def isItalicizableLowerCaseLatinLetter(aCodePoint):
+    return ((0x61 <= aCodePoint and aCodePoint <= 0x7A) or
+            aCodePoint == 0x131 or aCodePoint == 0x237)
+
+def isItalicizableUpperCaseLatinLetter(aCodePoint):
+    return (0x41 <= aCodePoint and aCodePoint <= 0x5A)
+
+def isItalicizableLowerCaseGreekLetter(aCodePoint):
+    return ((0x3B1 <= aCodePoint and aCodePoint <= 0x03C9) or
+            aCodePoint in [0x3D1, 0x3D5, 0x3D6, 0x3F0, 0x3F1, 0x3F4, 0x3F5])
+
+def isItalicizableUpperCaseGreekLetter(aCodePoint):
+    return ((0x391 <= aCodePoint and aCodePoint <= 0x03A1) or
+            (0x3A3 <= aCodePoint and aCodePoint <= 0x03A9))
+
 def customMathClass(aCodePoint):
 
     # We define/redefine some mathclass that are absent from unicode.xml or
@@ -21,6 +36,14 @@ def customMathClass(aCodePoint):
         elif (aCodePoint[0] in
               [0x0024, 0x0025, 0x0026, 0x00F0, 0x03C2, 0x210F, 0x2127, 0x2205]):
             return "A"
+        elif isItalicizableLowerCaseLatinLetter(aCodePoint[0]):
+            return "AILL"
+        elif isItalicizableUpperCaseLatinLetter(aCodePoint[0]):
+            return "AIUL"
+        elif isItalicizableLowerCaseGreekLetter(aCodePoint[0]):
+            return "AILG"
+        elif isItalicizableUpperCaseGreekLetter(aCodePoint[0]):
+            return "AIUG"
         elif (aCodePoint[0] in [0x0023, 0x2020, 0x2021, 0x214B,
                                 0x2305, 0x2306, 0x2322, 0x2323, 0x23B0, 0x23B1,
                                 0x25CA, 0x25CB,
@@ -459,8 +482,8 @@ if __name__ == "__main__":
         for i in range(0,len(LaTeXCommands)):
             LaTeXCommands[i] = LaTeXCommands[i].replace("\\", "\\\\")
 
-        if (mathclass == "A" or mathclass[:2] == "OP" or mathclass == "NUM" or
-            mathclass == "TEXT"):
+        if (mathclass[:1] == "A" or mathclass[:2] == "OP" or
+            mathclass == "NUM" or mathclass == "TEXT"):
             token = mathclass
         else:
             token = None
