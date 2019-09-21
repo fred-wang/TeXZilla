@@ -59,9 +59,9 @@ def addLaTeXCommands(aCodePoint, aLaTeXCommands):
     if len(aCodePoint) == 1:
         if aCodePoint[0] == 0x0023:
             aLaTeXCommands.append("\\#")
-        if aCodePoint[0] == 0x0024:
+        elif aCodePoint[0] == 0x0024:
             aLaTeXCommands.append("\\$")
-        if aCodePoint[0] == 0x0025:
+        elif aCodePoint[0] == 0x0025:
             aLaTeXCommands.append("\\%")
         elif aCodePoint[0] == 0x0026:
             aLaTeXCommands.append("\\&")
@@ -175,6 +175,8 @@ def addLaTeXCommands(aCodePoint, aLaTeXCommands):
             aLaTeXCommands.append("\\product")
         elif aCodePoint[0] == 0x2210:
             aLaTeXCommands.append("\\coproduct")
+        elif aCodePoint[0] == 0x2212:
+            aLaTeXCommands.append("-")
         elif aCodePoint[0] == 0x2216:
             aLaTeXCommands.append("\\smallsetminus")
         elif aCodePoint[0] == 0x221D:
@@ -471,9 +473,9 @@ if __name__ == "__main__":
 
             if len(codePoint) == 1:
 
-                # Skip special chars: { } ^ _ & \\ % $ '.
+                # Skip special chars: { } - ^ _ & \\ % $ ' . -
                 if (codePoint[0] in [0x7B, 0x7D, 0x5E, 0x5F, 0x26, 0x5C,
-                                     0x25, 0x24, 0x2E, 0x27]):
+                                     0x25, 0x24, 0x2E, 0x27, 0x2D]):
                     continue
 
                 # If it is a single char, add it to the appropriate unicode
