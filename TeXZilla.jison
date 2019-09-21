@@ -94,6 +94,11 @@ function newMo(aContent, aLeftSpace, aRightSpace) {
   });
 }
 
+function newMi(aContent, aNormal) {
+  return newTag("mi", escapeText(aContent),
+                aNormal ? { "mathvariant": "normal" } : undefined);
+}
+
 function newSpace(aWidth) {
    return newTag("mspace", null, {"width": aWidth + "em"});
 }
@@ -1074,7 +1079,13 @@ closedTerm
   }
   | NUM { $$ = newTag("mn", $1); }
   | TEXT { $$ = newTag("mtext", $1); }
-  | A { $$ = newTag("mi", escapeText($1)); }
+  /* FIXME: It should be possible to decide when these are italic or normal.
+     See https://github.com/fred-wang/TeXZilla/issues/72*/
+  | A { $$ = newMi($1); }
+  | AILL { $$ = newMi($1); }
+  | AIUL { $$ = newMi($1); }
+  | AILG { $$ = newMi($1); }
+  | AIUG { $$ = newMi($1, true); }
   | F { $$ = newMo($1, 0, 0); }
   | MI tokenContent { $$ = newTag("mi", $2); }
   | MN tokenContent { $$ = newTag("mn", $2); }
