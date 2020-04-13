@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CSS transforms</title>
+    <meta charset="utf-8"/>
+    <!-- This Source Code Form is subject to the terms of the Mozilla Public
+         License, v. 2.0. If a copy of the MPL was not distributed with this
+         file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+    <script type="text/javascript" src="../TeXZilla-min.js"></script>
+    <script type="text/javascript" src="./customElement.js"></script>
+    <style>
+      body {
+          font-size: 1vw;
+          max-width: 60em;
+          margin-left: auto;
+          margin-right: auto;
+      }
+      td {
+          border: 1px solid black;
+          padding: 1em;
+          text-align: center;
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          const la_tex_element_long_length = 10;
+          var elements = document.getElementsByTagName("la-tex");
+          document.getElementById("la-tex-element-count").textContent =
+              elements.length;
+          document.getElementById("la-tex-element-long-length").textContent =
+              la_tex_element_long_length;
+          var la_tex_element_long_count = 0;
+          Array.from(elements).forEach(e => {
+              if (e.textContent.replace(/\s/g, "").length >=
+                  la_tex_element_long_length)
+                  la_tex_element_long_count++;
+          });
+          document.getElementById("la-tex-element-long-count").innerText =
+              `${Math.round(100 * la_tex_element_long_count / elements.length)}%`;
+      })
+    </script>
+  </head>
+  <body>
+
+    <h1>CSS transforms</h1>
+
+    <h2>About this demo</h2>
+
+    <p>This page describes some mathematical aspect of the <a href="https://drafts.csswg.org/css-transforms-1/">CSS Transforms Module Level 1</a> and <a href="https://drafts.csswg.org/css-transforms-2/">CSS Transforms Module Level 2</a>.
+      It contains
+      <strong id="la-tex-element-count"></strong> <code>&lt;la-tex&gt;</code>
+      custom elements (<strong id="la-tex-element-long-count"></strong>
+      of them containing a LaTeX formula with at least
+      <span id="la-tex-element-long-length"></span>
+      non-whitespace characters). The LaTeX source of each of these elements
+      is converted to MathML when the <code>DOMContentLoaded</code> event is
+      triggered. The MathML formulas themselves are rendered by your browser.
+      Conversion and rendering should be fast!
+    </p>
+
+    <h2>Syntax and matrices</h2>
+
+    <p>The transform matrices from <a href="https://drafts.csswg.org/css-transforms-1/">CSS Transforms Module Level 1</a> and <a href="https://drafts.csswg.org/css-transforms-2/">CSS Transforms Module Level 2</a> are the following:</p>
+
+    <table id="table_css_and_matrices">
+      <tr>
+        <th></th>
+        <th>CSS syntax</th>
+        <th>4x4 matrix</th>
+      </tr>
+      <tr>
+        <th>General 3D matrix</th>
+        <td>
+          <pre><code>matrix3d(m11, m12, m13, m14,
+         m21, m22, m23, m24,
+         m31, m32, m33, m34,
+         m41, m42, m43, m44)</code></pre>
+        </td>
+        <td>
+          <la-tex display="block">
+            M =
+            \begin{pmatrix}
+            m_11 & m_21 & m_31 & m_41 \\
+            m_12 & m_22 & m_32 & m_42 \\
+            m_13 & m_23 & m_33 & m_43 \\
+            m_14 & m_24 & m_34 & m_44 \\
+            \end{pmatrix}
+            =
+            \begin{pmatrix}
+            A & T \\
+            P & m_44
+            \end{pmatrix}
+          </la-tex><br/>
+          where
+          <la-tex>A=
+          \begin{pmatrix}
+            m_11 & m_21 & m_31 \\
+            m_12 & m_22 & m_32 \\
+            m_13 & m_23 & m_33 \\
+            \end{pmatrix}
+          </la-tex>,
+          <la-tex>P =
+          \begin{pmatrix}
+            m_14 & m_24 & m_34
+          \end{pmatrix}
+          </la-tex>,
+          and
+          <la-tex>T =
+          \begin{pmatrix}
+            m_41 \\
+            m_42 \\
+            m_43 \\
+            m_44
+            \end{pmatrix}
+          </la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>General 2D matrix</th>
+        <td>
+          <code>matrix(a, b, c, d, e, f)</code>
+        </td>
+        <td>
+          <la-tex display="block">
+            {M_2(a, b, c, d, e, f)} =
+            \begin{pmatrix}
+            a & c & 0 & e \\
+            b & d & 0 & f \\
+            0 & 0 & 1 & 0 \\
+            0 & 0 & 0 & 1
+            \end{pmatrix}
+          </la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>Translations</th>
+        <td>
+          <ul>
+            <li><code>translate3d(tx, ty, tz)</code></li>
+            <li><code>translateZ(tz)</code> (<la-tex>t_x = t_y = 0</la-tex>)</li>
+            <li><code>translate(tx, ty)</code> (<la-tex>t_z = 0</la-tex>)</li>
+<li><code>translate(tx)</code> (<la-tex>t_y = t_x = 0</la-tex>)</li>
+          <li><code>translateX(tx)</code> (<la-tex>t_y = t_z = 0</la-tex>)</li>
+          <li><code>translateY(ty)</code> (<la-tex>t_x = t_z = 0</la-tex>)</li>
+          </ul>
+        </td>
+        <td>
+          <la-tex display="block">
+            {{\operatorname{Translate}}(t_x, t_y, t_z)} = \begin{pmatrix}
+            1 & 0 & 0 & t_x \\
+            0 & 1 & 0 & t_y \\
+            0 & 0 & 1 & t_z \\
+            0 & 0 & 0 & 1
+            \end{pmatrix}
+          </la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>Scales</th>
+        <td>
+          <ul>
+          <li><code>scale3d(sx, sy, sz)</code></li>
+          <li><code>scaleZ(sz)</code> (<la-tex>s_x = s_y = 1</la-tex>)</li>
+          <li><code>scale(sx, sy)</code> (<la-tex>s_z = 1</la-tex>)</li>
+          <li><code>scale(sx)</code> (<la-tex>s_y = s_x, s_z = 1</la-tex>)</li>
+          <li><code>scaleX(sx)</code> (<la-tex>s_y = s_z = 1</la-tex>)</li>
+          <li><code>scaleY(sy)</code> (<la-tex>s_x = s_z = 1</la-tex>)</li>
+          </ul>
+        </td>
+        <td>
+          <la-tex display="block">
+            {{\operatorname{Scale}}(s_x, s_y, s_z)} = \begin{pmatrix}
+            s_x & 0 & 0 & 0 \\
+            0 & s_y & 0 & 0 \\
+            0 & 0 & s_z & 0 \\
+            0 & 0 & 0 & 1
+            \end{pmatrix}
+          </la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>Rotations</th>
+        <td>
+          <ul>
+            <li><code>rotate3d(x, y, z, α)</code></li>
+            <li><code>rotateX(α)</code>
+            (<la-tex>y = z = 0, x = 1</la-tex>)</li>
+            <li><code>rotateY(α)</code>
+            (<la-tex>x = z = 0, y = 1</la-tex>)</li>
+            <li><code>rotateZ(α)</code>
+            (<la-tex>x = y = 0, z = 1</la-tex>)</li>
+            <li><code>rotate(α)</code>
+            (<la-tex>x = y = 0, z = 1</la-tex>)</li>
+          </ul>
+        </td>
+        <td>
+          <la-tex display="block">{R(x,y,z, α)} =
+            \begin{pmatrix}
+            {1 - 2 \left(Y^2 + Z^2\right)  S^2} &
+            {2  \left(X Y  S^2 - Z  SC\right)} &
+            {2  \left(X Z  S^2 + Y  SC\right)} & 0 \\
+            {2  \left(X Y  S^2 + Z  SC\right)} &
+            {1 - 2  \left(X^2 + Z^2\right)  S^2} &
+            {2  \left(Y  Z  S^2 - X SC\right)} & 0 \\
+            {2  \left(X Z  S^2 - Y  SC\right)} &
+            {2  \left(Y  Z  S^2 + X SC\right)} &
+            {1 - 2  \left(X^2 + Y^2\right)  S^2} &
+            0 \\ 0 & 0 & 0 &
+            1 \end{pmatrix}</la-tex><br/>
+          where
+          <la-tex>{(X, Y, Z)} = {\frac{1}{\sqrt{x^2+y^2+z^2}} {(x, y, z)}}
+          </la-tex> is the normalized rotation axis,
+          <la-tex>C = \cos \left(\frac{α}{2}\right)</la-tex> and
+          <la-tex>S = \sin \left(\frac{α}{2}\right)</la-tex>.
+        </td>
+      </tr>
+      <tr>
+        <th>Perspective</th>
+        <td>
+          <code>perspective(d)</code>
+        </td>
+        <td>
+          <la-tex display="block">{{\operatorname{Persp}}(d)} = \begin{pmatrix}
+            1 & 0 & 0 & 0 \\
+            0 & 1 & 0 & 0 \\
+            0 & 0 & 1 & 0 \\
+            0 & 0 & {-\frac{1}{d}} & 1
+            \end{pmatrix}</la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>Skews</th>
+        <td>
+          <ul>
+            <li><code>skew(α, β)</code></li>
+            <li><code>skewX(α)</code>
+          (<la-tex>β = 0</la-tex>)</li>
+            <li><code>skewY(β)</code>
+          (<la-tex>α = 0</la-tex>)</li>
+          </ul>
+        <td>
+          <la-tex display="block">{K(α, β)} =
+            \begin{pmatrix}
+            1 & {\tan(α)} & 0 & 0 \\
+            {\tan(β)} & 1 & 0 & 0 \\
+            0 & 0 & 1 & 0 \\
+            0 & 0 & 0 & 1
+            \end{pmatrix}</la-tex>
+        </td>
+      </tr>
+    </table>
+
+    <p>The determinants are listed in the following table table. When it is
+      nonzero, the matrix is invertible and the inverse is provided in the
+      last column.</p>
+
+      <table id="table_determinant_and_inverse">
+      <tr>
+        <th></th>
+        <th>Determinant</th>
+        <th>Inverse</th>
+      </tr>
+      <tr>
+        <th>General 3D matrix</th>
+        <td>
+          <la-tex display="block">\det M</la-tex>
+        </td>
+        <td>
+          <la-tex>M^{-1}</la-tex>
+          if <la-tex>{\det M} \neq 0</la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>General 2D matrix</th>
+        <td>
+          <la-tex display="block">
+            ad - bc
+          </la-tex>
+        </td>
+        <td>
+          <la-tex display="block">{{\operatorname{Scale}}\left(\frac{1}{ad-bc},\frac{1}{ad-bc}, 1\right)} {M_2(d,-b,-c,a,{cf-de},{be-af})}</la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>Translations</th>
+        <td>
+          <la-tex display="block">
+            1
+          </la-tex>
+        </td>
+        <td>
+          <la-tex display="block">
+            {\operatorname{Translate}}(-t_x, -t_y, -t_z)
+          </la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>Scales</th>
+        <td>
+          <la-tex display="block">
+            s_x s_y s_z s_w
+          </la-tex>
+        </td>
+        <td>
+          <la-tex display="block">
+            {{\operatorname{Scale}}\left(\frac{1}{s_x}, \frac{1}{s_y}, \frac{1}{s_z}\right)}
+          </la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>Rotations</th>
+        <td>
+          <la-tex display="block">
+            1
+          </la-tex>
+        </td>
+        <td>
+          <la-tex display="block">
+            R(x, y, z, -\alpha)
+          </la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>Perspective</th>
+        <td>
+          <la-tex display="block">
+            1
+          </la-tex>
+        </td>
+        <td>
+          <la-tex display="block">{{\operatorname{Persp}}(-d)}</la-tex>
+        </td>
+      </tr>
+      <tr>
+        <th>Skews</th>
+        <td>
+          <la-tex display="block">
+            1 - {\tan \alpha \tan \beta}
+          </la-tex>
+        </td>
+        <td>
+          <la-tex display="block">
+            {{\operatorname{Scale}}\left(
+            \frac{1}{1 - {\tan \alpha \tan \beta}},
+            \frac{1}{1 - {\tan \alpha \tan \beta}}, 1\right)}
+            {K(-α, -β)}
+          </la-tex>
+        </td>
+      </tr>
+    </table>
+
+    <h2>Applying a transform</h2>
+
+    <p>Let's consider a matrix</p>
+      <la-tex display="block">
+            M = \begin{pmatrix}
+            A & T \\
+            P & m_44
+            \end{pmatrix}
+      </la-tex>
+
+    <p>describing a transformation in the <a href="https://en.wikipedia.org/wiki/Projective_space">projective space</a>. A point of
+      <a href="https://en.wikipedia.org/wiki/Homogeneous_coordinates">homogeneous coordinates</a>  <la-tex>v = {(x, y, z, 1)}^{\mathrm T}</la-tex> is sent by this matrix to
+    </p>
+
+    <la-tex display="block">
+      Mv = \begin{pmatrix}
+      {Av + T} \\
+      {Pv + m_44}
+      \end{pmatrix}
+    </la-tex>
+
+    <p>If <la-tex>Pv + m_44 \neq 0</la-tex>, that image
+      corresponds to the following
+      point in homogeneous coordinates
+    </p>
+
+      <la-tex display="block">
+            \begin{pmatrix}
+            \frac{Av + T}{Pv + m_44} \\
+            1
+            \end{pmatrix}
+      </la-tex>
+    <p>If <la-tex>Pv + m_44 = 0</la-tex>, then either
+      <la-tex>Av + T \neq 0</la-tex> and this corresponds to the
+      <a href="https://en.wikipedia.org/wiki/Point_at_infinity">point at infinity</a> in the direction of the vector <la-tex>Av + T</la-tex>, or
+      <la-tex>Av + T = 0</la-tex> and this does not define any
+      point in the projective space.</p>
+
+    <p>Note that if <la-tex>M</la-tex> is multiplied by any nonzero scalar
+      <la-tex>\lambda</la-tex> then so are
+      <la-tex>A, T, P, m_44</la-tex> and <la-tex>\lambda M</la-tex>
+      defines exactly the same transform as <la-tex>M</la-tex>
+      per the description above.</p>
+
+    <h2>Normalization of <la-tex>m_44</la-tex></h2>
+
+    <p>Except for <code>matrix3d</code> all
+      the basic CSS transforms correspond to a matrix with
+      <la-tex>m_44 = 1</la-tex> per the
+      <a href="#table_css_and_matrices">table above</a>.
+      The inverse of such a matrix is also of this form and so is the product
+      of two such matrices:</p>
+      <la-tex display="block">
+            \begin{pmatrix}
+            A_1 & T_1 \\
+            P_1 & 1
+            \end{pmatrix}
+            \begin{pmatrix}
+            A_2 & T_2 \\
+            P_2 & 1
+            \end{pmatrix}
+            =
+            \begin{pmatrix}
+            {A_1A_2} & {A_1T_2+T_1} \\
+            {P_1A_2 + T_2} & 1
+            \end{pmatrix}
+      </la-tex>
+
+    <p>Let's consider a matrix</p>
+      <la-tex display="block">
+            M = \begin{pmatrix}
+            A & T \\
+            P & m_44
+            \end{pmatrix}
+      </la-tex>
+    <p>
+
+    <p>If <la-tex>m_44 = 0</la-tex> then <la-tex>M</la-tex>
+      cannot be decomposed as a product of
+      a <la-tex>\lambda \neq 0</la-tex> and other simpler
+      matrices defined by the CSS syntax, since the coefficent at position
+      4,4 of such a product should be <la-tex>\lambda \neq 0 = m_44</la-tex>.
+      If additionally, <la-tex>P = 0</la-tex>, this corresponds to
+      the transform sending
+      <la-tex>v = {(x, y, z, 1)}^{\mathrm T}</la-tex>
+      to the
+      <a>point at infinity</a> in the direction of the vector
+      <la-tex>Av + T</la-tex>
+      (or is undefined if <la-tex>Av + T = 0</la-tex>).
+    </p>
+
+    <p>Let's consider the following matrix:</p>
+      <la-tex display="block">
+      {\Sigma} =
+      \begin{pmatrix}0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\end{pmatrix}
+      </la-tex>
+    <p>Right-multiplying <la-tex>M</la-tex> by
+      <la-tex>\Sigma</la-tex> circularly shifts (from left to right)
+      the columns of
+      <la-tex>M</la-tex>.
+      Similarly, <la-tex>\Sigma^{n}</la-tex> is a
+      matrix with only 0's and 1's that circularly shifts
+      <la-tex>|n|</la-tex> times the columns of <la-tex>M</la-tex> (in
+      a direction depending on the sign of the integer).
+    </p>
+
+    <p>If <la-tex>P, m_44 \neq 0</la-tex>, then
+      let's pick the smallest <la-tex>n \in {\{0, 1, 2, 3\}}</la-tex>
+      such that the bottom right coefficient
+      <la-tex>{\left(M \Sigma^n\right)}_44</la-tex> is nonzero.
+      Then <la-tex>M</la-tex> can be decomposed as follows:
+    </p>
+
+    <la-tex display="block">
+      M =  {{\left(M \Sigma^n\right)}_44 M'
+      {\Sigma^{-n}}}
+    </la-tex>
+
+    <p>where <la-tex>M' = \frac{1}{{\left(M \Sigma^n\right)}_44} M \Sigma^n</la-tex> is of the form</p>
+
+    <la-tex display="block">{M'} = {\begin{pmatrix}
+            A' & T' \\
+            P' & 1
+      \end{pmatrix}}</la-tex>
+
+    <p>and the <la-tex>n</la-tex> first coefficients of <la-tex>P'</la-tex>
+      are zeros.</p>
+
+    <h2>Factoring <la-tex>T, P</la-tex> out</h2>
+
+    <p>Let's now consider matrices of the form</p>
+      <la-tex display="block">
+            M = \begin{pmatrix}
+            A & T \\
+            P & 1
+            \end{pmatrix}
+      </la-tex>
+    <p>
+
+    <p>We note that scales, rotations, perspectives and skews
+      all belongs to the subset of matrices for which
+      <la-tex>T = 0</la-tex> (lower triangular by block)
+      and this subset is stable by composition,
+      inversion or multiplication by a nonzero scalar.
+      However, it is easy to see that:
+    </p>
+
+      <la-tex display="block">
+        M ={
+        \begin{pmatrix}
+            1_3 & T \\
+            0 & 1
+        \end{pmatrix}
+
+        \begin{pmatrix}
+            A & 0 \\
+            P & 1
+            \end{pmatrix}}
+      </la-tex>
+
+    <p>Then scales, rotations and skews all belong to the set of matrices
+      for which <la-tex>T = P = 0</la-tex> (diagonal by block)
+      and this subset is stable by composition,
+      inversion or multiplication by a nonzero scalar.
+      Again, one can easily check that </p>
+
+      <la-tex display="block">
+        M ={
+
+        \underset{\text{translation}}{\underbrace{
+        \begin{pmatrix}
+            I_3 & T \\
+            0 & 1
+        \end{pmatrix}}}
+        \begin{pmatrix}
+            A & 0 \\
+            0 & 1
+            \end{pmatrix}
+
+        \begin{pmatrix}
+            I_3 & 0 \\
+            P & 1
+        \end{pmatrix}}
+      </la-tex>
+
+    <p>
+      which gives a straightforward extraction of the translation part.
+      If <la-tex>P = {(p_x, p_y, p_z)} \neq 0</la-tex> then one of the following
+      matrix is well-defined:</p>
+
+      <la-tex display="block">
+        \begin{aligned}
+        A_x &=
+        \begin{pmatrix}
+        -\frac{py}{px} & -\frac{pz}{px} & 1  \\
+        1 & 0 & 0  \\
+        0 & 1 & 0 \\
+        \end{pmatrix} \\
+
+        A_y &=
+        \begin{pmatrix}
+        0 & 1 & 0  \\
+        -\frac{pz}{py} & -\frac{px}{py} & 1 \\
+        1 & 0 & 0
+        \end{pmatrix} \\
+
+        A_z &=
+        \begin{pmatrix}
+        1 & 0 & 0  \\
+        0 & 1 & 0  \\
+        -\frac{px}{pz} & -\frac{py}{pz} & 1 \\
+        \end{pmatrix} \\
+
+        \end{aligned}
+      </la-tex>
+
+    <p>These matrices are of determinant 1 since they can be obtained by
+      permutting the rows (or columns) of a triangular matrix with only 1's
+      on the diagonal. Moreover, one can check that
+    </p>
+
+    <la-tex display="block">
+      \begin{aligned}
+
+      \begin{pmatrix}
+            I_3 & 0 \\
+            P & 1
+      \end{pmatrix} &=
+      {
+      \begin{pmatrix}
+            A_x & 0 \\
+            0 & 1
+      \end{pmatrix}
+      {{\operatorname{Persp}}\left(\frac{1}{p_x}\right)}
+      \begin{pmatrix}
+            A_x^{-1} & 0 \\
+            0 & 1
+      \end{pmatrix}
+      }\\
+
+      \begin{pmatrix}
+            I_3 & 0 \\
+            P & 1
+      \end{pmatrix} &=
+      {
+      \begin{pmatrix}
+            A_y & 0 \\
+            0 & 1
+      \end{pmatrix}
+      {{\operatorname{Persp}}\left(\frac{1}{p_y}\right)}
+      \begin{pmatrix}
+            A_y^{-1} & 0 \\
+            0 & 1
+      \end{pmatrix}
+      }\\
+
+      \begin{pmatrix}
+            I_3 & 0 \\
+            P & 1
+      \end{pmatrix} &=
+      {
+      \begin{pmatrix}
+            A_z & 0 \\
+            0 & 1
+      \end{pmatrix}
+      {{\operatorname{Persp}}\left(\frac{1}{p_z}\right)}
+      \begin{pmatrix}
+            A_z^{-1} & 0 \\
+            0 & 1
+      \end{pmatrix}
+      }
+
+      \end{aligned}
+      </la-tex>
+
+    <p>
+      For <la-tex>P \neq 0</la-tex>,
+      let <la-tex>d, A_P</la-tex> be the first of
+      <la-tex>\frac{1}{p_z}, \frac{1}{p_y}, \frac{1}{p_x}</la-tex>
+      <la-tex>A_z, A_y, A_z</la-tex> that is well_defined then one can write:
+    </p>
+
+      <la-tex display="block">
+        M ={
+
+        \underset{\text{translation}}{\underbrace{
+        \begin{pmatrix}
+            I_3 & T \\
+            0 & 1
+        \end{pmatrix}}}
+
+        \begin{pmatrix}
+            AA_P^{-1} & 0 \\
+            0 & 1
+            \end{pmatrix}
+
+        {{\operatorname{Persp}}(d)}
+
+        \begin{pmatrix}
+            A_P & 0 \\
+            0 & 1
+        \end{pmatrix}}
+      </la-tex>
+
+    <p>and one can extend that to <la-tex>P = 0</la-tex> using the convention
+      <la-tex>{{\operatorname{Persp}}(\infty)} = I_n</la-tex> and
+      taking <la-tex>A_0 = I_3, d = \infty</la-tex>.</p>
+
+    <h2><la-tex>QR</la-tex> decomposition of <la-tex>A</la-tex></h2>
+
+    <p>Let's consider a matrix</p>
+
+          <la-tex display="block">A=
+          \begin{pmatrix}
+            a_11 & a_21 & a_31 \\
+            a_12 & a_22 & a_32 \\
+            a_13 & a_23 & a_33 \\
+            \end{pmatrix}
+          </la-tex>
+
+    <p>Using the <a href="https://en.wikipedia.org/wiki/QR_decomposition"><la-tex>QR</la-tex> factorization</a>, one can find an
+      <a href="https://en.wikipedia.org/wiki/Orthogonal_matrix">orthogonal matrix</a> <la-tex>Q</la-tex> and
+      an <a href="https://en.wikipedia.org/wiki/Triangular_matrix">upper triangular</a> matrix <la-tex>R</la-tex> such that <la-tex>A = QR</la-tex>.
+       There are several ways to calculate this decomposition e.g.
+      using the <a href="https://en.wikipedia.org/wiki/QR_decomposition#Using_the_Gram%E2%80%93Schmidt_process">Gram–Schmidt process</a> or
+      <a href="https://en.wikipedia.org/wiki/QR_decomposition#Using_Givens_rotations">Givens rotations</a>. Our algorithm will use the
+      <a href="https://en.wikipedia.org/wiki/QR_decomposition#Using_Householder_reflections">Householder procedure</a> which is simple, numerically stable
+      and works for a non-invertible matrix <la-tex>A</la-tex>.
+      Our matrix is small, the decomposition only requires at
+      most two reflections and one scale.<la-tex>
+    </p>
+    <p>
+      As a quick reminder, one can
+      define for any unitary vector <la-tex>v</la-tex>
+      (i.e. <la-tex>v^\mathrm T v = 1</la-tex>) the matrix
+      <la-tex>P_v = I_3 - 2v v^{\mathrm T}</la-tex>. One can verify that</p>
+
+    <la-tex display="block">
+      {P_v v} = {v - 2v} = -v
+    </la-tex>
+    <la-tex display="block">
+      {P_v v^⟂} = {v^⟂ - 0} = v^⟂ \text{ for any  } {v^⟂ ⟂ v}
+    </la-tex>
+    <la-tex display="block">
+      P_v^{\mathrm T} = I_3^{\mathrm T} - 2{(v^{\mathrm T})}^{\mathrm T}v^{\mathrm T} = I_3 - 2v v^{\mathrm T} = P_v
+    </la-tex>
+    <la-tex display="block">
+      {P_v P_v^{\mathrm T}} = P_v^2 = I_3^2 - {2 {(2 v v^\mathrm T)}} +
+      {4 {(v v^\mathrm T v v^\mathrm T)}} = I_3
+    </la-tex>
+
+    <p>The two first equalities show that <la-tex>P_v</la-tex> is the reflection
+      about the plan orthogonal to <la-tex>v</la-tex> and that its eigenvalues
+      are 1 (with mutplicity 2) and <la-tex>-1</la-tex> (with multiplicity 1)
+      and so <la-tex>\det P_v = -1</la-tex>. The two last equalities show
+      that <la-tex>P_v</la-tex> is an orthogonal matrix.
+    </p>
+
+    <p>Let's start with the first step
+      of <a href="https://en.wikipedia.org/wiki/QR_decomposition#Using_Householder_reflections">Householder's algorithm</a>.
+      Let <la-tex>x_1 =
+        \begin{pmatrix}
+        a_11 \\
+        a_12 \\
+        a_13 \\
+        \end{pmatrix}</la-tex>. Suppose one of
+      <la-tex>a_12</la-tex> or <la-tex>a_13</la-tex> is nonzero. Then
+      let
+      <la-tex>\alpha_1 = \pm \sqrt{x_1^{\mathrm T} x_1} \neq 0</la-tex> with
+      the sign chosen to maximize (and in particular make it nonzero) the absolute value of
+      <la-tex>\alpha_1 - a_11</la-tex>. Then
+      <la-tex>u_1 = x_1 - \begin{pmatrix}
+        \alpha_1 \\
+        0 \\
+        0 \\
+        \end{pmatrix}</la-tex> satisfies
+      <la-tex>u_1^{\mathrm T} u_1 = 2 \alpha_1 {(\alpha_1 - a_11)} \neq 0</la-tex>
+      and the unitary vector
+      <la-tex>v_1 = \frac{u_1}{\sqrt{u_1^{\mathrm T} u_1}}</la-tex> satisfies:
+    </p>
+
+    <la-tex display="block">
+      \begin{aligned}
+      P_{v_1} x_1 &= {\left(I - 2\frac{u_1 u_1^{\mathrm T}}{u_1^{\mathrm T} u_1}\right) x_1} \\
+      &= {x_1 - 2\frac{u_1 {(\alpha_1 {(\alpha_1 - a_11)})}}{2 \alpha_1 {(\alpha_1 - a_11)}}}
+      &= {x_1 - u_1} \\
+      &= {\begin{pmatrix}
+        \alpha_1 \\
+        0 \\
+        0 \\
+        \end{pmatrix}}
+      \end{aligned}
+    </la-tex>
+
+    <p>As a consequence, one can write</p>
+
+    <la-tex display="block">{Q_1 A} =
+      \begin{pmatrix}
+      \alpha_1 & b_21 & b_31 \\
+      0 & b_22 & b_32 \\
+      0 & b_23 & b_33 \\
+      \end{pmatrix}
+    </la-tex>
+
+    <p>with <la-tex>Q_1 = P_{v_1}</la-tex>.
+      If <la-tex>a_12 = a_13 = 0</la-tex> then, one can instead choose
+      <la-tex>Q_1 = I_3</la-tex> and <la-tex>\alpha_1 = a_{11}</la-tex> to
+      obtain the same form.</p>
+
+    <p>Similarly, if <la-tex>b_32 \neq 0</la-tex> then we consider
+      <la-tex>x_2 =
+        \begin{pmatrix}
+        0 \\
+        b_22 \\
+        b_23 \\
+        \end{pmatrix}</la-tex>,
+      <la-tex>\alpha_2 = \pm \sqrt{x_2^{\mathrm T} x_2} \neq 0</la-tex> with
+      the sign chosen to maximize <la-tex>\left|\alpha_2 - b_22\right|</la-tex>,
+      <la-tex>u_2 = x_2 - \begin{pmatrix}
+        0 \\
+        \alpha_2 \\
+        0 \\
+        \end{pmatrix}</la-tex> and finally
+      <la-tex>v_2 = \frac{u_2}{\sqrt{u_2^{\mathrm T} u_2}}</la-tex> and
+      <la-tex>Q_2 = P_{v_2}</la-tex>. If
+      <la-tex>b_32 \neq 0</la-tex> then we consider instead
+      <la-tex>Q_2 = I_3</la-tex> and <la-tex>\alpha_2 = b_{22}</la-tex>.
+      In any case, one can write:
+    </p>
+
+    <la-tex display="block">{Q_2 Q_1 A} =
+      \begin{pmatrix}
+      \alpha_1 & c_21 & c_31 \\
+      0 & \alpha_2 & c_32 \\
+      0 & 0 & c_33 \\
+      \end{pmatrix}
+    </la-tex>
+
+    <p>Finally, one can define the orthogonal matrix
+      <la-tex>Q_3 = \begin{pmatrix}
+      \det{(Q_2 Q_1)} \epsilon_2 \epsilon_3 & 0 & 0 \\
+      0 & \epsilon_2 & 0  \\
+      0 & 0 & \epsilon_3  \\
+        \end{pmatrix}</la-tex>
+      with <la-tex>\epsilon_2, \epsilon_3 \in {\{-1, 1\}}</la-tex> such that
+       <la-tex>\epsilon_3 = 1</la-tex> if and only if
+      <la-tex>c_33 \geq 0</la-tex> and
+      <la-tex>\epsilon_2 = 1</la-tex> if and only if
+      <la-tex>\alpha_2 \geq 0</la-tex>. Then we obtain
+    </p>
+
+    <la-tex display="block"> R = {Q_3 Q_2 Q_1 A} =
+      \begin{pmatrix}
+      r_11 & r_21 & r_31 \\
+      0 & r_22 & r_32 \\
+      0 & 0 & r_33 \\
+      \end{pmatrix}
+    </la-tex>
+
+    <p>where <la-tex>r_22, r_33</la-tex> are nonnegative.
+      By construction,
+      <la-tex>Q = Q_1 Q_2 Q_3</la-tex> is an orthogonal matrix of
+      determinant 1 and so is a
+      <a href="https://en.wikipedia.org/wiki/3D_rotation_group">3D rotation</a>,
+      which gives the following factorization:</p>
+
+    <la-tex display="block">
+      \begin{pmatrix}
+      A & 0\\
+      0 & 1\end{pmatrix}
+
+       = {
+      \underset{\text{rotation}}{\underbrace{
+      \begin{pmatrix}
+      Q & 0\\
+      0 & 1\end{pmatrix}}
+      }
+      \begin{pmatrix}
+      R & 0\\
+      0 & 1
+      \end{pmatrix}
+      }
+    </la-tex>
+
+    <h2>Unscaling the diagonal of <la-tex>R</la-tex></h2>
+
+    <p>Let's consider the following upper triangular matrix:</p>
+
+    <la-tex display="block"> R =
+      \begin{pmatrix}
+      r_11 & r_21 & r_31 \\
+      0 & r_22 & r_32 \\
+      0 & 0 & r_33 \\
+      \end{pmatrix}
+    </la-tex>
+
+    <p>From that, we define a diagonal matrix</p>
+
+    <la-tex display="block"> S =
+      \begin{pmatrix}
+      s_1 & 0 & 0 \\
+      0 & s_2 & 0 \\
+      0 & 0 & s_3 \\
+      \end{pmatrix}
+    </la-tex>
+
+    <p>and an "unscaled" upper triangular matrix</p>
+
+    <la-tex display="block"> U =
+      \begin{pmatrix}
+      \frac{r_11}{s_1} & \frac{r_21}{s_1} & \frac{r_31}{s_1} \\
+      0 & \frac{r_22}{s_2} & \frac{r_32}{s_2} \\
+      0 & 0 & \frac{r_33}{s_3} \\
+      \end{pmatrix}
+    </la-tex>
+
+
+    <p>where <la-tex>s_i = r_ii</la-tex> if nonzero and 1 otherwise.</p>
+
+    <la-tex display="block"> R = {SU} =
+      \underset{\text{scale}}{\underbrace{
+      \begin{pmatrix}
+      s_1 & 0 & 0 \\
+      0 & s_2 & 0 \\
+      0 & 0 & s_3 \\
+      \end{pmatrix}
+      }}
+
+      \underset{\text{upper triangular}}{\underbrace{
+      \begin{pmatrix}
+      u_11 & u_21 & u_31 \\
+      0 & u_22 & u_32 \\
+      0 & 0 & u_33 \\
+      \end{pmatrix}}} = {US}
+    </la-tex>
+
+    <p>where the diagonal coefficients of <la-tex>U</la-tex> are only 0's or 1's.
+    </p>
+
+    <h2>Finding the rotation <la-tex>Q</la-tex></h2>
+
+    <p>In this section, we consider an orthogonal matrix</p> <la-tex display="block">Q =
+        \begin{pmatrix}
+            q_11 & q_21 & q_31 \\
+            q_12 & q_22 & q_32 \\
+            q_13 & q_23 & q_33 \\
+        \end{pmatrix}
+    </la-tex>
+    <p>with <la-tex>\detQ = 1</la-tex>.
+      Such a matrix corresponds to a <a href="https://en.wikipedia.org/wiki/3D_rotation_group">3D rotation</a> and can thus can be described by a non-zero
+      vector <la-tex>(x, y, z)</la-tex>
+      and an angle <la-tex>\alpha</la-tex>. As described in
+      the <a href="#table_css_and_matrices">table above</a>, it will then
+      be written
+      <la-tex>Q = R(x, y, z, \alpha)</la-tex> from the normalized rotation axis
+      <la-tex>{(X, Y, Z)} = {\frac{1}{\sqrt{x^2+y^2+z^2}} {(x, y, z)}}
+      </la-tex> as well as
+      <la-tex>C = \cos \left(\frac{α}{2}\right)</la-tex> and
+      <la-tex>S = \sin \left(\frac{α}{2}\right)</la-tex>.
+    </p>
+
+    <p>The <a href="https://en.wikipedia.org/wiki/Trace_(linear_algebra)">trace</a> of the rotation matrix allows to easily obtain the angle from
+      the formula
+      <la-tex>\alpha = \arccos\left(\frac{{{\operatorname{tr}} {Q}} - 1}{2}\right)
+        \in {[0, \pi]}
+      </la-tex>.
+    Indeed, we have:</p>
+
+      <la-tex display="block">
+        \begin{aligned}
+        {\operatorname{tr}} {Q} + 1
+        &= q_11 + q_22 + q_33 + 1 \\ &=
+        {\operatorname{tr}} {R(x, y, z, \alpha)} \\ &=
+        4 - 2S^2\left(Y^2+Z^2+X^2+Z^2 + X^2+Y^2\right) \\
+        &= 4{\left(1 - S^2\right)} \\
+        &= 4C^2 \\
+        &= 2\left(\cos{\alpha} + 1\right)
+        \end{aligned}
+      </la-tex>
+
+    <p>Similarly, using different linear combinations of the
+      elements of <la-tex>Q = R(x, y, z, \alpha)</la-tex> one obtains
+      the following equalities:</p>
+    <la-tex display="block">
+        \begin{aligned}
+        1 + q_11 - q_22 - q_33 &= {4S^2 X^2} & \text{ (1)} \\
+        1 + q_11 + q_22 - q_33 &= {4S^2 Y^2} & \text{ (2)} \\
+        1 + q_11 - q_22 + q_33 &= {4S^2 Z^2} & \text{ (3)} \\
+        q_12 - q_21 &= {4 ZSC} & \text{ (4)} \\
+        q_31 - q_13 &= {4 YSC} & \text{ (5)} \\
+        q_23 - q_32 &= {4 XSC} & \text{ (6)} \\
+        q_12 + q_21 &= {4 XYS^2} & \text{ (7)} \\
+        q_31 + q_13 &= {4 XZS^2} & \text{ (8)} \\
+        q_23 + q_32 &= {4 YZS^2} & \text{ (9)} \\
+        \end{aligned}
+    </la-tex>
+
+    <p>If <la-tex>\alpha = 0</la-tex>, then
+      <la-tex>Q = I_3</la-tex> is the identity and one can choose any rotation
+      vector. Note that <la-tex>S = 0</la-tex> so equalities (1-9) don't give
+      any information.
+    </p>
+
+    <p>Otherwise, <la-tex>0 &lt; \alpha \leq \pi</la-tex> so
+      <la-tex>0 &lt; S \leq 1</la-tex> and equalities (1-3) become:</p>
+
+    <la-tex display="block">
+        \begin{aligned}
+        {|X|} = \frac{\sqrt{1 + q_11 - q_22 - q_33}}{2S} \\
+        {|Y|} =  \frac{\sqrt{1 + q_11 + q_22 - q_33}}{2S} \\
+        {|Z|} =  \frac{\sqrt{1 + q_11 - q_22 + q_33}}{2S} \\
+        \end{aligned}
+    </la-tex>
+
+    <p>If additionally <la-tex>\alpha &lt; \pi</la-tex>, then
+      <la-tex>C \neq 0</la-tex> and equalities (4-6) provides the sign of
+      <la-tex>X, Y, Z</la-tex>. Otherwise can arbitrarily choose any sign for
+      one of them and the sign of the others is implied by equalities (7-8).
+    </p>
+
+    <p>In computers, 3D rotations are often just encoded as
+      <a href="https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation">quaternion</a>
+      with 4 coordinates <la-tex>(C, XS, YS, ZS)</la-tex>
+      and it is easy to rebuild the matrix
+      <la-tex>Q = R(x, y, z, \alpha)</la-tex> from these values
+      using the formula of the <a href="#table_css_and_matrices">table above</a>.
+    </p>
+
+    <h2>Wrapping up: Factorization of <la-tex>M</la-tex></h2>
+
+    <p>Summarizing what we have done so far, we are able to describe the
+      transformation matrix in two ways. If the last row of the matrix is
+      zero then it can be written:</p>
+
+    <la-tex display="block">
+      v \mapsto \begin{pmatrix}
+      QRv + T \\
+      0
+      \end{pmatrix}
+    </la-tex>
+
+    <p>The image is well defined if
+      <la-tex>
+        Rv \neq -Q^{\mathrm T} T
+        </la-tex> and is the point at infinity in the direction
+      <la-tex>QRv + T</la-tex>. If <la-tex>R</la-tex> (or equivalently
+      <la-tex>A</la-tex>) is invertible then clearly there is exactly one
+      vector with undefined image. The general case is more complicate to
+      express concisely, but is equivalent to solving the following triangular
+      system:
+    </p>
+
+    <la-tex display="block">
+      \left\{
+      \begin{aligned}
+      {r_33 v_3} &= {(-Q^{\mathrm T} T)}_3 \\
+      {r_22 v_2} &= {{(-Q^{\mathrm T} T)}_2 - r_32 v_3} \\
+      {r_11 v_1} &= {{(-Q^{\mathrm T} T)}_1 - r_31 v_3 - r_21 v_2} \\
+      \end{aligned}
+      \right.
+    </la-tex>
+
+    <p>The second way is when the last row of the matrix is
+      nonzero:
+    </p>
+
+    <la-tex id="decomposition-of-M" display="block">
+      M = { \lambda
+
+        \underset{\text{translation}}{\underbrace{
+        \begin{pmatrix}
+            I_3 & T \\
+            0 & 1
+        \end{pmatrix}}}
+
+      \underset{\text{rotation}}{\underbrace{
+      \begin{pmatrix}
+      Q & 0\\
+      0 & 1\end{pmatrix}}
+      }
+
+      \underset{\text{scale}}{\underbrace{
+      \begin{pmatrix}
+      s_1 & 0 & 0 & 0\\
+      0 & s_2 & 0 & 0 \\
+      0 & 0 & s_3 & 0\\
+      0 & 0 & 0 & 1 \\
+      \end{pmatrix}}}
+
+      \underset{\text{"unscaled" i.e. } u_{ii} \in {\{0,1\}} }{\underbrace{
+      \begin{pmatrix}
+      u_11 & u_21 & u_31 & 0\\
+      0 & u_22 & u_32 & 0 \\
+      0 & 0 & u_33 & 0\\
+      0 & 0 & 0 & 1 \\
+      \end{pmatrix}}}
+
+              \underset{\text{"perspective"}}{\underbrace{
+        \begin{pmatrix}
+            I_3 & 0 \\
+            P & 1
+        \end{pmatrix}}}
+
+
+
+
+      \Sigma^{-n}
+
+
+      }
+    </la-tex>
+
+    <p>with <la-tex>\lambda \in {\mathbb R}^*</la-tex>
+      and <la-tex>\Sigma^{-n}</la-tex> is the matrix shifting
+      <la-tex>n \in {\{0,1,2,3\}}</la-tex> times the columns
+      of a left operand.
+      In particular
+      <la-tex>\det M = {{(-1)}^n \lambda s_11 s_22 s_33 u_11 u_22 u_33}</la-tex>
+      so the
+      matrix is invertible if and only if all the diagonal coefficients
+      of the scale and unscaled factors are nonzero.
+    </p>
+
+
+    <h2>Decomposition of non-general 3D matrices</h2>
+
+    <p>Except for <code>matrix3d</code> all
+      the basic CSS transforms correspond to a matrix
+      <la-tex display="block">
+            M = \begin{pmatrix}
+            A & T \\
+            P & 1
+            \end{pmatrix}
+      </la-tex>
+      whose last row
+      is <la-tex>(0, 0, p_z, 1)</la-tex>.
+      So our decompositon algorithm will always
+      choose the second way and yield trivial factors
+      <la-tex>\lambda = 1</la-tex> and <la-tex>n = 0</la-tex>.
+      The translation and "perspective" factors are just given by the original
+      <la-tex>T, P</la-tex>.
+      The rest of the factors are obtained by factorization of
+      <la-tex>A</la-tex>.
+    </p>
+
+    <p>Decomposing <la-tex>A</la-tex> is less obvious, for example
+      <code>rotateZ(180°) scale(1, 1, 2)</code> rotates
+      the x-axis and y-axis by 180° (either clockwise or anticlockwise).
+      and scales the z-axis by 2 and so is then equivalent to
+      <code>scale(-1, -1, 2)</code>. The same example shows
+      that the <la-tex>QR</la-tex> decomposition is not unique so in theory
+      we cannot just say that our algorithm will choose a factorization once
+      we find one that works...
+    </p>
+
+    <p>
+      For <code>perspective()</code> and
+      <code>translate3d()</code> (and their aliases),
+      <la-tex>A = I_3</la-tex> is upper triangular so our algorithm will
+      yield <la-tex>Q_1 = Q_2 = I_3</la-tex>,
+      <la-tex>{\det {(Q_1 Q_2)}} = 1</la-tex> and
+      <la-tex>Q_2 Q_1 I_3 = I_3</la-tex>.
+      The <la-tex>Q_3 = I_3</la-tex> and so
+      <la-tex>Q = Q_1 Q_2 Q_3 = I_3</la-tex> and
+      <la-tex>R = Q^{\mathrm T} A = I_3</la-tex>. The scale is then
+      <la-tex>S = I_3</la-tex> and the unscaled upper triangular factor is also
+      <la-tex>U = I_3</la-tex>. So these two are indeed just decomposed into
+      a single perspective or translation factor.
+    </p>
+
+    <p>
+      For <code>rotate3D()</code> (and its aliases)
+      the algorithm will yield an upper triangular matrix
+      <la-tex>Q_2 Q_1 A</la-tex>,
+      which is additionnally orthogonal in that case
+      (because <la-tex>A</la-tex> is a rotation). This means that its
+      eigenvalues are both its diagonal elements (real numbers) and complex
+      numbers of norm 1,
+      that is they belong to <la-tex>\{-1, 1\}</la-tex>. Additionally,
+      the inverse is both the transpose and an upper triangular matrix
+      so the matrix is actually diagonal.
+      Finally its
+      determinant is 1, so
+      <la-tex>\alpha_2, c_33 \in {\{-1, 1\}}</la-tex>,
+      <la-tex>c_21 = c_31 = c_32 = 0</la-tex>
+      and <la-tex>\alpha_1 = \alpha_2 c_33</la-tex>.
+      The algorithm will choose
+      <la-tex>\epsilon_3, \epsilon_2</la-tex> such that
+      <la-tex>Q_3</la-tex> is this diagonal matrix.
+      From <la-tex>Q_3 = Q_2 Q_1 A</la-tex> we get
+      <la-tex>Q = A, R = I_3</la-tex> and so
+      <la-tex>S=U=I_3</la-tex>.
+      Again, this is decomposed into a single rotation factor.
+    </p>
+
+    <p>For <code>scale3d()</code> (and its aliases) the matrix is</p>
+      <la-tex display="block">A=
+      \begin{pmatrix}
+      s_x & 0 & 0 \\
+      0 & s_y & 0 \\
+      0 & 0   & s_z \\
+        \end{pmatrix}
+    </la-tex>
+    <p>It is diagonal and in particular upper triangular so our algorithm will
+      yield
+      <la-tex>Q_1 = Q_2 = I_3</la-tex> and
+      <la-tex>\det{(Q_1 Q_2)} = 1</la-tex>. Then <la-tex>Q_3</la-tex> is defined
+      according to the signs of <la-tex>s_y, s_z</la-tex>
+      (choosing the diagonal element to 1 if the corresponding scale
+      element is zero) to provide the
+      following <la-tex>QR</la-tex> decomposition:
+    </p>
+
+      <la-tex display="block">A=
+      \begin{pmatrix}
+      {\epsilon_2 \epsilon_3} & 0 & 0 \\
+      0 & \epsilon_2 & 0 \\
+      0 & 0   & \epsilon_3 \\
+        \end{pmatrix}
+      \begin{pmatrix}
+      \epsilon_2 \epsilon_3 s_x & 0 & 0 \\
+      0 & {|s_y|} & 0 \\
+      0 & 0   & {|s_z|} \\
+        \end{pmatrix}
+    </la-tex>
+
+    <p>It is decomposed into a single scale factor if and only if
+      <la-tex>s_x \neq 0, s_y, s_z &gt; 0</la-tex>.
+    </p>
+
+    <h2>Decomposition of 2D matrices</h2>
+
+    <p>For a 2D transform <code>matrix(a, b, c, d, e, f)</code>
+      (including skews, 2D translations, 2D scales, 2D rotations)
+      as explained in the previous section,
+      <la-tex>e, f</la-tex> are extracted in the translation component and this
+      is actually a 2D translation. The remaining part is then
+    </p>
+
+    <la-tex display="block">A=
+      \begin{pmatrix}
+      a & c & 0 \\
+      b & d & 0 \\
+      0 & 0 & 1 \\
+        \end{pmatrix}
+    </la-tex>
+
+    <p>If <la-tex>b = 0</la-tex> (e.g. translations, scales and
+      skewX) then the matrix
+      is upper triangular and the algorithm calculates
+      <la-tex>Q_1 = Q_2 = I_3</la-tex>.
+      <la-tex>\epsilon_3 = 1</la-tex> and
+      <la-tex>\epsilon_2</la-tex> is chosen to the sign of
+      <la-tex>d</la-tex>. This gives the following <la-tex>QR</la-tex>
+      decomposition:</p>
+
+    <la-tex display="block">A=
+      \begin{pmatrix}
+      \epsilon_2 & 0 & 0 \\
+      0 & \epsilon_2 & 0 \\
+      0 & 0 & 1 \\
+        \end{pmatrix}
+      \begin{pmatrix}
+      {\epsilon_2 a} & {\epsilon_2 c} & 0 \\
+      0 & {|d|} & 0 \\
+      0 & 0 & 1 \\
+        \end{pmatrix}
+    </la-tex>
+
+    <p>If <la-tex>b \neq 0</la-tex> (e.g. rotations of angle other than a
+      multiple of 180°) then
+      <la-tex>\alpha_1 = \pm \sqrt{a^2 + b^2} \neq 0</la-tex>
+      with the sign chosen to maximize the absolute value of
+      <la-tex>\alpha_1 - a</la-tex>. In any case, one can
+      verify that:
+    </p>
+
+    <la-tex display="block">Q_1 =
+      \begin{pmatrix}
+      \frac{a}{\alpha_1} & \frac{b}{\alpha_1} & 0 \\
+      \frac{b}{\alpha_1} & \frac{-a}{\alpha_1} & 0 \\
+      0 & 0 & 1 \\
+      \end{pmatrix}
+    </la-tex>
+
+
+    <la-tex display="block">Q_1 A =
+      \begin{pmatrix}
+      \alpha_1 & \frac{ac+bd}{\alpha_1} & 0 \\
+      0 & {-\frac{\det{(A)}}{\alpha_1}} & 0 \\
+      0 & 0 & 1 \\
+      \end{pmatrix}
+    </la-tex>
+
+    <p>This is an upper diagonal matrix and so <la-tex>Q_2 = I_3</la-tex>.
+      Then <la-tex>\epsilon_3 = 1</la-tex> is chosen
+      and <la-tex>\epsilon_2</la-tex> is chosen with same sign as
+      <la-tex>\mp {\det(A)}</la-tex>
+      (1 if the determinant is zero). The decomposition becomes:
+    </p>
+
+    <la-tex display="block">A=
+      \begin{pmatrix}
+      \epsilon \frac{a}{\sqrt{a^2+b^2}} & \epsilon \frac{b}{\sqrt{a^2+b^2}} & 0 \\
+      \epsilon \frac{b}{\sqrt{a^2+b^2}} & -\epsilon\frac{a}{\sqrt{a^2+b^2}} & 0 \\
+      0 & 0 & 1 \\
+      \end{pmatrix}
+
+      \begin{pmatrix}
+      \epsilon \sqrt{a^2+b^2} & \epsilon \frac{ac+bd}{\sqrt{a^2+b^2}} & 0 \\
+      0 & {\frac{\left|\det{(A)}\right|}{\sqrt{a^2+b^2}}} & 0 \\
+      0 & 0 & 1 \\
+      \end{pmatrix}
+    </la-tex>
+
+    <p>where <la-tex>\epsilon</la-tex> is chosen with same sign as
+      <la-tex>\det{(A)}</la-tex> (1 if the determinant is zero).
+      Note that this is slightly different from
+      the decomposition provided in this
+      <a href="http://frederic-wang.fr/decomposition-of-2d-transform-matrices.html">blog post</a> which uses Gram–Schmidt to perform the <la-tex>QR</la-tex>
+      factorization.
+    </p>
+
+    <p>To summarize,
+      <code>matrix(a, b, c, d, e, f)</code>
+      is decomposed as a product of a 2D-translation,
+      a 2D-rotation, a 2D-scale and an unscaled factor with
+      <la-tex>u_33 = 1, u_31 = u_32 = 0</la-tex> (i.e. a 2D transform).
+      If the matrix is invertible,
+      then the unscaled factor can be written as a <code>skewX</code>.
+      Per previous section, a 2D-translation or 2D-rotation is decomposed
+      into a single 2D-translation or 2D-rotation respectively.
+      A 2D-scale is decomposed
+      as a product of a 2D-rotation and a 2D-scale (with the rotation omitted
+      if the y-scale is nonnegative).
+    </p>
+
+  </body>
+</html>
