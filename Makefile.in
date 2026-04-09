@@ -32,7 +32,7 @@ help:
 
 unicode.xml:
 # Download the unicode.xml file from the "XML Entity Definitions for Characters"
-	@CURL@ http://www.w3.org/2003/entities/2007xml/unicode.xml -o $@
+	@CURL@ https://www.w3.org/2003/entities/2007xml/unicode.xml -o $@
 
 chars.txt: extractChars.xsl unicode.xml
 # Extract the relevant information on characters from unicode.xml
