@@ -1235,7 +1235,7 @@ closedTerm
   | MATHRM closedTerm { $$ = newMrow([$2], "mstyle",
                                     {"mathvariant": "normal"}); }
   | HREF attrArg closedTerm {
-    $$ = newTag("mrow", [$3], yy.mSafeMode ? null : {"href": $2});
+    $$ = yy.mSafeMode ? newTag("mrow", [$3]) : newTag("a", [$3], {"href": $2});
   }
   | STATUSLINE textArg closedTerm {
     $$ = yy.mSafeMode ? $3 :
